@@ -60,6 +60,24 @@ class ApiService extends NyApiService {
     );
   }
 
+  /// Register endpoint - POST /register
+  Future register({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    return await network(
+      request: (request) => request.post(
+        "/register",
+        data: {
+          "name": name,
+          "email": email,
+          "password": password,
+        },
+      ),
+    );
+  }
+
   /// Get current user - GET /user
   Future getCurrentUser() async {
     return await network(

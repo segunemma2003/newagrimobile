@@ -28,6 +28,12 @@ dependencies:
   scaffold_ui: ^1.2.9
   video_player: ^2.9.2
   connectivity_plus: ^6.1.0
+  youtube_player_flutter: ^9.0.2
+  flutter_cache_manager: ^3.4.1
+  chewie: ^1.8.0
+  file_picker: ^8.1.4
+  image_picker: ^1.1.2
+  share_plus: ^10.1.2
   flutter:
     sdk: flutter
   flutter_localizations:

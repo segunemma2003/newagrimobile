@@ -11,12 +11,13 @@ class Course extends Model {
   Category? category;
   String? thumbnail;
   String? thumbnailPath;
-  List<Module>? modules; // Modules in this course
-  List<Lesson>? lessons; // Legacy: direct lessons (if no modules)
+  List<Module>? modules;
+  List<Lesson>? lessons;
   int? totalLessons;
   int? completedLessons;
   bool? isCompleted;
   String? updatedAt;
+  String? projectId; // Reference to course capstone project
 
   static StorageKey key = 'courses';
 
@@ -33,24 +34,22 @@ class Course extends Model {
     completedLessons = data['completed_lessons'] ?? data['completedLessons'] ?? 0;
     isCompleted = data['is_completed'] ?? data['isCompleted'] ?? false;
     updatedAt = data['updated_at'] ?? data['updatedAt'];
+    projectId = data['project_id']?.toString() ?? data['projectId']?.toString();
     
     if (data['category'] != null) {
       category = Category.fromJson(data['category']);
     }
     
-    // Handle modules/topics structure from API (preferred)
     if (data['modules'] != null) {
       modules = (data['modules'] as List)
           .map((module) => Module.fromJson(module))
           .toList();
       modules?.sort((a, b) => (a.order ?? 0).compareTo(b.order ?? 0));
       
-      // Calculate totals from modules
       totalLessons = modules?.fold<int>(0, (sum, m) => sum + (m.totalLessons ?? 0)) ?? 0;
       completedLessons = modules?.fold<int>(0, (sum, m) => sum + (m.completedLessons ?? 0)) ?? 0;
     }
     
-    // Handle direct lessons array (legacy support)
     if (data['lessons'] != null && (modules == null || modules!.isEmpty)) {
       lessons = (data['lessons'] as List)
           .map((lesson) => Lesson.fromJson(lesson))
@@ -72,6 +71,7 @@ class Course extends Model {
         "completed_lessons": completedLessons,
         "is_completed": isCompleted,
         "updated_at": updatedAt,
+        "project_id": projectId,
         "category": category?.toJson(),
         "modules": modules?.map((m) => m.toJson()).toList(),
         "lessons": lessons?.map((l) => l.toJson()).toList(),

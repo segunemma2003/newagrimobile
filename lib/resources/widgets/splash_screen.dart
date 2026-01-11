@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
+import 'dart:math' as math;
 import 'package:nylo_framework/nylo_framework.dart';
-import 'dart:math';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   /// Create a new instance of the MaterialApp
@@ -14,131 +15,187 @@ class SplashScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                "logo-without.png",
-                height: 150,
-                width: 150,
-              ).localAsset(),
-              SizedBox(height: 50),
-              AnimatedLoader(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class AnimatedLoader extends StatefulWidget {
-  final double size;
-  final Color color;
-
-  const AnimatedLoader({
-    super.key,
-    this.size = 50.0,
-    this.color = Colors.blue,
-  });
-
-  @override
-  createState() => _AnimatedLoaderState();
-}
-
-class _AnimatedLoaderState extends State<AnimatedLoader>
+class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+  late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    // The splash screen will be automatically replaced by the main app
+    // after 5 seconds (handled in boot.dart)
+    _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1200),
     )..repeat();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Stack(
-          alignment: Alignment.center,
+    return Scaffold(
+      body: Container(
+        color: const Color(0xFF3E6866), // primary background
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildPulsatingCircle(),
-            _buildRotatingDots(),
-          ],
-        );
-      },
-    );
-  }
+            // Top App Bar Space (iOS Status Bar Area)
+            SizedBox(height: MediaQuery.of(context).padding.top + 16),
+            // Main Logo Area
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Branding Container
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Subtle Glow behind logo (blur-[60px] scale-150)
+                      Container(
+                        width: 192, // scale-150 on 128px base
+                        height: 192,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color(0xFF0fbd38)
+                              .withOpacity(0.2), // primary/20
+                        ),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
+                          child: Container(),
+                        ),
+                      ),
+                      // Logo
+                      Container(
+                        padding: const EdgeInsets.all(24), // p-6
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.1), // white/10
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.05), // white/5
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 20,
+                              spreadRadius: 0,
+                            ),
+                          ],
+                        ),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(
+                              sigmaX: 10, sigmaY: 10), // backdrop-blur-sm
+                          child: Image.asset(
+                            "logo-without.png",
+                            width: 84,
+                            height: 84,
+                            fit: BoxFit.contain,
+                          ).localAsset(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32), // mb-8
+                  // Headline Text
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      "Learn with Agrisiti",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 32, // text-[32px]
+                        fontWeight: FontWeight.w700, // font-bold
+                        color: Colors.white,
+                        height: 1.2, // leading-tight
+                        letterSpacing: -0.5, // tracking-tight
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 48), // mt-12
+                  // Loading Dots (animated with pulsing effect)
+                  AnimatedBuilder(
+                    animation: _animationController,
+                    builder: (context, child) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(3, (index) {
+                          final double delay = index * 0.2;
+                          final double value =
+                              (_animationController.value + delay) % 1.0;
+                          final double opacity =
+                              (math.sin(value * math.pi)).abs();
+                          final double scale = 0.7 + (opacity * 0.3);
 
-  Widget _buildPulsatingCircle() {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.8, end: 1.0),
-      duration: const Duration(milliseconds: 750),
-      curve: Curves.easeInOut,
-      builder: (context, value, child) {
-        return Transform.scale(
-          scale: value,
-          child: Container(
-            width: widget.size,
-            height: widget.size,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-            ),
-          ),
-        );
-      },
-    );
-  }
+                          // Base opacities: 40%, 70%, 100%
+                          final List<double> baseOpacities = [0.4, 0.7, 1.0];
+                          final double finalOpacity =
+                              baseOpacities[index] * (0.5 + opacity * 0.5);
 
-  Widget _buildRotatingDots() {
-    return Transform.rotate(
-      angle: _controller.value * 2 * pi,
-      child: Stack(
-        alignment: Alignment.center,
-        children: List.generate(8, (index) {
-          final double angle = (index / 8) * 2 * pi;
-          final double offset = widget.size * 0.35;
-          return Transform(
-            transform: Matrix4.identity()
-              ..translate(
-                offset * cos(angle),
-                offset * sin(angle),
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 4.0),
+                            child: Transform.scale(
+                              scale: scale,
+                              child: Container(
+                                width: 6, // w-1.5
+                                height: 6, // h-1.5
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: const Color(0xFF0fbd38)
+                                      .withOpacity(finalOpacity),
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                      );
+                    },
+                  ),
+                ],
               ),
-            child: _buildDot(index),
-          );
-        }),
-      ),
-    );
-  }
-
-  Widget _buildDot(int index) {
-    final double dotSize = widget.size * 0.1;
-    final double scaleFactor =
-        0.5 + (1 - _controller.value + index / 8) % 1 * 0.5;
-    return Transform.scale(
-      scale: scaleFactor,
-      child: Container(
-        width: dotSize,
-        height: dotSize,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: widget.color,
+            ),
+            // Footer Area
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).padding.bottom + 40, // pb-10
+              ),
+              child: Column(
+                children: [
+                  // Meta Text
+                  Text(
+                    "from Agrisiti",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12, // text-xs
+                      fontWeight: FontWeight.w500, // font-medium
+                      color: const Color(0xFF0fbd38)
+                          .withOpacity(0.6), // primary/60
+                      letterSpacing: 2.4, // tracking-[0.2em]
+                    ),
+                  ),
+                  const SizedBox(height: 32), // pb-8
+                  // iOS Home Indicator
+                  Container(
+                    width: 134, // w-32 (approx)
+                    height: 5, // h-1.5 (approx)
+                    decoration: BoxDecoration(
+                      color: Colors.white
+                          .withOpacity(0.3), // rgba(255, 255, 255, 0.3)
+                      borderRadius: BorderRadius.circular(100), // rounded-full
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

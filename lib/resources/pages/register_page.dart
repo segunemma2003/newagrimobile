@@ -2,24 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'dart:ui';
 import 'package:nylo_framework/nylo_framework.dart';
-import '/app/forms/login_form.dart';
-import '/app/controllers/login_controller.dart';
-import '/config/keys.dart';
-import '/resources/pages/register_page.dart';
+import '/app/forms/register_form.dart';
+import '/app/controllers/register_controller.dart';
+import '/resources/pages/login_page.dart';
+import '/resources/pages/terms_conditions_page.dart';
 
-class LoginPage extends NyStatefulWidget<LoginController> {
-  static RouteView path = ("/login", (_) => LoginPage());
+class RegisterPage extends NyStatefulWidget<RegisterController> {
+  static RouteView path = ("/register", (_) => RegisterPage());
 
-  LoginPage({super.key}) : super(child: () => _LoginPageState());
+  RegisterPage({super.key}) : super(child: () => _RegisterPageState());
 }
 
-class _LoginPageState extends NyPage<LoginPage> {
-  final LoginForm _form = LoginForm();
+class _RegisterPageState extends NyPage<RegisterPage> {
+  final RegisterForm _form = RegisterForm();
+  late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
+  late TextEditingController _confirmPasswordController;
+  late FocusNode _nameFocusNode;
   late FocusNode _emailFocusNode;
   late FocusNode _passwordFocusNode;
+  late FocusNode _confirmPasswordFocusNode;
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+  bool _agreeToTerms = false;
 
   // Color scheme from HTML
   static const Color primary = Color(0xFF3E6866);
@@ -31,43 +37,39 @@ class _LoginPageState extends NyPage<LoginPage> {
   @override
   void initState() {
     super.initState();
+    _nameController = TextEditingController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
+    _nameFocusNode = FocusNode();
     _emailFocusNode = FocusNode();
     _passwordFocusNode = FocusNode();
+    _confirmPasswordFocusNode = FocusNode();
   }
-
-  @override
-  get init => () async {
-        // Check if user is already authenticated
-        try {
-          final isAuthenticated = await Auth.isAuthenticated();
-          if (isAuthenticated) {
-            routeTo("/main");
-            return;
-          }
-        } catch (e) {
-          // Handle storage errors gracefully - check Backpack as fallback
-          // Suppress error logging for Keychain issues on simulator
-          if (!e.toString().contains('-34018')) {
-            print('Warning: Failed to check authentication from storage: $e');
-          }
-        }
-        // Also check Backpack (session storage) as fallback
-        var backpackAuth = backpackRead(Keys.auth);
-        if (backpackAuth != null) {
-          routeTo("/main");
-        }
-      };
 
   @override
   LoadingStyle get loadingStyle => LoadingStyle.none();
 
-  void _handleLogin() async {
+  void _handleRegister() async {
+    if (!_agreeToTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please agree to the Terms and Privacy Policy'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
 
-    if (email.isEmpty || password.isEmpty) {
+    if (name.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in all fields'),
@@ -77,16 +79,38 @@ class _LoginPageState extends NyPage<LoginPage> {
       return;
     }
 
+    if (password.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password must be at least 8 characters'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Passwords do not match'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    _form.data()['Name'] = name;
     _form.data()['Email'] = email;
     _form.data()['Password'] = password;
+    _form.data()['Password Confirmation'] = confirmPassword;
 
-    final success = await widget.controller.login(_form);
+    final success = await widget.controller.register(_form);
 
     if (!success && widget.controller.lastError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              widget.controller.lastError ?? 'Login failed. Please try again.'),
+          content: Text(widget.controller.lastError ??
+              'Registration failed. Please try again.'),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 3),
         ),
@@ -124,7 +148,7 @@ class _LoginPageState extends NyPage<LoginPage> {
                 ),
                 const Expanded(
                   child: Text(
-                    "Login",
+                    "Register",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 18,
@@ -200,7 +224,7 @@ class _LoginPageState extends NyPage<LoginPage> {
                   const SizedBox(height: 24),
                   // Title and Subtitle
                   const Text(
-                    "Welcome Back",
+                    "Create Account",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 30,
@@ -212,13 +236,89 @@ class _LoginPageState extends NyPage<LoginPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Sign in to continue your agricultural learning journey.",
+                    "Start your agricultural learning journey with the Agrisiti community.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[400],
                       height: 1.5,
                     ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Form Fields
+                  // Full Name Field
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                          text: "Full Name ",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: "*",
+                              style: TextStyle(color: primary),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Focus(
+                        onFocusChange: (hasFocus) => setState(() {}),
+                        child: Builder(
+                          builder: (context) {
+                            final isFocused = _nameFocusNode.hasFocus;
+                            return TextField(
+                              controller: _nameController,
+                              focusNode: _nameFocusNode,
+                              textInputAction: TextInputAction.next,
+                              onSubmitted: (_) {
+                                _nameFocusNode.unfocus();
+                                _emailFocusNode.requestFocus();
+                              },
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: "John Doe",
+                                hintStyle: TextStyle(color: Colors.grey[500]),
+                                prefixIcon: Icon(
+                                  Icons.person,
+                                  color: isFocused ? primary : Colors.grey[400],
+                                  size: 20,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(color: borderTeal),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(color: borderTeal),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: primary,
+                                    width: 2,
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: surfaceDark,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 18,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 24),
                   // Email Field
@@ -330,14 +430,14 @@ class _LoginPageState extends NyPage<LoginPage> {
                               textInputAction: TextInputAction.done,
                               onSubmitted: (_) {
                                 _passwordFocusNode.unfocus();
-                                _handleLogin();
+                                _confirmPasswordFocusNode.requestFocus();
                               },
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.white,
                               ),
                               decoration: InputDecoration(
-                                hintText: "Enter your password",
+                                hintText: "Min. 8 characters",
                                 hintStyle: TextStyle(color: Colors.grey[500]),
                                 prefixIcon: Icon(
                                   Icons.lock,
@@ -386,30 +486,165 @@ class _LoginPageState extends NyPage<LoginPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  // Forgot Password Link
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        // TODO: Navigate to forgot password page
-                      },
-                      child: Text(
-                        "Forgot Password?",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: primary,
-                          fontWeight: FontWeight.w500,
+                  const SizedBox(height: 24),
+                  // Confirm Password Field
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                          text: "Confirm Password ",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: "*",
+                              style: TextStyle(color: primary),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 8),
+                      Focus(
+                        onFocusChange: (hasFocus) => setState(() {}),
+                        child: Builder(
+                          builder: (context) {
+                            final isFocused =
+                                _confirmPasswordFocusNode.hasFocus;
+                            return TextField(
+                              controller: _confirmPasswordController,
+                              focusNode: _confirmPasswordFocusNode,
+                              obscureText: _obscureConfirmPassword,
+                              textInputAction: TextInputAction.done,
+                              onSubmitted: (_) {
+                                _confirmPasswordFocusNode.unfocus();
+                                _handleRegister();
+                              },
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: "Re-enter your password",
+                                hintStyle: TextStyle(color: Colors.grey[500]),
+                                prefixIcon: Icon(
+                                  Icons.lock,
+                                  color: isFocused ? primary : Colors.grey[400],
+                                  size: 20,
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureConfirmPassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: Colors.grey[400],
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureConfirmPassword =
+                                          !_obscureConfirmPassword;
+                                    });
+                                  },
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(color: borderTeal),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(color: borderTeal),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: primary,
+                                    width: 2,
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: surfaceDark,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 18,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  // Login Button
+                  const SizedBox(height: 24),
+                  // Terms Checkbox
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Checkbox(
+                        value: _agreeToTerms,
+                        onChanged: (value) {
+                          setState(() {
+                            _agreeToTerms = value ?? false;
+                          });
+                        },
+                        activeColor: primary,
+                        checkColor: Colors.white,
+                        side: BorderSide(color: borderTeal),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: RichText(
+                            text: TextSpan(
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[400],
+                              ),
+                              children: [
+                                const TextSpan(text: "I agree to the "),
+                                TextSpan(
+                                  text: "Terms",
+                                  style: TextStyle(
+                                    color: primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      routeTo(TermsConditionsPage.path);
+                                    },
+                                ),
+                                const TextSpan(text: " and "),
+                                TextSpan(
+                                  text: "Privacy Policy",
+                                  style: TextStyle(
+                                    color: primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      // TODO: Navigate to Privacy Policy
+                                    },
+                                ),
+                                const TextSpan(text: "."),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Create Account Button
                   SizedBox(
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: _handleLogin,
+                      onPressed: _handleRegister,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primary,
                         foregroundColor: Colors.white,
@@ -420,7 +655,7 @@ class _LoginPageState extends NyPage<LoginPage> {
                         shadowColor: primary.withOpacity(0.2),
                       ),
                       child: const Text(
-                        "Sign In",
+                        "Create Account",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -429,7 +664,7 @@ class _LoginPageState extends NyPage<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  // Register Link
+                  // Login Link
                   Padding(
                     padding: const EdgeInsets.only(bottom: 24),
                     child: RichText(
@@ -440,16 +675,16 @@ class _LoginPageState extends NyPage<LoginPage> {
                           color: Colors.grey[400],
                         ),
                         children: [
-                          const TextSpan(text: "Don't have an account? "),
+                          const TextSpan(text: "Already have an account? "),
                           TextSpan(
-                            text: "Create Account",
+                            text: "Log in",
                             style: TextStyle(
                               color: primary,
                               fontWeight: FontWeight.w700,
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
-                                routeTo(RegisterPage.path);
+                                routeTo(LoginPage.path);
                               },
                           ),
                         ],
@@ -467,10 +702,14 @@ class _LoginPageState extends NyPage<LoginPage> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _nameFocusNode.dispose();
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
     super.dispose();
   }
 }

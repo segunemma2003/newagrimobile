@@ -51,7 +51,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "Bayanin Buga:",
+                    "Last Updated:",
                     style: TextStyle(
                       fontSize: 12,
                       color: Color(0xFF999999),
@@ -59,7 +59,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                   ),
                   const SizedBox(height: 4),
                   const Text(
-                    "Oktoba 2024",
+                    "October 2024",
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -68,7 +68,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    "1. Gamsuwa da Amfani",
+                    "1. Acceptance of Terms",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -77,7 +77,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "Ta hanyar yin amfani da wannan aikace-aikacen, kana amincewa da duk sharuddan da aka kwatanta a nan. Idan baka yarda da waɗannan sharuddan ba, ka daina amfani da aikace-aikacen nan da nan.",
+                    "By using this application, you agree to all terms and conditions described herein. If you do not agree with these terms, please discontinue use of the application immediately.",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[700],
@@ -86,7 +86,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    "2. Bayanai da Asiri",
+                    "2. Privacy and Data",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -95,7 +95,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "Muna mutunta sirrinku. Bayanan da kuka bayar za a kiyaye su cikin aminci. Muna amfani da bayanan ku ne kawai don inganta sabis ɗinmu da samar da kwarewa mafi kyau.",
+                    "We respect your privacy. The information you provide will be kept secure. We only use your information to improve our services and provide you with a better experience.",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[700],
@@ -104,7 +104,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    "3. Amfani da Abun Ciki",
+                    "3. Content Usage",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -113,7 +113,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "Duk abun ciki na aikace-aikacen (darussa, hotuna, rubutu, da sauransu) mallaka ne na Agrisiti Academy. Ba za ka iya rarraba, sayarwa, ko sake yin amfani da abun ciki ba tare da izini ba.",
+                    "All application content (courses, images, text, etc.) is the property of Agrisiti Academy. You may not distribute, sell, or reuse the content without permission.",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[700],
@@ -122,7 +122,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    "4. Ayyukan Masu Amfani",
+                    "4. User Responsibilities",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -131,7 +131,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "Kana da alhakin duk ayyukan da ka yi ta aikace-aikacen. Ba za ka yi amfani da aikace-aikacen don wani dalili ba bisa ka'ida ba, ko don yin ayyuka masu cutarwa.",
+                    "You are responsible for all actions you take through the application. You may not use the application for any illegal purpose or to perform harmful activities.",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[700],
@@ -140,7 +140,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    "5. Dakatarwa da Soke",
+                    "5. Suspension and Termination",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -149,7 +149,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "Muna da 'yancin dakatar ko soke damarkar amfani da aikace-aikacen a kowane lokaci ba tare da sanarwa ba idan ana cin zarafin waɗannan sharuddan.",
+                    "We reserve the right to suspend or terminate your access to the application at any time without notice if these terms are violated.",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[700],
@@ -158,7 +158,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    "6. Canje-canje ga Sharuddan",
+                    "6. Changes to Terms",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -167,7 +167,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "Muna iya canza waɗannan sharuddan a kowane lokaci. Canje-canje za su fara aiki nan da nan bayan buga su a aikace-aikacen. Ci gaba da amfani da aikace-aikacen bayan canje-canje yana nufin kana amincewa da sabbin sharuddan.",
+                    "We may change these terms at any time. Changes will take effect immediately after being published in the application. Continued use of the application after changes means you agree to the new terms.",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[700],
@@ -184,4 +184,3 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
     );
   }
 }
-

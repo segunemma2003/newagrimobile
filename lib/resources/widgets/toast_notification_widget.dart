@@ -14,7 +14,6 @@ class ToastNotification extends StatelessWidget {
     try {
       return text.tr();
     } catch (e) {
-      // If translation fails, return the original text
       return text;
     }
   }

@@ -7,7 +7,6 @@ import '/resources/pages/contact_admin_page.dart';
 import '/resources/pages/help_support_page.dart';
 import '/resources/pages/terms_conditions_page.dart';
 import '/resources/pages/notification_settings_page.dart';
-import '/resources/pages/language_settings_page.dart';
 import '/app/providers/language_provider.dart';
 import '/app/helpers/language_helper.dart';
 
@@ -81,7 +80,6 @@ class _SettingsPageState extends NyPage<SettingsPage> {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              // Clear auth data
               try {
                 await Keys.auth.save(null);
                 await Keys.bearerToken.save(null);

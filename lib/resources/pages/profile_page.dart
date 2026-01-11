@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '/config/keys.dart';
-import '/resources/widgets/safearea_widget.dart';
+import '/resources/pages/notification_settings_page.dart';
+import '/resources/pages/help_support_page.dart';
+import '/resources/pages/terms_conditions_page.dart';
+import '/resources/pages/edit_profile_page.dart';
+import '/resources/pages/certificates_page.dart';
+import '/resources/pages/change_password_page.dart';
 
 class ProfilePage extends NyStatefulWidget {
   static RouteView path = ("/profile", (_) => ProfilePage());
@@ -10,441 +15,692 @@ class ProfilePage extends NyStatefulWidget {
 }
 
 class _ProfilePageState extends NyPage<ProfilePage> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _bioController = TextEditingController();
-  final TextEditingController _currentPasswordController =
-      TextEditingController();
-  final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-
   Map<String, dynamic>? _userData;
-  bool _isEditing = false;
-  bool _isChangingPassword = false;
+  bool _wifiOnlyDownloads = true;
+
+  // Color scheme from HTML
+  static const Color primary = Color(0xFF50C1AE); // Teal/Green from brand
+  static const Color brandDark = Color(0xFF3E6866); // Dark green from brand
+  static const Color backgroundLight = Color(0xFFFFFFFF);
+  static const Color surfaceMuted = Color(0xFFF8FAFA);
 
   @override
   get init => () async {
         await _loadUserData();
-        // Check if we should show change password section
-        final data = widget.data<Map<String, dynamic>>();
-        if (data != null && data['showChangePassword'] == true) {
-          setState(() {
-            _isChangingPassword = true;
-          });
-        }
       };
 
   Future<void> _loadUserData() async {
     try {
       _userData = await Keys.auth.read<Map<String, dynamic>>();
       if (_userData == null) {
-        // Try Backpack
         _userData = backpackRead(Keys.auth);
-      }
-
-      if (_userData != null) {
-        _nameController.text = _userData!['name'] ?? '';
-        _emailController.text = _userData!['email'] ?? '';
-        _phoneController.text = _userData!['phone'] ?? '';
-        _bioController.text = _userData!['bio'] ?? '';
       }
       setState(() {});
     } catch (e) {
-      print('Error loading user data: $e');
+      if (!e.toString().contains('-34018')) {
+        print('Warning: Failed to load user data: $e');
+      }
+      _userData = backpackRead(Keys.auth);
+      setState(() {});
     }
   }
 
-  Future<void> _updateProfile() async {
-    if (_nameController.text.trim().isEmpty ||
-        _emailController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Name and email are required"),
-          backgroundColor: Colors.red,
+  Future<void> _handleLogout() async {
+    try {
+      // Clear auth data
+      try {
+        await Keys.auth.save(null);
+        await Keys.bearerToken.save(null);
+      } catch (e) {
+        if (!e.toString().contains('-34018')) {
+          print('Warning: Failed to clear auth data: $e');
+        }
+      }
+      // Clear from Backpack
+      backpackDelete(Keys.auth);
+      backpackDelete(Keys.bearerToken);
+      routeTo("/login");
+    } catch (e) {
+      print('Error during logout: $e');
+      routeTo("/login");
+    }
+  }
+
+  Future<void> _handleDeleteAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete Account"),
+        content: const Text(
+          "Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.",
         ),
-      );
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text("Delete"),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+
+    // Show confirmation dialog again for safety
+    final doubleConfirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Final Confirmation"),
+        content: const Text(
+          "This is your last chance. Are you absolutely sure you want to delete your account?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text("Yes, Delete"),
+          ),
+        ],
+      ),
+    );
+
+    if (doubleConfirmed != true) {
       return;
     }
 
     try {
-      final updatedData = {
-        ...?_userData,
-        'name': _nameController.text.trim(),
-        'email': _emailController.text.trim(),
-        'phone': _phoneController.text.trim(),
-        'bio': _bioController.text.trim(),
-      };
-
-      // Save to storage
+      // Clear all user data
       try {
-        await Keys.auth.save(updatedData);
+        await Keys.auth.save(null);
+        await Keys.bearerToken.save(null);
+        await Keys.courses.save(null);
+        await Keys.courseProgress.save(null);
+        await Keys.moduleProgress.save(null);
+        await Keys.notes.save(null);
+        await Keys.assignments.save(null);
+        await Keys.comments.save(null);
+        await Keys.reviews.save(null);
+        await Keys.messages.save(null);
       } catch (e) {
-        // Suppress error logging for Keychain issues on simulator
         if (!e.toString().contains('-34018')) {
-          print('Warning: Failed to save to storage: $e');
+          print('Warning: Failed to clear data: $e');
         }
       }
 
-      // Save to Backpack
-      backpackSave(Keys.auth, updatedData);
+      // Clear from Backpack
+      backpackDelete(Keys.auth);
+      backpackDelete(Keys.bearerToken);
+      backpackDelete(Keys.courses);
+      backpackDelete(Keys.courseProgress);
+      backpackDelete(Keys.moduleProgress);
+      backpackDelete(Keys.notes);
+      backpackDelete(Keys.assignments);
+      backpackDelete(Keys.comments);
+      backpackDelete(Keys.reviews);
+      backpackDelete(Keys.messages);
 
-      _userData = updatedData;
-      setState(() {
-        _isEditing = false;
-      });
+      // In a real app, you would call an API to delete the account
+      // await api<ApiService>((request) => request.deleteAccount());
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Profile updated successfully"),
-          backgroundColor: Color(0xFF2D8659),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Account deleted successfully"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        routeTo("/login");
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Failed to update profile: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
+      print('Error during account deletion: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error deleting account: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
-  }
-
-  Future<void> _changePassword() async {
-    if (_currentPasswordController.text.trim().isEmpty ||
-        _newPasswordController.text.trim().isEmpty ||
-        _confirmPasswordController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("All password fields are required"),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    if (_newPasswordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("New passwords do not match"),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    if (_newPasswordController.text.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Password must be at least 6 characters"),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    // In a real app, you would call an API here
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Password changed successfully"),
-        backgroundColor: Color(0xFF2D8659),
-      ),
-    );
-
-    setState(() {
-      _isChangingPassword = false;
-      _currentPasswordController.clear();
-      _newPasswordController.clear();
-      _confirmPasswordController.clear();
-    });
   }
 
   @override
+  LoadingStyle get loadingStyle => LoadingStyle.normal();
+
+  @override
   Widget view(BuildContext context) {
+    final userName = _userData?['name']?.toString() ?? "Alex Doe";
+    final userEmail = _userData?['email']?.toString() ?? "alex.doe@example.com";
+    final userAvatar = _userData?['avatar']?.toString();
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F9F8),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF1A1A1A)),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          "Profile",
-          style: TextStyle(
-            color: Color(0xFF1A1A1A),
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        actions: [
-          if (_isEditing)
-            TextButton(
-              onPressed: _updateProfile,
-              child: const Text(
-                "Save",
-                style: TextStyle(
-                  color: Color(0xFF2D8659),
-                  fontWeight: FontWeight.w600,
+      backgroundColor: backgroundLight,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Sticky Header
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: BoxDecoration(
+                color: backgroundLight.withOpacity(0.8),
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey[100]!,
+                    width: 1,
+                  ),
                 ),
               ),
-            )
-          else
-            IconButton(
-              icon: const Icon(Icons.edit, color: Color(0xFF2D8659)),
-              onPressed: () {
-                setState(() {
-                  _isEditing = true;
-                });
-              },
-            ),
-        ],
-      ),
-      body: SafeAreaWidget(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Profile Header
-              Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: const Color(0xFF2D8659),
-                      child: Text(
-                        _userData?['name']
-                                ?.toString()
-                                .substring(0, 1)
-                                .toUpperCase() ??
-                            'U',
-                        style: const TextStyle(
-                          fontSize: 36,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      _userData?['name'] ?? 'User',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1A1A),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _userData?['email'] ?? '',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF666666),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              // Profile Information
-              Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Personal Information",
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      "Profile",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1A1A),
+                        color: brandDark,
+                        letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    _buildTextField(
-                      label: "Full Name",
-                      controller: _nameController,
-                      enabled: _isEditing,
-                      icon: Icons.person_outline,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTextField(
-                      label: "Email",
-                      controller: _emailController,
-                      enabled: _isEditing,
-                      icon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTextField(
-                      label: "Phone",
-                      controller: _phoneController,
-                      enabled: _isEditing,
-                      icon: Icons.phone_outlined,
-                      keyboardType: TextInputType.phone,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTextField(
-                      label: "Bio",
-                      controller: _bioController,
-                      enabled: _isEditing,
-                      icon: Icons.description_outlined,
-                      maxLines: 3,
-                    ),
-                  ],
-                ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.more_vert, size: 24),
+                    color: brandDark,
+                    onPressed: () {
+                      // TODO: Show more options
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              // Change Password Section
-              Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(20),
+            ),
+            // Scrollable Content
+            Expanded(
+              child: SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Change Password",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1A1A1A),
-                          ),
+                    // Profile Section with Gradient Background
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 32, horizontal: 24),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            brandDark.withOpacity(0.05),
+                            Colors.transparent,
+                          ],
                         ),
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _isChangingPassword = !_isChangingPassword;
-                            });
-                          },
-                          child: Text(
-                            _isChangingPassword ? "Cancel" : "Change",
-                            style: const TextStyle(
-                              color: Color(0xFF2D8659),
-                              fontWeight: FontWeight.w600,
-                            ),
+                      ),
+                      child: Column(
+                        children: [
+                          // Avatar with Camera Button
+                          Stack(
+                            children: [
+                              Container(
+                                width: 112, // h-28 w-28
+                                height: 112,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 4,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 20,
+                                      spreadRadius: 0,
+                                    ),
+                                  ],
+                                  image: userAvatar != null &&
+                                          userAvatar.isNotEmpty
+                                      ? DecorationImage(
+                                          image: NetworkImage(userAvatar),
+                                          fit: BoxFit.cover,
+                                          onError: (_, __) {},
+                                        )
+                                      : null,
+                                ),
+                                child: userAvatar == null || userAvatar.isEmpty
+                                    ? Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: brandDark.withOpacity(0.1),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            userName.isNotEmpty
+                                                ? userName[0].toUpperCase()
+                                                : "A",
+                                            style: TextStyle(
+                                              fontSize: 48,
+                                              fontWeight: FontWeight.w700,
+                                              color: brandDark,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : null,
+                              ),
+                              // Camera Button
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: primary,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 2,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 8,
+                                        spreadRadius: 0,
+                                      ),
+                                    ],
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.photo_camera,
+                                        size: 18, color: Colors.white),
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () {
+                                      // TODO: Implement photo picker
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    if (_isChangingPassword) ...[
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        label: "Current Password",
-                        controller: _currentPasswordController,
-                        enabled: true,
-                        icon: Icons.lock_outline,
-                        obscureText: true,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        label: "New Password",
-                        controller: _newPasswordController,
-                        enabled: true,
-                        icon: Icons.lock_outline,
-                        obscureText: true,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        label: "Confirm New Password",
-                        controller: _confirmPasswordController,
-                        enabled: true,
-                        icon: Icons.lock_outline,
-                        obscureText: true,
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _changePassword,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF2D8659),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: const Text(
-                            "Update Password",
+                          const SizedBox(height: 16),
+                          // Name and Email
+                          Text(
+                            userName,
                             style: TextStyle(
-                              fontWeight: FontWeight.w600,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: brandDark,
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 4),
+                          Text(
+                            userEmail,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          // Edit Profile Button
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              routeTo(EditProfilePage.path);
+                              // Reload data after returning
+                              Future.delayed(const Duration(milliseconds: 500))
+                                  .then((_) {
+                                _loadUserData();
+                              });
+                            },
+                            icon: const Icon(Icons.edit, size: 18),
+                            label: const Text("Edit Profile"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: brandDark,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              elevation: 2,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
+                    // Stats Grid
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 16),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _buildStatCard(
+                              value: "12",
+                              label: "Courses",
+                              isHighlighted: false,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _buildStatCard(
+                              value: "48",
+                              label: "Hours",
+                              isHighlighted: true,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _buildStatCard(
+                              value: "5",
+                              label: "Certs",
+                              isHighlighted: false,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Settings Sections
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 16),
+                          // Video Preferences Section
+                          _buildSectionTitle("Video Preferences"),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border(
+                                top: BorderSide(
+                                    color: Colors.grey[100]!, width: 1),
+                                bottom: BorderSide(
+                                    color: Colors.grey[100]!, width: 1),
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                // Wi-Fi Only Downloads
+                                _buildSettingRow(
+                                  icon: Icons.wifi,
+                                  title: "Wi-Fi Only Downloads",
+                                  trailing: _buildToggleSwitch(
+                                    value: _wifiOnlyDownloads,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _wifiOnlyDownloads = value;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                Divider(height: 1, color: Colors.grey[100]),
+                                // Video Quality
+                                _buildSettingRow(
+                                  icon: Icons.high_quality,
+                                  title: "Video Quality",
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "Auto (1080p)",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey[400],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Icon(Icons.chevron_right,
+                                          size: 20, color: Colors.grey[300]),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    // TODO: Show video quality options
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          // Account Settings Section
+                          _buildSectionTitle("Account Settings"),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border(
+                                top: BorderSide(
+                                    color: Colors.grey[100]!, width: 1),
+                                bottom: BorderSide(
+                                    color: Colors.grey[100]!, width: 1),
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                _buildSettingRow(
+                                  icon: Icons.lock_reset,
+                                  title: "Change Password",
+                                  trailing: Icon(Icons.open_in_new,
+                                      size: 20, color: Colors.grey[300]),
+                                  onTap: () {
+                                    routeTo(ChangePasswordPage.path);
+                                  },
+                                ),
+                                Divider(height: 1, color: Colors.grey[100]),
+                                _buildSettingRow(
+                                  icon: Icons.workspace_premium,
+                                  title: "My Certificates",
+                                  trailing: Icon(Icons.open_in_new,
+                                      size: 20, color: Colors.grey[300]),
+                                  onTap: () {
+                                    routeTo(CertificatesPage.path);
+                                  },
+                                ),
+                                Divider(height: 1, color: Colors.grey[100]),
+                                _buildSettingRow(
+                                  icon: Icons.notifications_active,
+                                  title: "Notification Preferences",
+                                  onTap: () {
+                                    routeTo(NotificationSettingsPage.path);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          // Support & Info Section
+                          _buildSectionTitle("Support & Info"),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border(
+                                top: BorderSide(
+                                    color: Colors.grey[100]!, width: 1),
+                                bottom: BorderSide(
+                                    color: Colors.grey[100]!, width: 1),
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                _buildSettingRow(
+                                  icon: Icons.help_center,
+                                  title: "Help & Support Center",
+                                  trailing: Icon(Icons.open_in_new,
+                                      size: 20, color: Colors.grey[300]),
+                                  onTap: () {
+                                    routeTo(HelpSupportPage.path);
+                                  },
+                                ),
+                                Divider(height: 1, color: Colors.grey[100]),
+                                _buildSettingRow(
+                                  icon: Icons.description,
+                                  title: "Terms of Service",
+                                  trailing: Icon(Icons.open_in_new,
+                                      size: 20, color: Colors.grey[300]),
+                                  onTap: () {
+                                    routeTo(TermsConditionsPage.path);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Delete Account Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: _handleDeleteAccount,
+                              icon: const Icon(Icons.delete_outline, size: 18),
+                              label: const Text("Delete Account"),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.red,
+                                side: const BorderSide(
+                                    color: Colors.red, width: 2),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Sign Out Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: _handleLogout,
+                              icon: const Icon(Icons.logout, size: 18),
+                              label: const Text("Sign Out"),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: primary,
+                                side: BorderSide(color: primary, width: 2),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          // Version Info
+                          Center(
+                            child: Text(
+                              "Version 2.4.0 (182)",
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.grey[300],
+                                letterSpacing: 2.4,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 100), // Space for bottom nav
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
-              // Other Options
-              Container(
-                color: Colors.white,
-                child: Column(
-                  children: [
-                    _buildMenuTile(
-                      icon: Icons.notifications_outlined,
-                      title: "Notifications",
-                      onTap: () {
-                        // Navigate back to main and switch to notifications tab
-                        Navigator.of(context).pop(); // Close profile page
-                        // Notifications are accessible from bottom nav
-                      },
-                    ),
-                    const Divider(height: 1),
-                    _buildMenuTile(
-                      icon: Icons.message_outlined,
-                      title: "Contact Admin",
-                      onTap: () => routeTo("/contact-admin"),
-                    ),
-                    const Divider(height: 1),
-                    _buildMenuTile(
-                      icon: Icons.settings_outlined,
-                      title: "Settings",
-                      onTap: () {},
-                    ),
-                    const Divider(height: 1),
-                    _buildMenuTile(
-                      icon: Icons.help_outline,
-                      title: "Help & Support",
-                      onTap: () {},
-                    ),
-                    const Divider(height: 1),
-                    _buildMenuTile(
-                      icon: Icons.logout,
-                      title: "Logout",
-                      onTap: () async {
-                        try {
-                          // Clear auth data
-                          try {
-                            await Keys.auth.save(null);
-                            await Keys.bearerToken.save(null);
-                          } catch (e) {
-                            print('Warning: Failed to clear auth data: $e');
-                          }
-                          // Clear from Backpack
-                          backpackDelete(Keys.auth);
-                          backpackDelete(Keys.bearerToken);
-                          routeTo("/login");
-                        } catch (e) {
-                          print('Error during logout: $e');
-                          routeTo("/login");
-                        }
-                      },
-                      textColor: Colors.red,
-                    ),
-                  ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          color: brandDark,
+          letterSpacing: 2.4, // tracking-[0.15em]
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatCard({
+    required String value,
+    required String label,
+    required bool isHighlighted,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: isHighlighted ? primary.withOpacity(0.1) : surfaceMuted,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isHighlighted ? primary.withOpacity(0.2) : Colors.grey[100]!,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: isHighlighted ? primary : brandDark,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color:
+                  isHighlighted ? primary.withOpacity(0.7) : Colors.grey[400],
+              letterSpacing: 1.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingRow({
+    required IconData icon,
+    required String title,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Row(
+            children: [
+              Icon(icon, color: brandDark, size: 24),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[700],
+                  ),
                 ),
               ),
-              const SizedBox(height: 24),
+              if (trailing != null) trailing,
+              if (trailing == null && onTap != null)
+                Icon(Icons.chevron_right, size: 20, color: Colors.grey[300]),
             ],
           ),
         ),
@@ -452,63 +708,42 @@ class _ProfilePageState extends NyPage<ProfilePage> {
     );
   }
 
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-    required bool enabled,
-    required IconData icon,
-    TextInputType? keyboardType,
-    bool obscureText = false,
-    int maxLines = 1,
+  Widget _buildToggleSwitch({
+    required bool value,
+    required ValueChanged<bool> onChanged,
   }) {
-    return TextField(
-      controller: controller,
-      enabled: enabled,
-      keyboardType: keyboardType,
-      obscureText: obscureText,
-      maxLines: maxLines,
-      style: const TextStyle(fontSize: 15),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Color(0xFF666666)),
-        prefixIcon: Icon(icon, color: const Color(0xFF2D8659)),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE5E5E5)),
+    return GestureDetector(
+      onTap: () => onChanged(!value),
+      child: Container(
+        width: 44,
+        height: 24,
+        decoration: BoxDecoration(
+          color: value ? primary : Colors.grey[200],
+          borderRadius: BorderRadius.circular(999),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE5E5E5)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF2D8659), width: 2),
-        ),
-        filled: true,
-        fillColor: enabled ? const Color(0xFFFAFAFA) : Colors.grey[100],
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      ),
-    );
-  }
-
-  Widget _buildMenuTile({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-    Color? textColor,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: textColor ?? const Color(0xFF2D8659)),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: textColor ?? const Color(0xFF1A1A1A),
-          fontWeight: FontWeight.w500,
+        child: Stack(
+          children: [
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              left: value ? 20 : 2,
+              top: 2,
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.grey[300]!,
+                    width: 1,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
-      trailing: const Icon(Icons.chevron_right, color: Color(0xFF999999)),
-      onTap: onTap,
     );
   }
 }

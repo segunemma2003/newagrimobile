@@ -1,15 +1,27 @@
 import '/resources/pages/not_found_page.dart';
 import '/resources/pages/intro_page.dart';
 import '/resources/pages/login_page.dart';
+import '/resources/pages/register_page.dart';
+import '/resources/pages/welcome_page.dart';
 import '/resources/pages/main_navigation_page.dart';
 import '/resources/pages/course_detail_page.dart';
 import '/resources/pages/lesson_detail_page.dart';
 import '/resources/pages/quiz_page.dart';
+import '/resources/pages/notes_page.dart';
+import '/resources/pages/modules_overview_page.dart';
+import '/resources/pages/assignment_page.dart';
 import '/resources/pages/profile_page.dart';
+import '/resources/pages/messages_page.dart';
+import '/resources/pages/edit_profile_page.dart';
+import '/resources/pages/certificates_page.dart';
+import '/resources/pages/community_forum_page.dart';
+import '/resources/pages/forum_post_detail_page.dart';
+import '/resources/pages/chat_detail_page.dart';
 import '/resources/pages/change_password_page.dart';
 import '/resources/pages/help_support_page.dart';
 import '/resources/pages/terms_conditions_page.dart';
 import '/resources/pages/notification_settings_page.dart';
+import '/resources/pages/notifications_page.dart';
 import '/resources/pages/language_settings_page.dart';
 import '/resources/pages/contact_admin_page.dart';
 import '/routes/guards/auth_route_guard.dart';
@@ -34,7 +46,9 @@ import 'package:nylo_framework/nylo_framework.dart';
 
 appRouter() => nyRoutes((router) {
       router.add(IntroPage.path).initialRoute();
+      router.add(WelcomePage.path);
       router.add(LoginPage.path);
+      router.add(RegisterPage.path);
 
       // Protected routes
       router.group(
@@ -46,11 +60,21 @@ appRouter() => nyRoutes((router) {
         router.add(CourseDetailPage.path);
         router.add(LessonDetailPage.path);
         router.add(QuizPage.path);
+        router.add(NotesPage.path);
+        router.add(ModulesOverviewPage.path);
+        router.add(AssignmentPage.path);
         router.add(ProfilePage.path);
+        router.add(MessagesPage.path);
+        router.add(EditProfilePage.path);
+        router.add(CertificatesPage.path);
+        router.add(CommunityForumPage.path);
+        router.add(ForumPostDetailPage.path);
+        router.add(ChatDetailPage.path);
         router.add(ChangePasswordPage.path);
         router.add(HelpSupportPage.path);
         router.add(TermsConditionsPage.path);
         router.add(NotificationSettingsPage.path);
+        router.add(NotificationsPage.path);
         router.add(LanguageSettingsPage.path);
         router.add(ContactAdminPage.path);
       });

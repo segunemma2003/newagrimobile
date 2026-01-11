@@ -65,13 +65,15 @@ class DummyDataService {
         "title": "Introduction to Modern Farming",
         "slug": "introduction-to-modern-farming",
         "short_description": "Learn the basics of modern farming techniques",
-        "description": "A comprehensive course covering modern farming techniques, sustainable practices, and innovative agricultural methods. Perfect for beginners who want to start their farming journey.",
+        "description":
+            "A comprehensive course covering modern farming techniques, sustainable practices, and innovative agricultural methods. Perfect for beginners who want to start their farming journey.",
         "image": "https://example.com/course1.jpg",
         "level": "beginner",
         "duration_minutes": 120,
         "rating": 4.5,
         "rating_count": 100,
         "enrollment_count": 500,
+        "project_id": "course_capstone_1", // Add course capstone project
         "category": {
           "id": 1,
           "name": "Agriculture",
@@ -88,13 +90,15 @@ class DummyDataService {
         "title": "Advanced Hydroponics Systems",
         "slug": "advanced-hydroponics-systems",
         "short_description": "Master advanced hydroponic farming systems",
-        "description": "Deep dive into advanced hydroponic systems, nutrient management, and system optimization. Designed for intermediate to advanced learners.",
+        "description":
+            "Deep dive into advanced hydroponic systems, nutrient management, and system optimization. Designed for intermediate to advanced learners.",
         "image": "https://example.com/course2.jpg",
         "level": "intermediate",
         "duration_minutes": 180,
         "rating": 4.8,
         "rating_count": 75,
         "enrollment_count": 300,
+        "project_id": "course_capstone_2", // Add course capstone project
         "category": {
           "id": 2,
           "name": "Hydroponics",
@@ -111,7 +115,8 @@ class DummyDataService {
         "title": "Urban Farming Essentials",
         "slug": "urban-farming-essentials",
         "short_description": "Essential skills for urban farming success",
-        "description": "Learn how to grow fresh produce in urban environments. Covering container gardening, vertical farming, and space optimization techniques.",
+        "description":
+            "Learn how to grow fresh produce in urban environments. Covering container gardening, vertical farming, and space optimization techniques.",
         "image": "https://example.com/course3.jpg",
         "level": "beginner",
         "duration_minutes": 90,
@@ -140,7 +145,8 @@ class DummyDataService {
         "course_id": courseId,
         "title": "Introduction to the Course",
         "description": "Welcome to the course! Learn what you'll be covering.",
-        "content": "This is the introduction lesson. Here you'll learn about the course structure and what to expect.",
+        "content":
+            "This is the introduction lesson. Here you'll learn about the course structure and what to expect.",
         "type": "writeup",
         "order": 1,
         "duration": 600,
@@ -150,7 +156,8 @@ class DummyDataService {
         "course_id": courseId,
         "title": "Getting Started with Basics",
         "description": "Learn the fundamental concepts",
-        "content": "In this lesson, we'll cover the basic concepts and terminology you need to know.",
+        "content":
+            "In this lesson, we'll cover the basic concepts and terminology you need to know.",
         "type": "writeup",
         "order": 2,
         "duration": 900,
@@ -160,18 +167,21 @@ class DummyDataService {
         "course_id": courseId,
         "title": "Video Tutorial: Practical Demonstration",
         "description": "Watch a practical demonstration",
-        "video_url": "https://example.com/video1.mp4",
+        "video_url": "https://www.youtube.com/watch?v=_Ffw8zxHHMk",
         "type": "video",
         "order": 3,
         "duration": 1200,
-        "transcript": "Welcome to this practical demonstration. In this video, we'll be showing you step-by-step how to set up your first farming project. First, you'll need to prepare your growing area. Make sure you have adequate space and lighting. Next, we'll cover the essential tools and materials you'll need. Then, we'll walk through the actual setup process, showing you each step in detail. Finally, we'll discuss maintenance and care tips to ensure your project succeeds. Remember, patience and consistency are key to successful farming.",
+        "assignment_id": "assignment_${courseId}_video_3", // Add assignment ID
+        "transcript":
+            "Welcome to this practical demonstration. In this video, we'll be showing you step-by-step how to set up your first farming project. First, you'll need to prepare your growing area. Make sure you have adequate space and lighting. Next, we'll cover the essential tools and materials you'll need. Then, we'll walk through the actual setup process, showing you each step in detail. Finally, we'll discuss maintenance and care tips to ensure your project succeeds. Remember, patience and consistency are key to successful farming.",
       },
       {
         "id": courseId * 10 + 4,
         "course_id": courseId,
         "title": "DIY Activity: Hands-on Practice",
         "description": "Practice what you've learned",
-        "content": "Complete this hands-on activity to reinforce your learning. Follow the step-by-step instructions provided.",
+        "content":
+            "Complete this hands-on activity to reinforce your learning. Follow the step-by-step instructions provided.",
         "type": "diy",
         "order": 4,
         "duration": 1800,
@@ -231,6 +241,7 @@ class DummyDataService {
       "rating_count": 100,
       "enrollment_count": 500,
       "category": course.category?.toJson(),
+      "project_id": "course_capstone_$courseId", // Add course capstone project
       "tutor": {
         "id": 2,
         "name": "Dr. Jane Smith",
@@ -245,14 +256,18 @@ class DummyDataService {
           "order": 1,
           "is_completed": false,
           "is_locked": false,
+          "project_id": "project_module_1", // Add module project ID
+          "has_vr": true, // Enable VR for Module 1
           "topics": [
             {
               "id": courseId * 10 + 1,
               "course_id": courseId,
               "module_id": 1,
               "title": "Introduction to the Course",
-              "description": "Welcome to the course! Learn what you'll be covering.",
-              "content": "This is the introduction lesson. Here you'll learn about the course structure and what to expect.",
+              "description":
+                  "Welcome to the course! Learn what you'll be covering.",
+              "content":
+                  "This is the introduction lesson. Here you'll learn about the course structure and what to expect.",
               "type": "writeup",
               "order": 1,
               "duration": 600,
@@ -265,12 +280,15 @@ class DummyDataService {
               "module_id": 1,
               "title": "Getting Started with Basics",
               "description": "Learn the fundamental concepts",
-              "content": "In this lesson, we'll cover the basic concepts and terminology you need to know.",
+              "content":
+                  "In this lesson, we'll cover the basic concepts and terminology you need to know.",
               "type": "writeup",
               "order": 2,
               "duration": 900,
               "is_completed": false,
               "is_locked": false,
+              "assignment_id":
+                  "assignment_${courseId}_1_2", // Add assignment ID
             },
             {
               "id": courseId * 10 + 3,
@@ -278,11 +296,12 @@ class DummyDataService {
               "module_id": 1,
               "title": "Video Tutorial: Practical Demonstration",
               "description": "Watch a practical demonstration",
-              "video_url": "https://example.com/video1.mp4",
+              "video_url": "https://www.youtube.com/watch?v=_Ffw8zxHHMk",
               "type": "video",
               "order": 3,
               "duration": 1200,
-              "transcript": "Welcome to this practical demonstration. In this video, we'll be showing you step-by-step how to set up your first farming project.",
+              "transcript":
+                  "Welcome to this practical demonstration. In this video, we'll be showing you step-by-step how to set up your first farming project.",
               "is_completed": false,
               "is_locked": false,
             },
@@ -292,7 +311,8 @@ class DummyDataService {
               "module_id": 1,
               "title": "DIY Activity: Hands-on Practice",
               "description": "Practice what you've learned",
-              "content": "Complete this hands-on activity to reinforce your learning.",
+              "content":
+                  "Complete this hands-on activity to reinforce your learning.",
               "type": "diy",
               "order": 4,
               "duration": 1800,
@@ -316,7 +336,11 @@ class DummyDataService {
                   "question": "What is the main topic of this module?",
                   "options": [
                     {"id": "opt1", "text": "Option A", "is_correct": false},
-                    {"id": "opt2", "text": "Option B (Correct)", "is_correct": true},
+                    {
+                      "id": "opt2",
+                      "text": "Option B (Correct)",
+                      "is_correct": true
+                    },
                     {"id": "opt3", "text": "Option C", "is_correct": false},
                     {"id": "opt4", "text": "Option D", "is_correct": false},
                   ],
@@ -336,6 +360,8 @@ class DummyDataService {
           "order": 2,
           "is_completed": false,
           "is_locked": true, // Locked until Module 1 is completed
+          "project_id": "project_module_2", // Add module project ID
+          "has_vr": false, // No VR for Module 2
           "topics": [
             {
               "id": courseId * 10 + 6,
@@ -356,7 +382,7 @@ class DummyDataService {
               "module_id": 2,
               "title": "Advanced Video Tutorial",
               "description": "Watch advanced techniques",
-              "video_url": "https://example.com/video2.mp4",
+              "video_url": "https://www.youtube.com/watch?v=_Ffw8zxHHMk",
               "type": "video",
               "order": 2,
               "duration": 1500,
@@ -379,7 +405,11 @@ class DummyDataService {
                   "id": courseId * 10 + 51,
                   "question": "What is an advanced technique?",
                   "options": [
-                    {"id": "opt1", "text": "Correct Answer", "is_correct": true},
+                    {
+                      "id": "opt1",
+                      "text": "Correct Answer",
+                      "is_correct": true
+                    },
                     {"id": "opt2", "text": "Wrong Answer", "is_correct": false},
                   ],
                 },
@@ -388,6 +418,51 @@ class DummyDataService {
           ],
           "completed_lessons": 0,
           "total_lessons": 3,
+        },
+        {
+          "id": 3,
+          "course_id": courseId,
+          "title": "Module 3: Capstone Project",
+          "description":
+              "Apply all learned concepts in a comprehensive project",
+          "order": 3,
+          "is_completed": false,
+          "is_locked": true,
+          "project_id": "project_module_3_capstone", // Add module project ID
+          "has_vr": true, // Enable VR for Module 3
+          "topics": [
+            {
+              "id": courseId * 10 + 9,
+              "course_id": courseId,
+              "module_id": 3,
+              "title": "Project Planning",
+              "description": "Plan your capstone project",
+              "content": "Learn how to plan and structure your final project.",
+              "type": "writeup",
+              "order": 1,
+              "duration": 1200,
+              "is_completed": false,
+              "is_locked": true,
+              "assignment_id":
+                  "assignment_${courseId}_3_1", // Add assignment ID
+            },
+            {
+              "id": courseId * 10 + 10,
+              "course_id": courseId,
+              "module_id": 3,
+              "title": "DIY: Build Your Project",
+              "description": "Hands-on project implementation",
+              "content":
+                  "Build and implement your capstone project with step-by-step guidance.",
+              "type": "diy",
+              "order": 2,
+              "duration": 3600,
+              "is_completed": false,
+              "is_locked": true,
+            },
+          ],
+          "completed_lessons": 0,
+          "total_lessons": 2,
         },
       ],
     };
@@ -411,4 +486,3 @@ class DummyDataService {
     return email == dummyEmail && password == dummyPassword;
   }
 }
-

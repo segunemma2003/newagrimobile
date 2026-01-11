@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import '/resources/widgets/splash_screen.dart';
 import '/bootstrap/app.dart';
 import '/config/providers.dart';
@@ -17,6 +18,8 @@ class Boot {
 
     if (getEnv('SHOW_SPLASH_SCREEN', defaultValue: false)) {
       runApp(SplashScreen.app());
+      // Wait 5 seconds before continuing with app initialization
+      await Future.delayed(const Duration(seconds: 5));
     }
 
     await _setup();

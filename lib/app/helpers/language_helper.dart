@@ -1,6 +1,5 @@
 import '/app/providers/language_provider.dart';
 
-/// Helper class to get localized strings based on current language
 class LanguageHelper {
   static final _provider = LanguageProvider();
 

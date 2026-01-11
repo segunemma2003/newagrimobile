@@ -14,12 +14,9 @@ class CourseDetailController extends NyController {
   Map<String, bool> lockedLessons = {};
 
   Future<void> loadCourseDetails(String courseId) async {
-    // Always load full course details with modules from dummy data
-    // This ensures modules are always available
     final dummyData = DummyDataService.getDummyCourseDetails(int.tryParse(courseId) ?? 1);
     course = Course.fromJson(dummyData);
     
-    // Try to sync if online (for real API)
     if (await _isOnline()) {
       try {
         Map<String, dynamic>? response = await api<ApiService>(
@@ -38,10 +35,7 @@ class CourseDetailController extends NyController {
       }
     }
 
-    // Save the dummy data course with modules to storage
     await _saveCourseToStorage();
-
-    // Load progress
     await _loadProgress();
   }
 
@@ -91,8 +85,6 @@ class CourseDetailController extends NyController {
           }
         }
       }
-
-      // Calculate module locking based on completion
       _updateModuleLocking();
     } catch (e) {
       print("Error loading progress: $e");
@@ -105,24 +97,20 @@ class CourseDetailController extends NyController {
     lockedModules.clear();
     lockedLessons.clear();
 
-    // First module is never locked
     if (course!.modules!.isNotEmpty) {
       lockedModules[course!.modules![0].id!] = false;
     }
 
-    // Check each module - lock if previous module is not completed
     for (int i = 1; i < course!.modules!.length; i++) {
       final previousModule = course!.modules![i - 1];
       final currentModule = course!.modules![i];
 
-      // Check if previous module is completed
       final prevCompleted = completedModules[previousModule.id!] ?? 
                             previousModule.isCompleted == true ||
                             _isModuleFullyCompleted(previousModule);
 
       lockedModules[currentModule.id!] = !prevCompleted;
 
-      // Lock all lessons in locked modules
       if (lockedModules[currentModule.id!] == true) {
         if (currentModule.lessons != null) {
           for (final lesson in currentModule.lessons!) {
@@ -149,12 +137,10 @@ class CourseDetailController extends NyController {
   }
 
   bool isLessonLocked(String lessonId, String moduleId) {
-    // Lesson is locked if its module is locked
     if (lockedModules[moduleId] == true) {
       return true;
     }
     
-    // Check if previous lessons in the same module are completed
     if (course?.modules != null) {
       final module = course!.modules!.firstWhere(
         (m) => m.id == moduleId,
@@ -164,7 +150,6 @@ class CourseDetailController extends NyController {
       if (module.lessons != null) {
         final lessonIndex = module.lessons!.indexWhere((l) => l.id == lessonId);
         if (lessonIndex > 0) {
-          // Check if previous lesson is completed
           final previousLesson = module.lessons![lessonIndex - 1];
           return !(completedLessons[previousLesson.id!] ?? false);
         }
@@ -190,12 +175,10 @@ class CourseDetailController extends NyController {
         progressList = List<Map<String, dynamic>>.from(progressJson);
       }
 
-      // Remove existing progress for this lesson
       progressList.removeWhere(
         (p) => p['course_id'] == course!.id && p['lesson_id'] == lessonId,
       );
 
-      // Add new progress
       final userData = await Keys.auth.read<Map<String, dynamic>>();
       progressList.add({
         'user_id': userData?['id']?.toString(),
@@ -208,7 +191,6 @@ class CourseDetailController extends NyController {
 
       await Keys.courseProgress.save(progressList);
 
-      // Update module completion if this was the last lesson in a module
       if (course!.modules != null) {
         for (final module in course!.modules!) {
           if (module.lessons != null) {
@@ -219,7 +201,6 @@ class CourseDetailController extends NyController {
             
             if (allCompleted && (completedModules[module.id!] != true)) {
               completedModules[module.id!] = true;
-              // Save module completion
               final moduleProgress = {
                 'user_id': userData?['id']?.toString(),
                 'course_id': course!.id,
@@ -229,15 +210,12 @@ class CourseDetailController extends NyController {
               };
               progressList.add(moduleProgress);
               await Keys.courseProgress.save(progressList);
-              
-              // Unlock next module
               _updateModuleLocking();
             }
           }
         }
       }
 
-      // Update course completed lessons count
       if (course!.modules != null) {
         int total = 0;
         int completed = 0;

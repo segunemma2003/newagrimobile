@@ -58,7 +58,7 @@ class _HelpSupportPageState extends NyPage<HelpSupportPage> {
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    "Ana Bukatar Taimako?",
+                    "Need Help?",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
@@ -68,7 +68,7 @@ class _HelpSupportPageState extends NyPage<HelpSupportPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Tuntuɓi ƙungiyar tallafi don ƙarin taimako",
+                    "Contact our support team for additional assistance",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -89,7 +89,7 @@ class _HelpSupportPageState extends NyPage<HelpSupportPage> {
                         ),
                       ),
                       child: const Text(
-                        "Tuntuɓi Admin",
+                        "Contact Admin",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                         ),
@@ -102,7 +102,7 @@ class _HelpSupportPageState extends NyPage<HelpSupportPage> {
             const SizedBox(height: 24),
             // FAQ Section
             const Text(
-              "Tambayoyi da Amsoshi (FAQ)",
+              "Frequently Asked Questions (FAQ)",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -111,23 +111,23 @@ class _HelpSupportPageState extends NyPage<HelpSupportPage> {
             ),
             const SizedBox(height: 16),
             _buildFAQItem(
-              question: "Yaya zan fara darasi?",
-              answer: "Za ka iya fara darasi ta hanyar danna darasin da kake so daga jerin darussa. Bayan haka, danna maɓallin 'Fara' don farawa.",
+              question: "How do I start a lesson?",
+              answer: "You can start a lesson by tapping on the lesson you want from the course list. Then, tap the 'Start' button to begin.",
             ),
             const SizedBox(height: 12),
             _buildFAQItem(
-              question: "Yaya zan ci jarabawar?",
-              answer: "Jarabawar za ta fito ne bayan ka kammala darasin. Danna maɓallin 'Fara Jarabawa' don farawa.",
+              question: "How do I take a quiz?",
+              answer: "The quiz will appear after you complete a lesson. Tap the 'Start Quiz' button to begin.",
             ),
             const SizedBox(height: 12),
             _buildFAQItem(
-              question: "Zan iya amfani da app ba tare da intanet ba?",
-              answer: "Ee, za ka iya amfani da darussa da aka saukar a gida ba tare da intanet ba. Amma don saukar da sababbin darussa, ana buƙatar intanet.",
+              question: "Can I use the app without internet?",
+              answer: "Yes, you can use downloaded courses offline without internet. However, internet is required to download new courses.",
             ),
             const SizedBox(height: 12),
             _buildFAQItem(
-              question: "Yaya zan sabunta bayanan da aka saukar?",
-              answer: "Danna maɓallin 'Sync' a shafin darussa don sabunta bayanan da aka saukar.",
+              question: "How do I update downloaded content?",
+              answer: "Tap the 'Sync' button on the courses page to update downloaded content.",
             ),
             const SizedBox(height: 24),
             // Contact Information
@@ -142,7 +142,7 @@ class _HelpSupportPageState extends NyPage<HelpSupportPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "Lambar Tuntuɓi",
+                    "Contact Information",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -152,20 +152,20 @@ class _HelpSupportPageState extends NyPage<HelpSupportPage> {
                   const SizedBox(height: 16),
                   _buildContactItem(
                     icon: Icons.email_outlined,
-                    title: "Imel",
-                    value: "tallafi@agrisiti.com",
+                    title: "Email",
+                    value: "support@agrisiti.com",
                   ),
                   const SizedBox(height: 12),
                   _buildContactItem(
                     icon: Icons.phone_outlined,
-                    title: "Wayar",
+                    title: "Phone",
                     value: "+234 123 456 7890",
                   ),
                   const SizedBox(height: 12),
                   _buildContactItem(
                     icon: Icons.access_time_outlined,
-                    title: "Lokacin Aiki",
-                    value: "Litinin - Jumma'a, 9AM - 5PM",
+                    title: "Working Hours",
+                    value: "Monday - Friday, 9AM - 5PM",
                   ),
                 ],
               ),
@@ -247,4 +247,3 @@ class _HelpSupportPageState extends NyPage<HelpSupportPage> {
     );
   }
 }
-

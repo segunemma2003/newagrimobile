@@ -34,6 +34,7 @@ class LanguageProvider extends ChangeNotifier {
       }
     }
     notifyListeners();
+    notifyListeners();
   }
 
   Future<void> changeLanguage(String languageCode) async {
@@ -49,7 +50,6 @@ class LanguageProvider extends ChangeNotifier {
       }
       backpackSave(Keys.languagePreference, languageCode);
     }
-
     notifyListeners();
   }
 }

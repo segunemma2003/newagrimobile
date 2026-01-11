@@ -1,5 +1,6 @@
 import '/app/controllers/home_controller.dart';
 import '/app/controllers/login_controller.dart';
+import '/app/controllers/register_controller.dart';
 import '/app/controllers/courses_controller.dart';
 import '/app/controllers/course_detail_controller.dart';
 import '/app/controllers/lesson_controller.dart';
@@ -70,6 +71,7 @@ final Map<Type, dynamic> apiDecoders = {
 final Map<Type, dynamic> controllers = {
   HomeController: () => HomeController(),
   LoginController: () => LoginController(),
+  RegisterController: () => RegisterController(),
   CoursesController: () => CoursesController(),
   CourseDetailController: () => CourseDetailController(),
   LessonController: () => LessonController(),

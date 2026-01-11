@@ -4,17 +4,18 @@ import 'quiz.dart';
 class Lesson extends Model {
   String? id;
   String? courseId;
-  String? moduleId; // Module this lesson belongs to
+  String? moduleId;
   String? title;
   String? description;
   String? content;
   String? videoUrl;
   String? videoPath;
-  String? transcript; // Video transcript
-  String? type; // 'writeup', 'video', 'quiz', 'diy'
+  String? transcript;
+  String? type;
   int? order;
-  int? duration; // in seconds
+  int? duration;
   List<Quiz>? quizzes;
+  String? assignmentId; // Reference to assignment if lesson has one
   bool? isCompleted;
   bool? isLocked;
 
@@ -37,6 +38,7 @@ class Lesson extends Model {
     duration = data['duration'] ?? 0;
     isCompleted = data['is_completed'] ?? data['isCompleted'] ?? false;
     isLocked = data['is_locked'] ?? data['isLocked'] ?? false;
+    assignmentId = data['assignment_id']?.toString() ?? data['assignmentId']?.toString();
     if (data['quizzes'] != null) {
       quizzes = (data['quizzes'] as List)
           .map((quiz) => Quiz.fromJson(quiz))
@@ -60,6 +62,7 @@ class Lesson extends Model {
         "duration": duration,
         "is_completed": isCompleted,
         "is_locked": isLocked,
+        "assignment_id": assignmentId,
         "quizzes": quizzes?.map((q) => q.toJson()).toList(),
       };
 }
