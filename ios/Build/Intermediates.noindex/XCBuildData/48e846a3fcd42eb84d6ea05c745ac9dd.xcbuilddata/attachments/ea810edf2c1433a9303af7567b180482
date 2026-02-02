@@ -1,0 +1,5 @@
+
+module app_badge_plus.Swift {
+  header "app_badge_plus-Swift.h"
+  requires objc
+}

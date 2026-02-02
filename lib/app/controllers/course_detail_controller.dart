@@ -2,7 +2,6 @@ import 'package:nylo_framework/nylo_framework.dart';
 import '/app/models/course.dart';
 import '/app/models/module.dart';
 import '/app/networking/api_service.dart';
-import '/app/services/dummy_data_service.dart';
 import '/config/keys.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
@@ -14,9 +13,6 @@ class CourseDetailController extends NyController {
   Map<String, bool> lockedLessons = {};
 
   Future<void> loadCourseDetails(String courseId) async {
-    final dummyData = DummyDataService.getDummyCourseDetails(int.tryParse(courseId) ?? 1);
-    course = Course.fromJson(dummyData);
-    
     if (await _isOnline()) {
       try {
         Map<String, dynamic>? response = await api<ApiService>(
@@ -31,12 +27,27 @@ class CourseDetailController extends NyController {
           return;
         }
       } catch (e) {
-        print("Error fetching course details from API: $e - Using dummy data");
+        print("Error fetching course details from API: $e");
       }
     }
 
-    await _saveCourseToStorage();
-    await _loadProgress();
+    // Try to load from storage if API fails
+    try {
+      final coursesJson = await Keys.courses.read<List>();
+      if (coursesJson != null) {
+        final courses = List<Map<String, dynamic>>.from(coursesJson);
+        final courseData = courses.firstWhere(
+          (c) => c['id'] == courseId,
+          orElse: () => {},
+        );
+        if (courseData.isNotEmpty) {
+          course = Course.fromJson(courseData);
+          await _loadProgress();
+        }
+      }
+    } catch (e) {
+      print("Error loading course from storage: $e");
+    }
   }
 
   Future<void> _saveCourseToStorage() async {
@@ -68,9 +79,8 @@ class CourseDetailController extends NyController {
     try {
       final progressJson = await Keys.courseProgress.read<List>();
       if (progressJson != null) {
-        final progressList = progressJson
-            .map((json) => json as Map<String, dynamic>)
-            .toList();
+        final progressList =
+            progressJson.map((json) => json as Map<String, dynamic>).toList();
 
         for (final progress in progressList) {
           if (progress['course_id'] == course!.id) {
@@ -105,9 +115,9 @@ class CourseDetailController extends NyController {
       final previousModule = course!.modules![i - 1];
       final currentModule = course!.modules![i];
 
-      final prevCompleted = completedModules[previousModule.id!] ?? 
-                            previousModule.isCompleted == true ||
-                            _isModuleFullyCompleted(previousModule);
+      final prevCompleted = completedModules[previousModule.id!] ??
+          previousModule.isCompleted == true ||
+              _isModuleFullyCompleted(previousModule);
 
       lockedModules[currentModule.id!] = !prevCompleted;
 
@@ -123,12 +133,11 @@ class CourseDetailController extends NyController {
 
   bool _isModuleFullyCompleted(Module module) {
     if (module.lessons == null || module.lessons!.isEmpty) return false;
-    
+
     final totalLessons = module.lessons!.length;
-    final completedCount = module.lessons!
-        .where((l) => completedLessons[l.id!] == true)
-        .length;
-    
+    final completedCount =
+        module.lessons!.where((l) => completedLessons[l.id!] == true).length;
+
     return completedCount == totalLessons;
   }
 
@@ -140,13 +149,13 @@ class CourseDetailController extends NyController {
     if (lockedModules[moduleId] == true) {
       return true;
     }
-    
+
     if (course?.modules != null) {
       final module = course!.modules!.firstWhere(
         (m) => m.id == moduleId,
         orElse: () => Module(),
       );
-      
+
       if (module.lessons != null) {
         final lessonIndex = module.lessons!.indexWhere((l) => l.id == lessonId);
         if (lessonIndex > 0) {
@@ -155,7 +164,7 @@ class CourseDetailController extends NyController {
         }
       }
     }
-    
+
     return lockedLessons[lessonId] ?? false;
   }
 
@@ -198,7 +207,7 @@ class CourseDetailController extends NyController {
             final allCompleted = moduleLessons.every(
               (l) => completedLessons[l.id!] == true,
             );
-            
+
             if (allCompleted && (completedModules[module.id!] != true)) {
               completedModules[module.id!] = true;
               final moduleProgress = {
@@ -237,7 +246,7 @@ class CourseDetailController extends NyController {
         course!.completedLessons = completedCount;
         course!.isCompleted = completedCount == course!.lessons!.length;
       }
-      
+
       await _saveCourseToStorage();
 
       // Sync to server if online
@@ -264,4 +273,3 @@ class CourseDetailController extends NyController {
     return connectivityResult != ConnectivityResult.none;
   }
 }
-

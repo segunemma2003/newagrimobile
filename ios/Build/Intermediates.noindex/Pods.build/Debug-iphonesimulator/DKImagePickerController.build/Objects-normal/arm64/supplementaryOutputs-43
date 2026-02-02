@@ -1,0 +1,23 @@
+{
+  "/Users/mac/Downloads/agrisiti_mobile/ios/Pods/DKImagePickerController/Sources/DKImagePickerController/View/Cell/DKAssetGroupDetailVideoCell.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupDetailVideoCell.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupDetailVideoCell.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupDetailVideoCell.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupDetailVideoCell.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupDetailVideoCell.swiftdeps"
+  },
+  "/Users/mac/Downloads/agrisiti_mobile/ios/Pods/DKImagePickerController/Sources/DKImagePickerController/View/DKAssetGroupGridLayout.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupGridLayout.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupGridLayout.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupGridLayout.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupGridLayout.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupGridLayout.swiftdeps"
+  },
+  "/Users/mac/Downloads/agrisiti_mobile/ios/Pods/DKImagePickerController/Sources/DKImagePickerController/View/DKAssetGroupListVC.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupListVC.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupListVC.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupListVC.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupListVC.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupListVC.swiftdeps"
+  }
+}

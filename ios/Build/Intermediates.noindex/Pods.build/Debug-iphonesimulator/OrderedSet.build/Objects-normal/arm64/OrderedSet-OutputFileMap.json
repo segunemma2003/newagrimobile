@@ -1,0 +1,19 @@
+{
+  "" : {
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/OrderedSet.build/Objects-normal/arm64/OrderedSet-primary.dia",
+    "emit-module-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/OrderedSet.build/Objects-normal/arm64/OrderedSet-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/OrderedSet.build/Objects-normal/arm64/OrderedSet-primary-emit-module.dia",
+    "pch" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/OrderedSet.build/Objects-normal/arm64/OrderedSet-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/OrderedSet.build/Objects-normal/arm64/OrderedSet-primary.swiftdeps"
+  },
+  "/Users/mac/Downloads/agrisiti_mobile/ios/Pods/OrderedSet/Sources/OrderedSet.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/OrderedSet.build/Objects-normal/arm64/OrderedSet.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/OrderedSet.build/Objects-normal/arm64/OrderedSet.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/OrderedSet.build/Objects-normal/arm64/OrderedSet.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/OrderedSet.build/Objects-normal/arm64/OrderedSet.o",
+    "llvm-bc" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/OrderedSet.build/Objects-normal/arm64/OrderedSet.bc",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/OrderedSet.build/Objects-normal/arm64/OrderedSet.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/OrderedSet.build/Objects-normal/arm64/OrderedSet.swiftdeps",
+    "swiftmodule" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/OrderedSet.build/Objects-normal/arm64/OrderedSet~partial.swiftmodule"
+  }
+}

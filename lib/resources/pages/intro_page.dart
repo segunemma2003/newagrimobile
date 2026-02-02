@@ -1061,8 +1061,8 @@ class _IntroPageState extends NyPage<IntroPage> {
                                 child: _PulsingVRIcon(primary: primary),
                               ),
                             ],
-                          ),
-                        ),
+                  ),
+                ),
               ),
             const SizedBox(height: 24),
                       // Text Content

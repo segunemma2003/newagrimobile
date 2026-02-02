@@ -1,0 +1,114 @@
+{
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/InAppWebView/WebViewChannelDelegate.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewChannelDelegate.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewChannelDelegate.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewChannelDelegate.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewChannelDelegate.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewChannelDelegate.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/InAppWebView/WebViewChannelDelegateMethods.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewChannelDelegateMethods.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewChannelDelegateMethods.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewChannelDelegateMethods.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewChannelDelegateMethods.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewChannelDelegateMethods.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/PluginScriptsJS/WindowIdJS.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WindowIdJS.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WindowIdJS.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WindowIdJS.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WindowIdJS.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WindowIdJS.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/WKContentWorld.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKContentWorld.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKContentWorld.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKContentWorld.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKContentWorld.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKContentWorld.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/WKFrameInfo.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKFrameInfo.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKFrameInfo.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKFrameInfo.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKFrameInfo.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKFrameInfo.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/WKNavigationAction.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKNavigationAction.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKNavigationAction.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKNavigationAction.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKNavigationAction.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKNavigationAction.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/WKNavigationResponse.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKNavigationResponse.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKNavigationResponse.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKNavigationResponse.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKNavigationResponse.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKNavigationResponse.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/WKSecurityOrigin.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKSecurityOrigin.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKSecurityOrigin.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKSecurityOrigin.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKSecurityOrigin.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKSecurityOrigin.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/WKUserContentController.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKUserContentController.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKUserContentController.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKUserContentController.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKUserContentController.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKUserContentController.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/WKWindowFeatures.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKWindowFeatures.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKWindowFeatures.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKWindowFeatures.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKWindowFeatures.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKWindowFeatures.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/WebMessagePort.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebMessagePort.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebMessagePort.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebMessagePort.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebMessagePort.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebMessagePort.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/WebResourceError.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceError.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceError.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceError.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceError.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceError.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/WebResourceRequest.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceRequest.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceRequest.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceRequest.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceRequest.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceRequest.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/WebResourceResponse.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceResponse.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceResponse.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceResponse.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceResponse.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebResourceResponse.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/WebViewTransport.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewTransport.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewTransport.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewTransport.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewTransport.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WebViewTransport.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/WKProcessPoolManager.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKProcessPoolManager.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKProcessPoolManager.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKProcessPoolManager.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKProcessPoolManager.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/x86_64/WKProcessPoolManager.swiftdeps"
+  }
+}

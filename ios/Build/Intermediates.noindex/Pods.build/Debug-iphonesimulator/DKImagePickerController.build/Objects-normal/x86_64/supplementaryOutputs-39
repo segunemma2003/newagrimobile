@@ -1,0 +1,23 @@
+{
+  "/Users/mac/Downloads/agrisiti_mobile/ios/Pods/DKImagePickerController/Sources/DKImagePickerController/DKImagePickerController.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerController.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerController.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerController.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerController.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerController.swiftdeps"
+  },
+  "/Users/mac/Downloads/agrisiti_mobile/ios/Pods/DKImagePickerController/Sources/DKImagePickerController/DKImagePickerControllerBaseUIDelegate.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerControllerBaseUIDelegate.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerControllerBaseUIDelegate.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerControllerBaseUIDelegate.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerControllerBaseUIDelegate.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerControllerBaseUIDelegate.swiftdeps"
+  },
+  "/Users/mac/Downloads/agrisiti_mobile/ios/Pods/DKImagePickerController/Sources/DKImagePickerController/Resource/DKImagePickerControllerResource.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerControllerResource.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerControllerResource.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerControllerResource.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerControllerResource.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/DKImagePickerController.build/Objects-normal/x86_64/DKImagePickerControllerResource.swiftdeps"
+  }
+}

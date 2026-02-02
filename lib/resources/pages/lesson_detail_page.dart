@@ -462,17 +462,17 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
 
     // Show locked state if lesson is locked
     if (lesson!.isLocked == true) {
-      return Scaffold(
+    return Scaffold(
         backgroundColor: bgColor,
-        appBar: AppBar(
-          elevation: 0,
+      appBar: AppBar(
+        elevation: 0,
           backgroundColor: bgColor,
-          automaticallyImplyLeading: true,
-          leading: IconButton(
+        automaticallyImplyLeading: true,
+        leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             color: textColor,
-            onPressed: () => Navigator.of(context).pop(),
-          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
           title: Text(lesson!.title ?? "Lesson",
               style: TextStyle(color: textColor)),
         ),
@@ -574,7 +574,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                         moduleTitle,
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w600,
                           color: textColor,
                         ),
                       ),
@@ -591,7 +591,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
           ),
           // Main Content
           Expanded(
-            child: SingleChildScrollView(
+        child: SingleChildScrollView(
               child: Column(
                 children: [
                   // Video Player (Sticky)
@@ -599,9 +599,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                   // Content
                   Padding(
                     padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
                         // Lesson Title
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -636,9 +636,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+              const SizedBox(height: 8),
                         // Description
-                        Text(
+                Text(
                           lesson!.description ?? lesson!.content ?? "",
                           style: TextStyle(
                             fontSize: 14,
@@ -653,29 +653,29 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                         // Quick Actions Grid
                         _buildQuickActionsGrid(surfaceColor, textColor,
                             secondaryTextColor, isDark, bgColor),
-                        const SizedBox(height: 24),
+              const SizedBox(height: 24),
                         // Divider
                         Divider(
                             color: isDark
                                 ? Colors.white.withOpacity(0.05)
                                 : Colors.grey[200]),
-                        const SizedBox(height: 24),
+              const SizedBox(height: 24),
                         // Notes Section
                         _buildNotesSection(surfaceColor, textColor,
                             secondaryTextColor, isDark),
-                        const SizedBox(height: 24),
+              const SizedBox(height: 24),
                         // Interactive Experience
                         if (lesson!.type == 'video')
                           _buildInteractiveExperience(
                               textColor, secondaryTextColor, isDark),
-                        const SizedBox(height: 24),
+              const SizedBox(height: 24),
                         // DIY Activity
                         if (lesson!.type == 'diy')
                           _buildDIYActivity(surfaceColor, textColor,
                               secondaryTextColor, isDark),
-                      ],
-                    ),
-                  ),
+            ],
+          ),
+        ),
                   const SizedBox(height: 100), // Space for bottom nav
                 ],
               ),
@@ -883,9 +883,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
             },
           ),
           builder: (context, player) {
-            return Container(
+      return Container(
               decoration: const BoxDecoration(
-                color: Colors.black,
+        color: Colors.black,
               ),
               child: player,
             );
@@ -919,10 +919,10 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
               ),
             ],
           ),
+          ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
   Widget _buildDownloadButton(Color surfaceColor, Color textColor,
       Color secondaryTextColor, bool isDark) {
@@ -990,7 +990,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
     return Column(
       children: [
         Row(
-          children: [
+            children: [
             Expanded(
               child: _buildQuickActionButton(
                 Icons.description,
@@ -1087,7 +1087,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
           (a) => a.id == lesson!.assignmentId,
           orElse: () => _createDummyAssignment(),
         );
-      } else {
+                    } else {
         assignment = _createDummyAssignment();
       }
 
@@ -1177,10 +1177,10 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                 fontWeight: FontWeight.w600,
                 color: textColor,
               ),
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
-      ),
     );
   }
 
@@ -1188,11 +1188,11 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
       Color textColor, Color secondaryTextColor, bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+              children: [
         Row(
-          children: [
+                      children: [
             Icon(Icons.view_in_ar, size: 18, color: accent),
-            const SizedBox(width: 8),
+                        const SizedBox(width: 8),
             Text(
               "INTERACTIVE EXPERIENCE",
               style: TextStyle(
@@ -1200,10 +1200,10 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                 fontWeight: FontWeight.w900,
                 letterSpacing: 2,
                 color: accent,
-              ),
-            ),
-          ],
-        ),
+                          ),
+                        ),
+                      ],
+                    ),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(20),
@@ -1217,8 +1217,8 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
             border: Border.all(color: Colors.white.withOpacity(0.1)),
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
@@ -1236,7 +1236,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                 ),
               ),
               const SizedBox(height: 12),
-              Text(
+                              Text(
                 "Step into the Greenhouse",
                 style: TextStyle(
                   fontSize: 18,
@@ -1267,11 +1267,11 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                ),
-              ),
-            ],
+                          ),
+                  ),
+              ],
+            ),
           ),
-        ),
       ],
     );
   }
@@ -1324,16 +1324,16 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
         // DIY Description
         if (lesson?.description != null || lesson?.content != null)
           Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
               color: surfaceColor,
-              borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color:
                     isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
               ),
-            ),
-            child: Text(
+      ),
+      child: Text(
               lesson?.description ??
                   lesson?.content ??
                   "Follow the step-by-step instructions to complete this DIY activity.",
@@ -1348,8 +1348,8 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
         // DIY Video (if available)
         if (lesson?.videoUrl != null && lesson!.videoUrl!.isNotEmpty)
           Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color:
                     isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
@@ -1370,8 +1370,8 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
               color:
                   isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
             ),
-          ),
-          child: Column(
+      ),
+      child: Column(
             children: _diyActivities.entries.map((entry) {
               return CheckboxListTile(
                 title: Text(
@@ -1421,19 +1421,19 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
   Widget _buildNotesSection(Color surfaceColor, Color textColor,
       Color secondaryTextColor, bool isDark) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
+            children: [
             Row(
               children: [
                 Icon(Icons.note, size: 20, color: accent),
-                const SizedBox(width: 8),
-                Text(
+              const SizedBox(width: 8),
+              Text(
                   "My Notes",
                   style: TextStyle(
-                    fontSize: 18,
+                  fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: textColor,
                   ),
@@ -1454,9 +1454,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                 foregroundColor: accent,
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 12),
+            ],
+          ),
+          const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -1487,7 +1487,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
+          Text(
                     "${_lessonNotes.length} note${_lessonNotes.length != 1 ? 's' : ''}",
                     style: TextStyle(
                       fontSize: 12,
@@ -1556,12 +1556,12 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.85,
-        decoration: BoxDecoration(
+      decoration: BoxDecoration(
           color: bgColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          children: [
+      ),
+      child: Column(
+        children: [
             // Handle bar
             Container(
               margin: const EdgeInsets.only(top: 12),
@@ -1582,8 +1582,8 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Transcript",
-                          style: TextStyle(
+                      "Transcript",
+                      style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
                             color: textColor,
@@ -1596,10 +1596,10 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                             fontSize: 14,
                             color: secondaryTextColor,
                           ),
-                        ),
-                      ],
-                    ),
                   ),
+                ],
+              ),
+            ),
                   IconButton(
                     icon: const Icon(Icons.close),
                     color: textColor,
@@ -1612,12 +1612,12 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
+              child: Text(
                   transcript,
                   style: TextStyle(
                     fontSize: 15,
                     color: textColor,
-                    height: 1.6,
+                  height: 1.6,
                   ),
                 ),
               ),
@@ -1650,7 +1650,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                 ),
               ),
             ),
-          ],
+        ],
         ),
       ),
     );
@@ -1673,7 +1673,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
-            children: [
+      children: [
               Container(
                 margin: const EdgeInsets.only(top: 12),
                 width: 40,
@@ -1761,9 +1761,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                         },
                       ),
               ),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
                   color: surfaceColor,
                   border: Border(
                     top: BorderSide(
@@ -1772,9 +1772,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                           : Colors.grey[200]!,
                     ),
                   ),
-                ),
-                child: Row(
-                  children: [
+            ),
+            child: Row(
+              children: [
                     Expanded(
                       child: TextField(
                         controller: _commentController,
@@ -1867,11 +1867,11 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                       )
                     : null,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -1890,32 +1890,32 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                             children: [
                               Text(
                                 comment.userName ?? 'Anonymous',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                                   color: textColor,
-                                ),
-                              ),
+                        ),
+                      ),
                               const SizedBox(width: 8),
-                              Text(
+                      Text(
                                 _formatTime(comment.createdAt),
                                 style: TextStyle(
-                                  fontSize: 12,
+                          fontSize: 12,
                                   color: secondaryTextColor,
-                                ),
+                        ),
                               ),
                             ],
-                          ),
-                          const SizedBox(height: 8),
+                      ),
+                      const SizedBox(height: 8),
                           Text(
                             comment.content ?? '',
                             style: TextStyle(
                               fontSize: 14,
                               color: textColor,
                               height: 1.4,
-                            ),
-                          ),
-                        ],
+                        ),
+                      ),
+                    ],
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -1943,11 +1943,11 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: secondaryTextColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                  ),
+                ),
+              ],
+            ),
+          ),
                         const SizedBox(width: 16),
                         InkWell(
                           onTap: () {
@@ -2014,10 +2014,10 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                     ),
                     if (_replyingToCommentId == comment.id) ...[
                       const SizedBox(height: 12),
-                      Row(
-                        children: [
+        Row(
+          children: [
                           const SizedBox(width: 32),
-                          Expanded(
+            Expanded(
                             child: TextField(
                               controller: _replyController,
                               style: TextStyle(color: textColor),
@@ -2163,10 +2163,10 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                             style: TextStyle(
                               fontSize: 11,
                               color: secondaryTextColor,
-                            ),
-                          ),
-                        ],
-                      ),
+              ),
+            ),
+          ],
+        ),
                       const SizedBox(height: 6),
                       Text(
                         reply.content ?? '',

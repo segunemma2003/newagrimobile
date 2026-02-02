@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
-import '/app/models/message.dart';
-import '/config/keys.dart';
-import '/resources/pages/chat_detail_page.dart';
+// Commented out - messaging coming soon
+// import '/app/models/message.dart';
+// import '/config/keys.dart';
+// import '/resources/pages/chat_detail_page.dart';
 
 class MessagesPage extends NyStatefulWidget {
   static RouteView path = ("/messages", (_) => MessagesPage());
@@ -11,10 +12,11 @@ class MessagesPage extends NyStatefulWidget {
 }
 
 class _MessagesPageState extends NyPage<MessagesPage> {
-  String _selectedFilter = "All";
-  String _searchQuery = "";
-  List<Message> _conversations = [];
-  TextEditingController? _searchController;
+  // Commented out - messaging coming soon
+  // String _selectedFilter = "All";
+  // String _searchQuery = "";
+  // List<Message> _conversations = [];
+  // TextEditingController? _searchController;
 
   // Color scheme - maintain from other pages
   static const Color accent = Color(0xFF50C1AE);
@@ -25,10 +27,13 @@ class _MessagesPageState extends NyPage<MessagesPage> {
 
   @override
   get init => () async {
-        _searchController = TextEditingController();
-        await _loadConversations();
+        // Commented out - messaging coming soon
+        // _searchController = TextEditingController();
+        // await _loadConversations();
       };
 
+  // Commented out - messaging coming soon
+  /*
   Future<void> _loadConversations() async {
     try {
       final conversationsJson = await Keys.messages.read<List>();
@@ -112,7 +117,10 @@ class _MessagesPageState extends NyPage<MessagesPage> {
     ];
     setState(() {});
   }
+  */
 
+  // Commented out - messaging coming soon
+  /*
   List<Message> get _filteredConversations {
     var filtered = _conversations;
     
@@ -153,7 +161,10 @@ class _MessagesPageState extends NyPage<MessagesPage> {
   List<Message> get _unpinnedConversations {
     return _filteredConversations.where((c) => c.isPinned != true).toList();
   }
+  */
 
+  // Commented out - messaging coming soon
+  /*
   String _formatTime(DateTime? dateTime) {
     if (dateTime == null) return '';
     
@@ -176,10 +187,12 @@ class _MessagesPageState extends NyPage<MessagesPage> {
       return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
     }
   }
+  */
 
   @override
   void dispose() {
-    _searchController?.dispose();
+    // Commented out - messaging coming soon
+    // _searchController?.dispose();
     super.dispose();
   }
 
@@ -224,31 +237,71 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                       letterSpacing: -0.5,
                     ),
                   ),
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        // TODO: Open new message dialog
-                      },
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: accent.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.edit_square,
-                          color: accent,
-                          size: 24,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Commented out - messaging coming soon
+                  // Material(
+                  //   color: Colors.transparent,
+                  //   child: InkWell(
+                  //     onTap: () {
+                  //       // TODO: Open new message dialog
+                  //     },
+                  //     borderRadius: BorderRadius.circular(20),
+                  //     child: Container(
+                  //       width: 40,
+                  //       height: 40,
+                  //       decoration: BoxDecoration(
+                  //         color: accent.withOpacity(0.1),
+                  //         shape: BoxShape.circle,
+                  //       ),
+                  //       child: Icon(
+                  //         Icons.edit_square,
+                  //         color: accent,
+                  //         size: 24,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
+            // Coming Soon Message
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.chat_bubble_outline,
+                      size: 80,
+                      color: secondaryTextColor.withOpacity(0.5),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      "Coming Soon",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        color: textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 48),
+                      child: Text(
+                        "Messaging feature is under development. Stay tuned for updates!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: secondaryTextColor,
+                          height: 1.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Commented out - messaging functionality
+            /*
             // Search Bar
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -376,20 +429,24 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                 ],
               ),
             ),
+            */
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: "messages_fab",
-        onPressed: () {
-          // TODO: Open new message dialog
-        },
-        backgroundColor: accent,
-        child: const Icon(Icons.add_comment, color: Colors.white),
-      ),
+      // Commented out - messaging coming soon
+      // floatingActionButton: FloatingActionButton(
+      //   heroTag: "messages_fab",
+      //   onPressed: () {
+      //     // TODO: Open new message dialog
+      //   },
+      //   backgroundColor: accent,
+      //   child: const Icon(Icons.add_comment, color: Colors.white),
+      // ),
     );
   }
 
+  // Commented out - messaging coming soon
+  /*
   Widget _buildFilterChip(String label, bool isSelected, VoidCallback onTap, bool isDark, Color accent) {
     return Material(
       color: Colors.transparent,
@@ -647,4 +704,5 @@ class _MessagesPageState extends NyPage<MessagesPage> {
     
     return Icon(icon, color: iconColor, size: 28);
   }
+  */
 }

@@ -14,7 +14,7 @@ class AppProvider implements NyProvider {
   boot(Nylo nylo) async {
     await LanguageProvider().init();
     String effectiveLanguageCode = LanguageProvider().languageCode;
-    
+
     try {
       await NyLocalization.instance.init(
         localeType: localeType,

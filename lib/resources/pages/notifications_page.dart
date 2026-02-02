@@ -95,18 +95,18 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
   }
 
   void _markAllAsRead() {
-    setState(() {
-      for (var notification in _notifications) {
-        notification['isRead'] = true;
-      }
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("All notifications marked as read"),
+                setState(() {
+                  for (var notification in _notifications) {
+                    notification['isRead'] = true;
+                  }
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("All notifications marked as read"),
         backgroundColor: primary,
-        duration: Duration(seconds: 2),
-      ),
-    );
+                    duration: Duration(seconds: 2),
+                  ),
+                );
   }
 
   @override
@@ -244,19 +244,19 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                         ),
                       );
                     }).toList(),
-                  ),
-                ),
-              ],
+              ),
             ),
+        ],
+      ),
           ),
           // Main Content
           Expanded(
             child: _filteredNotifications.isEmpty
                 ? _buildEmptyState(textColor, secondaryTextColor, isDark)
-                : RefreshIndicator(
-                    onRefresh: () async {
-                      await Future.delayed(const Duration(seconds: 1));
-                      setState(() {});
+          : RefreshIndicator(
+              onRefresh: () async {
+                await Future.delayed(const Duration(seconds: 1));
+                setState(() {});
                     },
                     child: SingleChildScrollView(
                       child: Column(
@@ -350,7 +350,7 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                   ),
           ),
         ],
-      ),
+            ),
     );
   }
 
@@ -491,19 +491,19 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                   ],
                 )
               else if (icon != null)
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
                     color: iconColor!.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: iconColor,
-                    size: 24,
-                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                child: Icon(
+                    icon,
+                  color: iconColor,
+                  size: 24,
+                ),
+              ),
               const SizedBox(width: 16),
               // Content
               Expanded(
@@ -536,7 +536,7 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                             fontWeight: FontWeight.w500,
                             color: isRead ? secondaryTextColor : primary,
                           ),
-                        ),
+                          ),
                       ],
                     ),
                     const SizedBox(height: 4),

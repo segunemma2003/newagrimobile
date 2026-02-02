@@ -13,7 +13,7 @@ class _ChangePasswordPageState extends NyPage<ChangePasswordPage> {
   final TextEditingController _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  
+
   // Password visibility toggles
   bool _currentPasswordVisible = false;
   bool _newPasswordVisible = false;
@@ -107,29 +107,29 @@ class _ChangePasswordPageState extends NyPage<ChangePasswordPage> {
                   ),
                   Expanded(
                     child: Text(
-                      "Change Password",
+          "Change Password",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+          style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: primary,
                         letterSpacing: -0.5,
-                      ),
-                    ),
-                  ),
+          ),
+        ),
+      ),
                   const SizedBox(width: 40), // Balance for back button
                 ],
               ),
             ),
             // Main Content
             Expanded(
-              child: SingleChildScrollView(
+        child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                       const SizedBox(height: 32),
                       // Headline & Intro
                       Text(
@@ -144,7 +144,7 @@ class _ChangePasswordPageState extends NyPage<ChangePasswordPage> {
                       const SizedBox(height: 8),
                       Text(
                         "Please enter your current password and choose a new strong one to update your credentials.",
-                        style: TextStyle(
+                          style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
                           color: secondaryTextColor,
@@ -159,13 +159,13 @@ class _ChangePasswordPageState extends NyPage<ChangePasswordPage> {
                         decoration: BoxDecoration(
                           color: accent,
                           borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      const SizedBox(height: 32),
+                  ),
+                ),
+                const SizedBox(height: 32),
                       // Current Password Field
-                      _buildPasswordField(
-                        label: "Current Password",
-                        controller: _currentPasswordController,
+                _buildPasswordField(
+                  label: "Current Password",
+                  controller: _currentPasswordController,
                         hintText: "Enter current password",
                         isVisible: _currentPasswordVisible,
                         onToggleVisibility: () {
@@ -188,9 +188,9 @@ class _ChangePasswordPageState extends NyPage<ChangePasswordPage> {
                       ),
                       const SizedBox(height: 24),
                       // New Password Field
-                      _buildPasswordField(
-                        label: "New Password",
-                        controller: _newPasswordController,
+                _buildPasswordField(
+                  label: "New Password",
+                  controller: _newPasswordController,
                         hintText: "Create new password",
                         isVisible: _newPasswordVisible,
                         onToggleVisibility: () {
@@ -216,9 +216,9 @@ class _ChangePasswordPageState extends NyPage<ChangePasswordPage> {
                       ),
                       const SizedBox(height: 24),
                       // Confirm New Password Field
-                      _buildPasswordField(
-                        label: "Confirm New Password",
-                        controller: _confirmPasswordController,
+                _buildPasswordField(
+                  label: "Confirm New Password",
+                  controller: _confirmPasswordController,
                         hintText: "Re-type new password",
                         isVisible: _confirmPasswordVisible,
                         onToggleVisibility: () {
@@ -265,15 +265,15 @@ class _ChangePasswordPageState extends NyPage<ChangePasswordPage> {
               ),
               child: Column(
                 children: [
-                  SizedBox(
-                    width: double.infinity,
+                SizedBox(
+                  width: double.infinity,
                     height: 56,
                     child: ElevatedButton.icon(
-                      onPressed: _isLoading ? null : _changePassword,
-                      style: ElevatedButton.styleFrom(
+                    onPressed: _isLoading ? null : _changePassword,
+                    style: ElevatedButton.styleFrom(
                         backgroundColor: primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: 4,
@@ -281,35 +281,35 @@ class _ChangePasswordPageState extends NyPage<ChangePasswordPage> {
                       ),
                       icon: const Icon(Icons.lock_reset, size: 20),
                       label: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : const Text(
-                              "Update Password",
-                              style: TextStyle(
-                                fontSize: 16,
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            "Update Password",
+                            style: TextStyle(
+                              fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),
-                            ),
-                    ),
+                          ),
                   ),
-                  const SizedBox(height: 16),
+                ),
+                const SizedBox(height: 16),
                   Text(
                     "Your data is protected by Agrisiti encryption.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                      style: TextStyle(
                       fontSize: 12,
                       color: secondaryTextColor,
-                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
+          ),
           ],
         ),
       ),
@@ -347,15 +347,15 @@ class _ChangePasswordPageState extends NyPage<ChangePasswordPage> {
           children: [
             Expanded(
               child: TextFormField(
-                controller: controller,
+          controller: controller,
                 obscureText: !isVisible,
                 style: TextStyle(
                   color: textColor,
                   fontSize: 16,
                   fontWeight: FontWeight.normal,
                 ),
-                decoration: InputDecoration(
-                  hintText: hintText,
+          decoration: InputDecoration(
+            hintText: hintText,
                   hintStyle: TextStyle(
                     color: secondaryTextColor,
                     fontSize: 16,
@@ -363,7 +363,7 @@ class _ChangePasswordPageState extends NyPage<ChangePasswordPage> {
                   filled: true,
                   fillColor: inputBgColor,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                  border: OutlineInputBorder(
+            border: OutlineInputBorder(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(8),
                       bottomLeft: Radius.circular(8),

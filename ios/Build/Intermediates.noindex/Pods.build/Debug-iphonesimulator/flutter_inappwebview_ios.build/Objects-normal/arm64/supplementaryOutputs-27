@@ -1,0 +1,114 @@
+{
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/PluginScriptsJS/PrintJS.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJS.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJS.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJS.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJS.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJS.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/PluginScriptsJS/PromisePolyfillJS.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PromisePolyfillJS.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PromisePolyfillJS.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PromisePolyfillJS.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PromisePolyfillJS.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PromisePolyfillJS.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/PrintJob/PrintAttributes.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintAttributes.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintAttributes.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintAttributes.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintAttributes.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintAttributes.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/PrintJob/PrintJobChannelDelegate.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobChannelDelegate.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobChannelDelegate.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobChannelDelegate.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobChannelDelegate.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobChannelDelegate.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/PrintJob/PrintJobController.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobController.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobController.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobController.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobController.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobController.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/PrintJob/PrintJobInfo.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobInfo.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobInfo.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobInfo.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobInfo.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobInfo.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/PrintJob/PrintJobManager.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobManager.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobManager.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobManager.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobManager.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobManager.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/PrintJob/PrintJobSettings.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobSettings.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobSettings.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobSettings.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobSettings.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PrintJobSettings.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/PullToRefresh/PullToRefreshChannelDelegate.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshChannelDelegate.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshChannelDelegate.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshChannelDelegate.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshChannelDelegate.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshChannelDelegate.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/PullToRefresh/PullToRefreshControl.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshControl.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshControl.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshControl.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshControl.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshControl.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/PullToRefresh/PullToRefreshDelegate.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshDelegate.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshDelegate.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshDelegate.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshDelegate.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshDelegate.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/PullToRefresh/PullToRefreshSettings.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshSettings.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshSettings.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshSettings.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshSettings.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/PullToRefreshSettings.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/SafariViewController/SafariBrowserSettings.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariBrowserSettings.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariBrowserSettings.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariBrowserSettings.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariBrowserSettings.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariBrowserSettings.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/SafariViewController/SafariViewController.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariViewController.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariViewController.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariViewController.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariViewController.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariViewController.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/SafariViewController/SafariViewControllerChannelDelegate.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariViewControllerChannelDelegate.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariViewControllerChannelDelegate.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariViewControllerChannelDelegate.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariViewControllerChannelDelegate.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SafariViewControllerChannelDelegate.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/SecCertificate.swift" : {
+    "const-values" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SecCertificate.swiftconstvalues",
+    "dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SecCertificate.d",
+    "diagnostics" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SecCertificate.dia",
+    "object" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SecCertificate.o",
+    "swift-dependencies" : "/Users/mac/Downloads/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/flutter_inappwebview_ios.build/Objects-normal/arm64/SecCertificate.swiftdeps"
+  }
+}

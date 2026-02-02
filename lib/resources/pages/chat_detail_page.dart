@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
-import '/app/models/message.dart';
-import '/app/models/chat_message.dart';
-import '/config/keys.dart';
+// Commented out - messaging coming soon
+// import '/app/models/message.dart';
+// import '/app/models/chat_message.dart';
+// import '/config/keys.dart';
 
 class ChatDetailPage extends NyStatefulWidget {
   static RouteView path = ("/chat-detail", (_) => ChatDetailPage());
@@ -11,23 +12,27 @@ class ChatDetailPage extends NyStatefulWidget {
 }
 
 class _ChatDetailPageState extends NyPage<ChatDetailPage> {
-  Message? _conversation;
-  List<ChatMessage> _messages = [];
-  TextEditingController? _messageController;
-  String? _currentUserId;
-  String? _currentUserName;
-  String? _currentUserAvatar;
-  final ScrollController _scrollController = ScrollController();
+  // Commented out - messaging coming soon
+  // Message? _conversation;
+  // List<ChatMessage> _messages = [];
+  // TextEditingController? _messageController;
+  // String? _currentUserId;
+  // String? _currentUserName;
+  // String? _currentUserAvatar;
+  // final ScrollController _scrollController = ScrollController();
 
   // Color scheme
   static const Color primary = Color(0xFF3F6967);
-  static const Color secondary = Color(0xFF50C1AE);
+  // Commented out - messaging coming soon
+  // static const Color secondary = Color(0xFF50C1AE);
   static const Color backgroundDark = Color(0xFF161C1B);
-  static const Color sentMessageColor = Color(0xFFDCF8C6);
-  static const Color receivedMessageColor = Color(0xFFFFFFFF);
+  // static const Color sentMessageColor = Color(0xFFDCF8C6);
+  // static const Color receivedMessageColor = Color(0xFFFFFFFF);
 
   @override
   get init => () async {
+        // Commented out - messaging coming soon
+        /*
         final data = widget.data<Map<String, dynamic>>();
         if (data != null && data['conversation'] != null) {
           _conversation = data['conversation'] as Message;
@@ -36,8 +41,11 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
         await _loadCurrentUser();
         await _loadMessages();
         _scrollToBottom();
+        */
       };
 
+  // Commented out - messaging coming soon
+  /*
   Future<void> _loadCurrentUser() async {
     try {
       final userData = await Keys.auth.read<Map<String, dynamic>>();
@@ -174,7 +182,10 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
       }
     });
   }
+  */
 
+  // Commented out - messaging coming soon
+  /*
   String _formatTime(DateTime? dateTime) {
     if (dateTime == null) return '';
     
@@ -207,11 +218,13 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
       return '$month/$day $displayHour:$minute $period';
     }
   }
+  */
 
   @override
   void dispose() {
-    _messageController?.dispose();
-    _scrollController.dispose();
+    // Commented out - messaging coming soon
+    // _messageController?.dispose();
+    // _scrollController.dispose();
     super.dispose();
   }
 
@@ -220,19 +233,13 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
 
   @override
   Widget view(BuildContext context) {
-    if (_conversation == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text("Chat")),
-        body: const Center(child: Text("Conversation not found")),
-      );
-    }
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? backgroundDark : const Color(0xFFECE5DD);
     final textColor = isDark ? Colors.white : const Color(0xFF131515);
     final secondaryTextColor = isDark ? Colors.grey[400]! : Colors.grey[600]!;
 
     return Scaffold(
-      backgroundColor: isDark ? backgroundDark : const Color(0xFFECE5DD),
+      backgroundColor: bgColor,
       appBar: AppBar(
         backgroundColor: isDark ? backgroundDark : primary,
         elevation: 0,
@@ -240,218 +247,283 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Row(
+        title: const Text(
+          "Chat",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: _conversation!.senderAvatar != null && _conversation!.senderAvatar!.isNotEmpty
-                    ? DecorationImage(
-                        image: NetworkImage(_conversation!.senderAvatar!),
-                        fit: BoxFit.cover,
-                        onError: (_, __) {},
+            Icon(
+              Icons.chat_bubble_outline,
+              size: 80,
+              color: secondaryTextColor.withOpacity(0.5),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              "Coming Soon",
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                color: textColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 48),
+              child: Text(
+                "Messaging feature is under development. Stay tuned for updates!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: secondaryTextColor,
+                  height: 1.5,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      // Commented out - messaging functionality
+      /*
+      if (_conversation == null) {
+        return Scaffold(
+          appBar: AppBar(title: const Text("Chat")),
+          body: const Center(child: Text("Conversation not found")),
+        );
+      }
+
+      return Scaffold(
+        backgroundColor: isDark ? backgroundDark : const Color(0xFFECE5DD),
+        appBar: AppBar(
+          backgroundColor: isDark ? backgroundDark : primary,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          title: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: _conversation!.senderAvatar != null && _conversation!.senderAvatar!.isNotEmpty
+                      ? DecorationImage(
+                          image: NetworkImage(_conversation!.senderAvatar!),
+                          fit: BoxFit.cover,
+                          onError: (_, __) {},
+                        )
+                      : null,
+                  color: _conversation!.senderAvatar == null || _conversation!.senderAvatar!.isEmpty
+                      ? Colors.white.withOpacity(0.2)
+                      : null,
+                ),
+                child: _conversation!.senderAvatar == null || _conversation!.senderAvatar!.isEmpty
+                    ? Center(
+                        child: Text(
+                          (_conversation!.senderName ?? 'U')[0].toUpperCase(),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
                       )
                     : null,
-                color: _conversation!.senderAvatar == null || _conversation!.senderAvatar!.isEmpty
-                    ? Colors.white.withOpacity(0.2)
-                    : null,
               ),
-              child: _conversation!.senderAvatar == null || _conversation!.senderAvatar!.isEmpty
-                  ? Center(
-                      child: Text(
-                        (_conversation!.senderName ?? 'U')[0].toUpperCase(),
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _conversation!.senderName ?? 'Unknown',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
-                    )
-                  : null,
+                    ),
+                    if (_conversation!.senderType == 'instructor' || _conversation!.senderType == 'student')
+                      const Text(
+                        "online",
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.videocam, color: Colors.white),
+              onPressed: () {
+                // TODO: Start video call
+              },
             ),
-            const SizedBox(width: 12),
+            IconButton(
+              icon: const Icon(Icons.phone, color: Colors.white),
+              onPressed: () {
+                // TODO: Start voice call
+              },
+            ),
+            PopupMenuButton(
+              icon: const Icon(Icons.more_vert, color: Colors.white),
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'view_profile',
+                  child: Text('View Profile'),
+                ),
+                const PopupMenuItem(
+                  value: 'media',
+                  child: Text('Media, Links & Docs'),
+                ),
+                const PopupMenuItem(
+                  value: 'search',
+                  child: Text('Search'),
+                ),
+                const PopupMenuItem(
+                  value: 'mute',
+                  child: Text('Mute Notifications'),
+                ),
+              ],
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            // Messages List
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: ListView.builder(
+                controller: _scrollController,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: _messages.length,
+                itemBuilder: (context, index) {
+                  final message = _messages[index];
+                  final showDateDivider = index == 0 ||
+                      (_messages[index - 1].timestamp != null &&
+                          message.timestamp != null &&
+                          DateTime(
+                                _messages[index - 1].timestamp!.year,
+                                _messages[index - 1].timestamp!.month,
+                                _messages[index - 1].timestamp!.day,
+                              ) !=
+                              DateTime(
+                                message.timestamp!.year,
+                                message.timestamp!.month,
+                                message.timestamp!.day,
+                              ));
+                  
+                  return Column(
+                    children: [
+                      if (showDateDivider)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Text(
+                            _formatDate(message.timestamp),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: secondaryTextColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      _buildMessageBubble(
+                        message,
+                        textColor,
+                        secondaryTextColor,
+                        isDark,
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            // Input Area
+            Container(
+              padding: EdgeInsets.only(
+                left: 8,
+                right: 8,
+                top: 8,
+                bottom: 8 + MediaQuery.of(context).padding.bottom,
+              ),
+              decoration: BoxDecoration(
+                color: isDark ? backgroundDark : Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: Row(
                 children: [
-                  Text(
-                    _conversation!.senderName ?? 'Unknown',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                  IconButton(
+                    icon: Icon(Icons.emoji_emotions_outlined, color: secondaryTextColor),
+                    onPressed: () {
+                      // TODO: Open emoji picker
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.attach_file, color: secondaryTextColor),
+                    onPressed: () {
+                      // TODO: Open attachment options
+                    },
+                  ),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200],
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: TextField(
+                        controller: _messageController,
+                        style: TextStyle(color: textColor),
+                        decoration: InputDecoration(
+                          hintText: "Type a message",
+                          hintStyle: TextStyle(color: secondaryTextColor),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        ),
+                        maxLines: null,
+                        textCapitalization: TextCapitalization.sentences,
+                      ),
                     ),
                   ),
-                  if (_conversation!.senderType == 'instructor' || _conversation!.senderType == 'student')
-                    const Text(
-                      "online",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
+                  const SizedBox(width: 8),
+                  Material(
+                    color: secondary,
+                    borderRadius: BorderRadius.circular(24),
+                    child: InkWell(
+                      onTap: _sendMessage,
+                      borderRadius: BorderRadius.circular(24),
+                      child: Container(
+                        width: 48,
+                        height: 48,
+                        child: const Icon(Icons.send, color: Colors.white, size: 20),
                       ),
                     ),
+                  ),
                 ],
               ),
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.videocam, color: Colors.white),
-            onPressed: () {
-              // TODO: Start video call
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.phone, color: Colors.white),
-            onPressed: () {
-              // TODO: Start voice call
-            },
-          ),
-          PopupMenuButton(
-            icon: const Icon(Icons.more_vert, color: Colors.white),
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'view_profile',
-                child: Text('View Profile'),
-              ),
-              const PopupMenuItem(
-                value: 'media',
-                child: Text('Media, Links & Docs'),
-              ),
-              const PopupMenuItem(
-                value: 'search',
-                child: Text('Search'),
-              ),
-              const PopupMenuItem(
-                value: 'mute',
-                child: Text('Mute Notifications'),
-              ),
-            ],
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Messages List
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final message = _messages[index];
-                final showDateDivider = index == 0 ||
-                    (_messages[index - 1].timestamp != null &&
-                        message.timestamp != null &&
-                        DateTime(
-                              _messages[index - 1].timestamp!.year,
-                              _messages[index - 1].timestamp!.month,
-                              _messages[index - 1].timestamp!.day,
-                            ) !=
-                            DateTime(
-                              message.timestamp!.year,
-                              message.timestamp!.month,
-                              message.timestamp!.day,
-                            ));
-                
-                return Column(
-                  children: [
-                    if (showDateDivider)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Text(
-                          _formatDate(message.timestamp),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: secondaryTextColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    _buildMessageBubble(
-                      message,
-                      textColor,
-                      secondaryTextColor,
-                      isDark,
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-          // Input Area
-          Container(
-            padding: EdgeInsets.only(
-              left: 8,
-              right: 8,
-              top: 8,
-              bottom: 8 + MediaQuery.of(context).padding.bottom,
-            ),
-            decoration: BoxDecoration(
-              color: isDark ? backgroundDark : Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 4,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.emoji_emotions_outlined, color: secondaryTextColor),
-                  onPressed: () {
-                    // TODO: Open emoji picker
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.attach_file, color: secondaryTextColor),
-                  onPressed: () {
-                    // TODO: Open attachment options
-                  },
-                ),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200],
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: TextField(
-                      controller: _messageController,
-                      style: TextStyle(color: textColor),
-                      decoration: InputDecoration(
-                        hintText: "Type a message",
-                        hintStyle: TextStyle(color: secondaryTextColor),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      ),
-                      maxLines: null,
-                      textCapitalization: TextCapitalization.sentences,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Material(
-                  color: secondary,
-                  borderRadius: BorderRadius.circular(24),
-                  child: InkWell(
-                    onTap: _sendMessage,
-                    borderRadius: BorderRadius.circular(24),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      child: const Icon(Icons.send, color: Colors.white, size: 20),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      );
+      */
     );
   }
 
+  // Commented out - messaging coming soon
+  /*
   String _formatDate(DateTime? dateTime) {
     if (dateTime == null) return '';
     
@@ -583,4 +655,5 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
       ),
     );
   }
+  */
 }
