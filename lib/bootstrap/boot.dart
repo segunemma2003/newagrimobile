@@ -7,12 +7,12 @@ import 'package:nylo_framework/nylo_framework.dart';
 
 /* Boot
 |--------------------------------------------------------------------------
-| The boot class is used to initialize your application.
+| The boot class is used to initialize Learn with Agrisiti application.
 | Providers are booted in the order they are defined.
 |-------------------------------------------------------------------------- */
 
 class Boot {
-  /// This method is called to initialize Nylo.
+  /// This method is called to initialize Learn with Agrisiti.
   static Future<Nylo> nylo() async {
     WidgetsFlutterBinding.ensureInitialized();
 
@@ -26,7 +26,7 @@ class Boot {
     return await bootApplication(providers);
   }
 
-  /// This method is called after Nylo is initialized.
+  /// This method is called after Learn with Agrisiti is initialized.
   static Future<void> finished(Nylo nylo) async {
     await bootFinished(nylo, providers);
 

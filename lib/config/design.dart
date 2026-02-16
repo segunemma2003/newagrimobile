@@ -9,7 +9,7 @@ import 'package:nylo_framework/nylo_framework.dart';
 /* Design
 |--------------------------------------------------------------------------
 | Contains App Font + Widgets used in the Nylo.
-| Learn more: https://nylo.dev/docs/6.x/themes-and-styling#design
+| Learn more: Learn with Agrisiti/6.x/themes-and-styling#design
 |-------------------------------------------------------------------------- */
 
 /* Font

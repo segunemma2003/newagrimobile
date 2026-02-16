@@ -6,7 +6,7 @@ import 'package:nylo_framework/nylo_framework.dart';
 | E.g. static StorageKey coins = "SK_COINS";
 | String coins = await Keys.coins.read();
 |
-| Learn more: https://nylo.dev/docs/6.x/storage#storage-keys
+| Learn with Agrisiti - Storage Keys
 |-------------------------------------------------------------------------- */
 
 class Keys {

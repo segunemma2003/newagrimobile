@@ -9,6 +9,6 @@ void main() async {
       showSplashScreen: true,
     );
   } catch (e) {
-    print('Warning: Error during Nylo initialization: $e');
+    print('Warning: Error during Learn with Agrisiti initialization: $e');
   }
 }

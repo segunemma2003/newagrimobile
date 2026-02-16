@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
-        android:label="Nylo"
+        android:label="Learn with Agrisiti"
         android:name="${applicationName}"
         android:allowBackup="false"
         android:fullBackupContent="false"

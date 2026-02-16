@@ -3,7 +3,7 @@ import 'controller.dart';
 
 class HomeController extends Controller {
   onTapDocumentation() async {
-    await launchUrl(Uri.parse("https://nylo.dev/docs"));
+    await launchUrl(Uri.parse("Learn with Agrisiti"));
   }
 
   onTapGithub() async {

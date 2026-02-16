@@ -10,7 +10,7 @@ import 'package:nylo_framework/nylo_framework.dart';
 | Run the below in the terminal to add a new theme.
 | "dart run nylo_framework:main make:theme bright_theme"
 |
-| Learn more: https://nylo.dev/docs/6.x/themes-and-styling
+| Learn more: Learn with Agrisiti/6.x/themes-and-styling
 |-------------------------------------------------------------------------- */
 
 // App Themes

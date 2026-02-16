@@ -1,11 +1,10 @@
-# Nylo - Micro-framework for Flutter.
+# Learn with Agrisiti - Mobile Learning Application
 #
-# Website: https://nylo.dev
-# Official repository: https://github.com/nylo-core/nylo
-# Author: Anthony Gordon <https://github.com/agordn52>
+# Agrisiti Academy Mobile App
+# Built with Flutter
 
 name: flutter_app
-description: A new Nylo Flutter application.
+description: Learn with Agrisiti - Mobile Learning Application
 
 publish_to: 'none'
 
@@ -53,7 +52,8 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "public/app_icon/icon.png"
+  # image_path: "public/app_icon/icon.png"
+  image_path: "public/images/logo-without.png"
   remove_alpha_ios: true
 
 # RENAME YOUR PROJECT

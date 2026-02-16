@@ -55,13 +55,13 @@ class _IntroPageState extends NyPage<IntroPage> {
   Widget view(BuildContext context) {
     return Scaffold(
       body: PageView(
-          controller: _pageController,
-          onPageChanged: (index) {
-            setState(() {
-              _currentPage = index;
-            });
-          },
-          children: [
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _currentPage = index;
+          });
+        },
+        children: [
           _buildScreen1(context),
           _buildScreen2(context),
           _buildScreen3(context),
@@ -156,15 +156,12 @@ class _IntroPageState extends NyPage<IntroPage> {
                         child: Stack(
                           children: [
                             // Background image
-                            Container(
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(
-                                    "https://lh3.googleusercontent.com/aida-public/AB6AXuCqTpy-S8kyuaevR2mmivH86ePRnIGY5NjgP-Gog9Nhy0zJLc8CBDNEH9LHmW4H4MiOhwfdP0v1OU2_6q8JbMrBX43WAh4SSfznrVdHGbe2L0KalcHcm63Gi75NC2TtI1H5Xp3q-L_ljNFvCbYqP-e7wAbWlMrOmy58nHyF6F16PVjRYA5A6wXq4cbbHes3zIU0qPqcXQcGoONRFVQ-EtpZTZ4M2iZM2YVtbseFfPocJZTVoHB1R5DuhL2r5bE-u2OmpD9ZPaWj5CY",
-                                  ),
-                                  fit: BoxFit.cover,
-                                  onError: (_, __) {},
-                                ),
+                            Image.asset(
+                              "public/images/A-01.png",
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                color: primary.withOpacity(0.1),
                               ),
                             ),
                             // Gradient overlay (from bottom to top)
@@ -377,12 +374,12 @@ class _IntroPageState extends NyPage<IntroPage> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-            Image.asset(
+                      Image.asset(
                         "logo-without.png",
                         width: 24,
                         height: 24,
                         fit: BoxFit.contain,
-            ).localAsset(),
+                      ).localAsset(),
                       const SizedBox(width: 4),
                       Text(
                         "Agrisiti",
@@ -407,35 +404,63 @@ class _IntroPageState extends NyPage<IntroPage> {
                 child: Column(
                   children: [
                     const SizedBox(height: 16),
+                    // Hero Image
+                    Container(
+                      height: 280,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: primary.withOpacity(0.1),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          "public/images/B-01.png",
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                            color: primary.withOpacity(0.1),
+                            child: Center(
+                              child: Icon(
+                                Icons.image,
+                                color: primary.withOpacity(0.3),
+                                size: 64,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                     // Headline Section
-            Text(
+                    Text(
                       "Master Agriculture Step-by-Step",
-              textAlign: TextAlign.center,
+                      textAlign: TextAlign.center,
                       style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w700,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w700,
                         color: const Color(
                             0xFF1e293b), // Dark text for white background
-                height: 1.2,
-                letterSpacing: -0.5,
-              ),
-            ),
+                        height: 1.2,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
                     const SizedBox(height: 12),
-            // Description
+                    // Description
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
                         "Our courses are divided into easy-to-digest modules and lessons, designed to take you from beginner to expert.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                height: 1.5,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          height: 1.5,
                           color: const Color(
                               0xFF475569), // Dark text for white background
                         ),
-              ),
-            ),
-              const SizedBox(height: 32),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
                     // Module Cards with decorative glow
                     Stack(
                       children: [
@@ -460,14 +485,14 @@ class _IntroPageState extends NyPage<IntroPage> {
                         Column(
                           children: [
                             // Completed Module Card
-              Container(
+                            Container(
                               padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
+                              decoration: BoxDecoration(
                                 color: isDark
                                     ? Colors.grey[800]!.withOpacity(0.4)
                                     : Colors.white.withOpacity(0.8),
                                 borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
+                                border: Border.all(
                                   color: isDark
                                       ? Colors.white.withOpacity(0.05)
                                       : Colors.grey[300]!,
@@ -631,12 +656,12 @@ class _IntroPageState extends NyPage<IntroPage> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
-                child: Column(
+                                        child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
                                             Row(
-                  children: [
+                                              children: [
                                                 Icon(
                                                   Icons.pending,
                                                   color: secondary,
@@ -686,8 +711,8 @@ class _IntroPageState extends NyPage<IntroPage> {
                                         ),
                                         child: Text(
                                           "4/10",
-                      style: TextStyle(
-                        fontSize: 14,
+                                          style: TextStyle(
+                                            fontSize: 14,
                                             fontWeight: FontWeight.w700,
                                             color:
                                                 isDark ? Colors.white : primary,
@@ -811,24 +836,24 @@ class _IntroPageState extends NyPage<IntroPage> {
                                                       .withOpacity(0.4)
                                                   : Colors.grey[600],
                                               letterSpacing: 1.0,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
                                             "Advanced Irrigation",
-                      style: TextStyle(
+                                            style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w700,
                                               color: isDark
                                                   ? Colors.white
                                                       .withOpacity(0.6)
                                                   : Colors.grey[700],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -889,18 +914,18 @@ class _IntroPageState extends NyPage<IntroPage> {
                       ),
                       Expanded(
                         flex: 2,
-                child: ElevatedButton(
+                        child: ElevatedButton(
                           onPressed: () {
                             _pageController.nextPage(
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
                             );
-                  },
-                  style: ElevatedButton.styleFrom(
+                          },
+                          style: ElevatedButton.styleFrom(
                             backgroundColor: primary,
-                    foregroundColor: Colors.white,
+                            foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
+                            shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             elevation: 8,
@@ -976,8 +1001,8 @@ class _IntroPageState extends NyPage<IntroPage> {
                     onPressed: _skipIntro,
                     child: Text(
                       "Skip",
-                    style: TextStyle(
-                      fontSize: 16,
+                      style: TextStyle(
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: const Color(0xFF9db9a3), // dark:text-[#9db9a3]
                         letterSpacing: 0.015,
@@ -1028,8 +1053,8 @@ class _IntroPageState extends NyPage<IntroPage> {
                             children: [
                               // Background image
                               Positioned.fill(
-                                child: Image.network(
-                                  "https://lh3.googleusercontent.com/aida-public/AB6AXuCXk_T3ABy3pj3P63iuqgRsJsL9S6qQ6IFc-nxkWPynnsNlRtOrlZVVgmPnx0teGe1uWsJPYHAxh1s8umgaGPzGYhgSYBKp8Bqeb_omDunu4UpOnkirIu-2t7KDaXbyzg5Rj0-WY0pVV0hw4HfbnP5Jke1AmnsbU9mqBLycM5vS1qc1yfWsMxJHIfguUCLnqtmOdXFHj8Nu5QvRmgd4WNXzmxXWe8oDUEw7wv8o4Op161a1__qL5YemYtaSsbXW9Xxro7vunAultEw",
+                                child: Image.asset(
+                                  "public/images/C-01.png",
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) =>
                                       Container(
@@ -1061,10 +1086,10 @@ class _IntroPageState extends NyPage<IntroPage> {
                                 child: _PulsingVRIcon(primary: primary),
                               ),
                             ],
-                  ),
-                ),
-              ),
-            const SizedBox(height: 24),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
                       // Text Content
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -1124,8 +1149,8 @@ class _IntroPageState extends NyPage<IntroPage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                         child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
                             3,
                             (index) {
                               final isActive = _currentPage == index;
@@ -1133,8 +1158,8 @@ class _IntroPageState extends NyPage<IntroPage> {
                                 margin:
                                     const EdgeInsets.symmetric(horizontal: 6),
                                 width: isActive ? 32 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
+                                height: 8,
+                                decoration: BoxDecoration(
                                   color: isActive
                                       ? secondary // primary (secondary color)
                                       : (Theme.of(context).brightness ==

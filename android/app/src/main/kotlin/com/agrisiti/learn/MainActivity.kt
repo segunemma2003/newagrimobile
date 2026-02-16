@@ -1,4 +1,4 @@
-package com.nylo.android
+package com.agrisiti.learn
 
 import android.content.ContentResolver
 import android.content.Context
@@ -11,7 +11,7 @@ import java.util.*
 class MainActivity: FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "nylo.dev/android").setMethodCallHandler { call, result ->
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "agrisiti.learn/android").setMethodCallHandler { call, result ->
             if ("drawableToUri" == call.method) {
                 val resourceId = this@MainActivity.resources.getIdentifier(call.arguments as String, "drawable", this@MainActivity.packageName)
                 result.success(resourceToUriString(this@MainActivity.applicationContext, resourceId))

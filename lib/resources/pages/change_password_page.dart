@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
+import '/app/networking/api_service.dart';
 
 class ChangePasswordPage extends NyStatefulWidget {
   static RouteView path = ("/change-password", (_) => ChangePasswordPage());
@@ -444,13 +445,7 @@ class _ChangePasswordPageState extends NyPage<ChangePasswordPage> {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () {
-                // TODO: Navigate to forgot password page
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Forgot password feature coming soon"),
-                    backgroundColor: Colors.orange,
-                  ),
-                );
+                routeTo("/forgot-password");
               },
               style: TextButton.styleFrom(
                 padding: EdgeInsets.zero,
@@ -528,28 +523,77 @@ class _ChangePasswordPageState extends NyPage<ChangePasswordPage> {
       _isLoading = true;
     });
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 1));
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text("Password changed successfully"),
-          backgroundColor: accent,
-          duration: const Duration(seconds: 2),
+    try {
+      // Call the actual API
+      Map<String, dynamic>? response = await api<ApiService>(
+        (request) => request.changePassword(
+          currentPassword: _currentPasswordController.text.trim(),
+          password: _newPasswordController.text.trim(),
+          passwordConfirmation: _confirmPasswordController.text.trim(),
         ),
       );
 
-      // Clear fields and go back
-      _currentPasswordController.clear();
-      _newPasswordController.clear();
-      _confirmPasswordController.clear();
+      setState(() {
+        _isLoading = false;
+      });
 
-      Navigator.of(context).pop();
+      if (mounted) {
+        if (response != null && response['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response['message'] ?? 'Password changed successfully'),
+              backgroundColor: accent,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+
+          // Clear fields and go back
+          _currentPasswordController.clear();
+          _newPasswordController.clear();
+          _confirmPasswordController.clear();
+
+          Navigator.of(context).pop();
+        } else {
+          final errorMessage = response?['message'] ?? 
+              response?['errors']?.toString() ?? 
+              'Failed to change password. Please try again.';
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (mounted) {
+        String errorMessage = 'An error occurred. Please try again.';
+        
+        // Handle specific error cases
+        if (e.toString().contains('401') || e.toString().contains('Unauthenticated')) {
+          errorMessage = 'Your session has expired. Please login again.';
+        } else if (e.toString().contains('Current password is incorrect')) {
+          errorMessage = 'Current password is incorrect. Please try again.';
+        } else if (e.toString().contains('must be different')) {
+          errorMessage = 'New password must be different from your current password.';
+        } else if (e.toString().contains('at least 8 characters')) {
+          errorMessage = 'Password must be at least 8 characters long.';
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 }

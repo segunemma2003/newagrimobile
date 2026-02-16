@@ -10,7 +10,7 @@ import 'package:nylo_framework/nylo_framework.dart';
 | Run the below in the terminal to create a new route guard.
 | "dart run nylo_framework:main make:route_guard check_subscription"
 |
-| Learn more https://nylo.dev/docs/6.x/router#route-guards
+| Learn with Agrisiti - Route Guards
 |-------------------------------------------------------------------------- */
 
 class AuthRouteGuard extends NyRouteGuard {

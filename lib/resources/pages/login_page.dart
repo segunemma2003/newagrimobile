@@ -392,7 +392,7 @@ class _LoginPageState extends NyPage<LoginPage> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        // TODO: Navigate to forgot password page
+                        routeTo("/forgot-password");
                       },
                       child: Text(
                         "Forgot Password?",

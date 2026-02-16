@@ -18,6 +18,8 @@ import '/resources/pages/community_forum_page.dart';
 import '/resources/pages/forum_post_detail_page.dart';
 import '/resources/pages/chat_detail_page.dart';
 import '/resources/pages/change_password_page.dart';
+import '/resources/pages/forgot_password_page.dart';
+import '/resources/pages/reset_password_page.dart';
 import '/resources/pages/help_support_page.dart';
 import '/resources/pages/terms_conditions_page.dart';
 import '/resources/pages/notification_settings_page.dart';
@@ -41,7 +43,7 @@ import 'package:nylo_framework/nylo_framework.dart';
 | Run the below in the terminal to add In-app Purchases to your project.
 | "dart run scaffold_ui:main iap"
 |
-| Learn more https://nylo.dev/docs/6.x/router
+| Learn with Agrisiti - Application Router
 |-------------------------------------------------------------------------- */
 
 appRouter() => nyRoutes((router) {
@@ -49,6 +51,8 @@ appRouter() => nyRoutes((router) {
       router.add(WelcomePage.path);
       router.add(LoginPage.path);
       router.add(RegisterPage.path);
+      router.add(ForgotPasswordPage.path);
+      router.add(ResetPasswordPage.path);
 
       // Protected routes
       router.group(

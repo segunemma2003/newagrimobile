@@ -17,7 +17,7 @@ import '/app/networking/api_service.dart';
 | Model decoders are used in 'app/networking/' for morphing json payloads
 | into Models.
 |
-| Learn more https://nylo.dev/docs/6.x/decoders#model-decoders
+| Learn with Agrisiti - Model Decoders
 |-------------------------------------------------------------------------- */
 
 final Map<Type, dynamic> modelDecoders = {
@@ -53,7 +53,7 @@ final Map<Type, dynamic> modelDecoders = {
 | API decoders are used when you need to access an API service using the
 | 'api' helper. E.g. api<MyApiService>((request) => request.fetchData());
 |
-| Learn more https://nylo.dev/docs/6.x/decoders#api-decoders
+| Learn with Agrisiti - API Decoders
 |-------------------------------------------------------------------------- */
 
 final Map<Type, dynamic> apiDecoders = {
@@ -66,7 +66,7 @@ final Map<Type, dynamic> apiDecoders = {
 | -------------------------------------------------------------------------
 | Controller are used in pages.
 |
-| Learn more https://nylo.dev/docs/6.x/controllers
+| Learn with Agrisiti - Controllers
 |-------------------------------------------------------------------------- */
 final Map<Type, dynamic> controllers = {
   HomeController: () => HomeController(),
