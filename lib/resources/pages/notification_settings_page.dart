@@ -197,7 +197,7 @@ class _NotificationSettingsPageState extends NyPage<NotificationSettingsPage> {
       ),
       value: value,
       onChanged: onChanged,
-      activeColor: const Color(0xFF2D8659),
+      activeThumbColor: const Color(0xFF2D8659),
     );
   }
 }

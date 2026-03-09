@@ -1,0 +1,114 @@
+{
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/PluginScriptsJS/SupportZoomJS.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SupportZoomJS.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SupportZoomJS.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SupportZoomJS.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SupportZoomJS.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SupportZoomJS.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/SwiftFlutterPlugin.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SwiftFlutterPlugin.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SwiftFlutterPlugin.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SwiftFlutterPlugin.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SwiftFlutterPlugin.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SwiftFlutterPlugin.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/ServerTrustAuthResponse.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/ServerTrustAuthResponse.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/ServerTrustAuthResponse.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/ServerTrustAuthResponse.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/ServerTrustAuthResponse.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/ServerTrustAuthResponse.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/ServerTrustChallenge.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/ServerTrustChallenge.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/ServerTrustChallenge.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/ServerTrustChallenge.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/ServerTrustChallenge.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/ServerTrustChallenge.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/Size2D.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/Size2D.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/Size2D.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/Size2D.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/Size2D.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/Size2D.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/SslCertificate.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SslCertificate.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SslCertificate.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SslCertificate.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SslCertificate.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SslCertificate.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/SslError.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SslError.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SslError.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SslError.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SslError.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/SslError.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/StringOrInt.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/StringOrInt.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/StringOrInt.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/StringOrInt.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/StringOrInt.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/StringOrInt.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/UIColor.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIColor.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIColor.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIColor.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIColor.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIColor.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/UIEdgeInsets.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIEdgeInsets.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIEdgeInsets.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIEdgeInsets.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIEdgeInsets.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIEdgeInsets.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/UIEventAttribution.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIEventAttribution.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIEventAttribution.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIEventAttribution.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIEventAttribution.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIEventAttribution.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/UIFindSession.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIFindSession.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIFindSession.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIFindSession.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIFindSession.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIFindSession.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/UIImage.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIImage.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIImage.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIImage.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIImage.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/UIImage.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/URLAuthenticationChallenge.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLAuthenticationChallenge.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLAuthenticationChallenge.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLAuthenticationChallenge.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLAuthenticationChallenge.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLAuthenticationChallenge.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/URLCredential.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLCredential.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLCredential.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLCredential.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLCredential.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLCredential.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/ios/Classes/Types/URLProtectionSpace.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLProtectionSpace.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLProtectionSpace.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLProtectionSpace.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLProtectionSpace.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/flutter_inappwebview_ios.build/Objects-normal/arm64/URLProtectionSpace.swiftdeps"
+  }
+}

@@ -49,7 +49,7 @@ class _MainNavigationPageState extends NyPage<MainNavigationPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF13251E) : Colors.white;
     final borderColor =
-        isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!;
+        isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[200]!;
 
     return Scaffold(
       body: IndexedStack(
@@ -64,7 +64,7 @@ class _MainNavigationPageState extends NyPage<MainNavigationPage> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),

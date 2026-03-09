@@ -148,7 +148,7 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
     final bgColor = isDark ? backgroundDark : backgroundLight;
     final textColor = isDark ? Colors.white : const Color(0xFF131515);
     final secondaryTextColor = isDark ? Colors.grey[400]! : Colors.grey[700]!;
-    final borderColor = isDark ? Colors.white.withOpacity(0.1) : primary;
+    final borderColor = isDark ? Colors.white.withValues(alpha: 0.1) : primary;
     final inputBgColor = isDark ? Colors.grey[900]! : Colors.white;
 
     final currentAvatar = _selectedImagePath != null
@@ -168,10 +168,10 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 decoration: BoxDecoration(
-                  color: bgColor.withOpacity(0.8),
+                  color: bgColor.withValues(alpha: 0.8),
                   border: Border(
                     bottom: BorderSide(
-                      color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+                      color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
                     ),
                   ),
                 ),
@@ -238,11 +238,11 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
                                     )
                                   : null,
                               color: currentAvatar == null
-                                  ? accent.withOpacity(0.2)
+                                  ? accent.withValues(alpha: 0.2)
                                   : null,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: Colors.black.withValues(alpha: 0.1),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -282,7 +282,7 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
+                                        color: Colors.black.withValues(alpha: 0.2),
                                         blurRadius: 4,
                                         offset: const Offset(0, 2),
                                       ),
@@ -390,10 +390,10 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
           bottom: 16 + MediaQuery.of(context).padding.bottom,
         ),
         decoration: BoxDecoration(
-          color: bgColor.withOpacity(0.95),
+          color: bgColor.withValues(alpha: 0.95),
           border: Border(
             top: BorderSide(
-              color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+              color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
             ),
           ),
         ),
@@ -409,7 +409,7 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               elevation: 4,
-              shadowColor: primary.withOpacity(0.3),
+              shadowColor: primary.withValues(alpha: 0.3),
             ),
             child: const Text(
               "Save Changes",

@@ -22,14 +22,24 @@ class Boot {
       await Future.delayed(const Duration(seconds: 5));
     }
 
+    print('Boot nylo: _setup');
     await _setup();
-    return await bootApplication(providers);
+    print('Boot nylo: bootApplication');
+    try {
+      final nylo = await bootApplication(providers);
+      print('Boot nylo: bootApplication (after)');
+      return nylo;
+    } catch (e, st) {
+      print('Boot nylo ERROR in bootApplication: $e');
+      print(st);
+      rethrow;
+    }
   }
 
   /// This method is called after Learn with Agrisiti is initialized.
   static Future<void> finished(Nylo nylo) async {
     await bootFinished(nylo, providers);
-
+    print('Boot nylo: finished');
     runApp(Main(nylo));
   }
 }

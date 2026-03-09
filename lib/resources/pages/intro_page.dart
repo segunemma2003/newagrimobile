@@ -16,9 +16,11 @@ class _IntroPageState extends NyPage<IntroPage> {
 
   @override
   get init => () async {
+        print('INTRO: init called on intro');
         // Check if intro has already been seen
         try {
           final hasSeenIntro = await Keys.hasSeenIntro.read<bool>() ?? false;
+          print('INTRO: hasSeenIntro: $hasSeenIntro');
           if (hasSeenIntro) {
             // Check if user is authenticated
             final isAuthenticated = await Auth.isAuthenticated();
@@ -28,6 +30,7 @@ class _IntroPageState extends NyPage<IntroPage> {
               routeTo("/login");
             }
           }
+          print('INTRO: init called on intro (after)');
         } catch (e) {
           // Handle storage errors gracefully - assume intro hasn't been seen
           // Suppress error logging for Keychain issues on simulator
@@ -72,6 +75,7 @@ class _IntroPageState extends NyPage<IntroPage> {
 
   // Screen 1: Light background - Empowering Agriculture
   Widget _buildScreen1(BuildContext context) {
+    print('INTRO: _buildScreen1 called');
     // Color scheme
     const primary = Color(0xFF3E6866);
     const secondary = Color(0xFF50C1AE);
@@ -79,8 +83,8 @@ class _IntroPageState extends NyPage<IntroPage> {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: secondary
-          .withOpacity(0.1), // Light teal background (#50C1AE with opacity)
+      color: secondary.withValues(
+          alpha: 0.1), // Light teal background (#50C1AE with opacity)
       child: SafeArea(
         child: Column(
           children: [
@@ -98,7 +102,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: primary.withOpacity(0.2), // primary/20
+                          color: primary.withValues(alpha: 0.2), // primary/20
                           shape: BoxShape.circle,
                         ),
                         child: Padding(
@@ -132,7 +136,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: primary.withOpacity(0.6), // primary/60
+                        color: primary.withValues(alpha: 0.6), // primary/60
                       ),
                     ),
                   ),
@@ -149,7 +153,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: primary.withOpacity(0.1), // primary/10
+                        color: primary.withValues(alpha: 0.1), // primary/10
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
@@ -161,7 +165,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
                                   Container(
-                                color: primary.withOpacity(0.1),
+                                color: primary.withValues(alpha: 0.1),
                               ),
                             ),
                             // Gradient overlay (from bottom to top)
@@ -172,7 +176,8 @@ class _IntroPageState extends NyPage<IntroPage> {
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter,
                                     colors: [
-                                      primary.withOpacity(0.4), // primary/40
+                                      primary.withValues(
+                                          alpha: 0.4), // primary/40
                                       Colors.transparent,
                                     ],
                                   ),
@@ -234,7 +239,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                       style: TextStyle(
                         fontSize: 16,
                         height: 1.5,
-                        color: primary.withOpacity(0.8), // primary/80
+                        color: primary.withValues(alpha: 0.8), // primary/80
                       ),
                     ),
                   ),
@@ -255,8 +260,9 @@ class _IntroPageState extends NyPage<IntroPage> {
                             color: index == 0
                                 ? secondary // secondary
                                 : (isDark
-                                    ? Colors.white.withOpacity(0.2)
-                                    : primary.withOpacity(0.2)), // primary/20
+                                    ? Colors.white.withValues(alpha: 0.2)
+                                    : primary.withValues(
+                                        alpha: 0.2)), // primary/20
                             borderRadius: BorderRadius.circular(999),
                           ),
                         );
@@ -285,7 +291,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                               BorderRadius.circular(999), // full rounded
                         ),
                         elevation: 8,
-                        shadowColor: primary.withOpacity(0.2),
+                        shadowColor: primary.withValues(alpha: 0.2),
                       ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -340,8 +346,8 @@ class _IntroPageState extends NyPage<IntroPage> {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: secondary
-          .withOpacity(0.1), // Light teal background (#50C1AE with opacity)
+      color: secondary.withValues(
+          alpha: 0.1), // Light teal background (#50C1AE with opacity)
       child: SafeArea(
         child: Column(
           children: [
@@ -356,7 +362,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: primary.withOpacity(0.1),
+                      color: primary.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
@@ -410,7 +416,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: primary.withOpacity(0.1),
+                        color: primary.withValues(alpha: 0.1),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
@@ -419,11 +425,11 @@ class _IntroPageState extends NyPage<IntroPage> {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
                               Container(
-                            color: primary.withOpacity(0.1),
+                            color: primary.withValues(alpha: 0.1),
                             child: Center(
                               child: Icon(
                                 Icons.image,
-                                color: primary.withOpacity(0.3),
+                                color: primary.withValues(alpha: 0.3),
                                 size: 64,
                               ),
                             ),
@@ -472,7 +478,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                             width: 192,
                             height: 192,
                             decoration: BoxDecoration(
-                              color: secondary.withOpacity(0.2),
+                              color: secondary.withValues(alpha: 0.2),
                               shape: BoxShape.circle,
                             ),
                             child: BackdropFilter(
@@ -489,24 +495,24 @@ class _IntroPageState extends NyPage<IntroPage> {
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: isDark
-                                    ? Colors.grey[800]!.withOpacity(0.4)
-                                    : Colors.white.withOpacity(0.8),
+                                    ? Colors.grey[800]!.withValues(alpha: 0.4)
+                                    : Colors.white.withValues(alpha: 0.8),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: isDark
-                                      ? Colors.white.withOpacity(0.05)
+                                      ? Colors.white.withValues(alpha: 0.05)
                                       : Colors.grey[300]!,
                                   width: 1,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.3),
+                                    color: Colors.black.withValues(alpha: 0.3),
                                     blurRadius: 15,
                                     spreadRadius: 0,
                                     offset: const Offset(0, 4),
                                   ),
                                   BoxShadow(
-                                    color: primary.withOpacity(0.1),
+                                    color: primary.withValues(alpha: 0.1),
                                     blurRadius: 20,
                                     spreadRadius: 2,
                                     offset: const Offset(0, 0),
@@ -524,7 +530,8 @@ class _IntroPageState extends NyPage<IntroPage> {
                                         Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: BoxDecoration(
-                                            color: primary.withOpacity(0.2),
+                                            color:
+                                                primary.withValues(alpha: 0.2),
                                             shape: BoxShape.circle,
                                           ),
                                           child: Icon(
@@ -540,7 +547,8 @@ class _IntroPageState extends NyPage<IntroPage> {
                                             fontSize: 12,
                                             fontWeight: FontWeight.w500,
                                             color: isDark
-                                                ? Colors.white.withOpacity(0.6)
+                                                ? Colors.white
+                                                    .withValues(alpha: 0.6)
                                                 : Colors.grey[700],
                                             letterSpacing: 1.0,
                                           ),
@@ -575,7 +583,8 @@ class _IntroPageState extends NyPage<IntroPage> {
                                           decoration: BoxDecoration(
                                             boxShadow: [
                                               BoxShadow(
-                                                color: primary.withOpacity(0.3),
+                                                color: primary.withValues(
+                                                    alpha: 0.3),
                                                 blurRadius: 8,
                                                 spreadRadius: 0,
                                                 offset: const Offset(0, 2),
@@ -620,28 +629,28 @@ class _IntroPageState extends NyPage<IntroPage> {
                               padding: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
                                 color: isDark
-                                    ? Colors.grey[800]!.withOpacity(0.8)
+                                    ? Colors.grey[800]!.withValues(alpha: 0.8)
                                     : Colors.white,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: primary.withOpacity(0.3),
+                                  color: primary.withValues(alpha: 0.3),
                                   width: 1.5,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: primary.withOpacity(0.2),
+                                    color: primary.withValues(alpha: 0.2),
                                     blurRadius: 20,
                                     spreadRadius: 2,
                                     offset: const Offset(0, 4),
                                   ),
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.4),
+                                    color: Colors.black.withValues(alpha: 0.4),
                                     blurRadius: 15,
                                     spreadRadius: 0,
                                     offset: const Offset(0, 6),
                                   ),
                                   BoxShadow(
-                                    color: secondary.withOpacity(0.15),
+                                    color: secondary.withValues(alpha: 0.15),
                                     blurRadius: 30,
                                     spreadRadius: -5,
                                     offset: const Offset(0, 0),
@@ -675,7 +684,8 @@ class _IntroPageState extends NyPage<IntroPage> {
                                                     fontWeight: FontWeight.w500,
                                                     color: isDark
                                                         ? Colors.white
-                                                            .withOpacity(0.6)
+                                                            .withValues(
+                                                                alpha: 0.6)
                                                         : Colors.grey[700],
                                                     letterSpacing: 1.0,
                                                   ),
@@ -704,8 +714,9 @@ class _IntroPageState extends NyPage<IntroPage> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: isDark
-                                              ? Colors.white.withOpacity(0.1)
-                                              : primary.withOpacity(0.1),
+                                              ? Colors.white
+                                                  .withValues(alpha: 0.1)
+                                              : primary.withValues(alpha: 0.1),
                                           borderRadius:
                                               BorderRadius.circular(4),
                                         ),
@@ -752,7 +763,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                                         "Currently studying: N-Fixing Plants",
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: primary.withOpacity(0.8),
+                                          color: primary.withValues(alpha: 0.8),
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -772,18 +783,18 @@ class _IntroPageState extends NyPage<IntroPage> {
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: isDark
-                                    ? Colors.grey[900]!.withOpacity(0.4)
-                                    : Colors.grey[100]!.withOpacity(0.6),
+                                    ? Colors.grey[900]!.withValues(alpha: 0.4)
+                                    : Colors.grey[100]!.withValues(alpha: 0.6),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: isDark
-                                      ? Colors.white.withOpacity(0.05)
+                                      ? Colors.white.withValues(alpha: 0.05)
                                       : Colors.grey[300]!,
                                   width: 1,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
+                                    color: Colors.black.withValues(alpha: 0.2),
                                     blurRadius: 10,
                                     spreadRadius: 0,
                                     offset: const Offset(0, 2),
@@ -804,8 +815,8 @@ class _IntroPageState extends NyPage<IntroPage> {
                                         borderRadius: BorderRadius.circular(8),
                                         boxShadow: [
                                           BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.3),
+                                            color: Colors.black
+                                                .withValues(alpha: 0.3),
                                             blurRadius: 8,
                                             spreadRadius: 0,
                                             offset: const Offset(0, 2),
@@ -833,7 +844,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                                               fontWeight: FontWeight.w500,
                                               color: isDark
                                                   ? Colors.white
-                                                      .withOpacity(0.4)
+                                                      .withValues(alpha: 0.4)
                                                   : Colors.grey[600],
                                               letterSpacing: 1.0,
                                             ),
@@ -846,7 +857,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                                               fontWeight: FontWeight.w700,
                                               color: isDark
                                                   ? Colors.white
-                                                      .withOpacity(0.6)
+                                                      .withValues(alpha: 0.6)
                                                   : Colors.grey[700],
                                             ),
                                           ),
@@ -929,7 +940,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             elevation: 8,
-                            shadowColor: primary.withOpacity(0.2),
+                            shadowColor: primary.withValues(alpha: 0.2),
                           ),
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -969,8 +980,8 @@ class _IntroPageState extends NyPage<IntroPage> {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: secondary
-          .withOpacity(0.1), // Light teal background (#50C1AE with opacity)
+      color: secondary.withValues(
+          alpha: 0.1), // Light teal background (#50C1AE with opacity)
       child: SafeArea(
         child: Column(
           children: [
@@ -986,7 +997,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: primary.withOpacity(0.2),
+                      color: primary.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Image.asset(
@@ -1030,18 +1041,18 @@ class _IntroPageState extends NyPage<IntroPage> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              primary.withOpacity(0.2), // primary/20
+                              primary.withValues(alpha: 0.2), // primary/20
                               backgroundDark,
                             ],
                           ),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: primary.withOpacity(0.1),
+                            color: primary.withValues(alpha: 0.1),
                             width: 1,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: primary.withOpacity(0.05),
+                              color: primary.withValues(alpha: 0.05),
                               blurRadius: 20,
                               spreadRadius: 0,
                             ),
@@ -1058,13 +1069,15 @@ class _IntroPageState extends NyPage<IntroPage> {
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) =>
                                       Container(
-                                    color: backgroundDark.withOpacity(0.6),
+                                    color:
+                                        backgroundDark.withValues(alpha: 0.6),
                                     child: Center(
                                       child: Image.asset(
                                         "logo-without.png",
                                         height: 200,
                                         width: 200,
-                                        color: Colors.white.withOpacity(0.2),
+                                        color:
+                                            Colors.white.withValues(alpha: 0.2),
                                       ).localAsset(),
                                     ),
                                   ),
@@ -1073,7 +1086,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                               // Backdrop blur overlay
                               Positioned.fill(
                                 child: Container(
-                                  color: backgroundDark.withOpacity(0.4),
+                                  color: backgroundDark.withValues(alpha: 0.4),
                                   child: BackdropFilter(
                                     filter:
                                         ImageFilter.blur(sigmaX: 2, sigmaY: 2),
@@ -1164,13 +1177,14 @@ class _IntroPageState extends NyPage<IntroPage> {
                                       ? secondary // primary (secondary color)
                                       : (Theme.of(context).brightness ==
                                               Brightness.dark
-                                          ? secondary.withOpacity(0.2)
+                                          ? secondary.withValues(alpha: 0.2)
                                           : Colors.grey[300]),
                                   borderRadius: BorderRadius.circular(999),
                                   boxShadow: isActive
                                       ? [
                                           BoxShadow(
-                                            color: secondary.withOpacity(0.5),
+                                            color: secondary.withValues(
+                                                alpha: 0.5),
                                             blurRadius: 10,
                                             spreadRadius: 0,
                                           ),
@@ -1212,7 +1226,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                                     borderRadius: BorderRadius.circular(999),
                                   ),
                                   elevation: 8,
-                                  shadowColor: secondary.withOpacity(0.2),
+                                  shadowColor: secondary.withValues(alpha: 0.2),
                                 ),
                                 child: const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1301,9 +1315,9 @@ class _PulsingVRIconState extends State<_PulsingVRIcon>
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: widget.primary.withOpacity(0.2),
+              color: widget.primary.withValues(alpha: 0.2),
               border: Border.all(
-                color: widget.primary.withOpacity(0.3),
+                color: widget.primary.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -1324,7 +1338,7 @@ class DigitalInterfacePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
+      ..color = Colors.white.withValues(alpha: 0.3)
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
@@ -1338,7 +1352,7 @@ class DigitalInterfacePainter extends CustomPainter {
 
     // Draw connecting lines (simplified)
     final linePaint = Paint()
-      ..color = Colors.white.withOpacity(0.2)
+      ..color = Colors.white.withValues(alpha: 0.2)
       ..strokeWidth = 1.5;
 
     // Draw some connecting lines

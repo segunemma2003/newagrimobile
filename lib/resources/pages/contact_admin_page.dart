@@ -47,7 +47,7 @@ class _ContactAdminPageState extends NyPage<ContactAdminPage> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFF0F7F3),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFF2D8659).withOpacity(0.2)),
+                    border: Border.all(color: const Color(0xFF2D8659).withValues(alpha: 0.2)),
                   ),
                   child: const Row(
                     children: [

@@ -138,10 +138,10 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
               bottom: 8,
             ),
             decoration: BoxDecoration(
-              color: bgColor.withOpacity(0.95),
+              color: bgColor.withValues(alpha: 0.95),
               border: Border(
                 bottom: BorderSide(
-                  color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
+                  color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[200]!,
                 ),
               ),
             ),
@@ -213,13 +213,13 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                                   ? null
                                   : Border.all(
                                       color: isDark
-                                          ? Colors.white.withOpacity(0.1)
+                                          ? Colors.white.withValues(alpha: 0.1)
                                           : Colors.grey[200]!,
                                     ),
                               boxShadow: isSelected
                                   ? [
                                       BoxShadow(
-                                        color: primary.withOpacity(0.3),
+                                        color: primary.withValues(alpha: 0.3),
                                         blurRadius: 15,
                                         offset: const Offset(0, 0),
                                       ),
@@ -438,7 +438,7 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
             color: bgColor,
             border: Border(
               bottom: BorderSide(
-                color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+                color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
               ),
             ),
           ),
@@ -495,7 +495,7 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                    color: iconColor!.withOpacity(0.1),
+                    color: iconColor!.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -566,7 +566,7 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                     color: primary,
                     boxShadow: [
                       BoxShadow(
-                        color: primary.withOpacity(0.6),
+                        color: primary.withValues(alpha: 0.6),
                         blurRadius: 8,
                         spreadRadius: 0,
                       ),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
-// Commented out - messaging coming soon
-// import '/app/models/message.dart';
-// import '/app/models/chat_message.dart';
-// import '/config/keys.dart';
+import '/app/models/message.dart';
+import '/app/models/chat_message.dart';
+import '/app/networking/api_service.dart';
+import '/config/keys.dart';
 
 class ChatDetailPage extends NyStatefulWidget {
   static RouteView path = ("/chat-detail", (_) => ChatDetailPage());
@@ -12,162 +12,206 @@ class ChatDetailPage extends NyStatefulWidget {
 }
 
 class _ChatDetailPageState extends NyPage<ChatDetailPage> {
-  // Commented out - messaging coming soon
-  // Message? _conversation;
-  // List<ChatMessage> _messages = [];
-  // TextEditingController? _messageController;
-  // String? _currentUserId;
-  // String? _currentUserName;
-  // String? _currentUserAvatar;
-  // final ScrollController _scrollController = ScrollController();
+  Message? _conversation;
+  List<ChatMessage> _messages = [];
+  TextEditingController? _messageController;
+  String? _currentUserId;
+  String? _currentUserName;
+  String? _currentUserAvatar;
+  String? _courseId;
+  String? _recipientId;
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoading = true;
 
   // Color scheme
   static const Color primary = Color(0xFF3F6967);
-  // Commented out - messaging coming soon
-  // static const Color secondary = Color(0xFF50C1AE);
+  static const Color secondary = Color(0xFF50C1AE);
   static const Color backgroundDark = Color(0xFF161C1B);
-  // static const Color sentMessageColor = Color(0xFFDCF8C6);
-  // static const Color receivedMessageColor = Color(0xFFFFFFFF);
+  static const Color sentMessageColor = Color(0xFFDCF8C6);
+  static const Color receivedMessageColor = Color(0xFFFFFFFF);
 
   @override
   get init => () async {
-        // Commented out - messaging coming soon
-        /*
         final data = widget.data<Map<String, dynamic>>();
-        if (data != null && data['conversation'] != null) {
-          _conversation = data['conversation'] as Message;
+        if (data != null) {
+          if (data['conversation'] != null) {
+            _conversation = data['conversation'] as Message;
+            // Extract course ID and recipient ID from conversation
+            final convId = _conversation!.conversationId ?? _conversation!.id;
+            if (convId != null && convId.contains('-')) {
+              final parts = convId.split('-');
+              if (parts.length >= 2) {
+                _courseId = parts[0];
+                _recipientId = parts[1];
+              }
+            }
+          }
+          // Also check if course_id and recipient_id are passed directly
+          if (data['course_id'] != null) _courseId = data['course_id']?.toString();
+          if (data['recipient_id'] != null) _recipientId = data['recipient_id']?.toString();
         }
         _messageController = TextEditingController();
         await _loadCurrentUser();
         await _loadMessages();
         _scrollToBottom();
-        */
       };
 
-  // Commented out - messaging coming soon
-  /*
   Future<void> _loadCurrentUser() async {
     try {
       final userData = await Keys.auth.read<Map<String, dynamic>>();
-      _currentUserId = userData?['id']?.toString() ?? 'user_1';
+      _currentUserId = userData?['id']?.toString();
       _currentUserName = userData?['name']?.toString() ?? 'You';
       _currentUserAvatar = userData?['avatar']?.toString();
     } catch (e) {
-      _currentUserId = 'user_1';
-      _currentUserName = 'You';
+      print('Error loading current user: $e');
     }
   }
 
   Future<void> _loadMessages() async {
-    if (_conversation?.id == null) return;
-    
+    if (_courseId == null || _currentUserId == null) {
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
-      final messagesJson = await Keys.chatMessages.read<List>();
-      if (messagesJson != null) {
-        _messages = messagesJson
-            .map((m) => ChatMessage.fromJson(m))
-            .where((m) => m.conversationId == _conversation!.id)
-            .toList();
+      // Fetch course messages from API
+      final response = await api<ApiService>(
+        (request) => request.fetchCourseMessages(_courseId!),
+      );
+
+      if (response != null) {
+        final messagesData = response is List ? response : (response['data'] ?? []);
+        _messages = [];
+
+        for (var msgData in messagesData) {
+          final senderId = msgData['sender_id']?.toString();
+          final recipientId = msgData['recipient_id']?.toString();
+          
+          // Only include messages in this conversation
+          if ((senderId == _currentUserId && recipientId == _recipientId) ||
+              (senderId == _recipientId && recipientId == _currentUserId)) {
+            final isSent = senderId == _currentUserId;
+            final sender = msgData['sender'];
+            final recipient = msgData['recipient'];
+            final otherUser = isSent ? recipient : sender;
+
+            final chatMsg = ChatMessage()
+              ..id = msgData['id']?.toString()
+              ..conversationId = _conversation?.id ?? '${_courseId}-$_recipientId'
+              ..senderId = senderId
+              ..senderName = otherUser?['name'] ?? (isSent ? _currentUserName : 'Unknown')
+              ..senderAvatar = otherUser?['avatar']
+              ..content = msgData['message'] ?? msgData['subject'] ?? ''
+              ..timestamp = msgData['created_at'] != null
+                  ? DateTime.tryParse(msgData['created_at'].toString())
+                  : null
+              ..isSent = isSent
+              ..isRead = msgData['is_read'] ?? false
+              ..type = 'text';
+
+            _messages.add(chatMsg);
+
+            // Mark as read if user is recipient
+            if (!isSent && msgData['is_read'] == false) {
+              try {
+                await api<ApiService>(
+                  (request) => request.markMessageAsRead(msgData['id']?.toString() ?? ''),
+                );
+              } catch (e) {
+                print('Error marking message as read: $e');
+              }
+            }
+          }
+        }
+
+        // Sort by timestamp
         _messages.sort((a, b) {
           final aTime = a.timestamp ?? DateTime(2000);
           final bTime = b.timestamp ?? DateTime(2000);
           return aTime.compareTo(bTime);
         });
-        setState(() {});
+
+        setState(() {
+          _isLoading = false;
+        });
       } else {
-        _loadDummyMessages();
+        setState(() {
+          _isLoading = false;
+        });
       }
     } catch (e) {
       print('Error loading messages: $e');
-      _loadDummyMessages();
+      setState(() {
+        _isLoading = false;
+      });
     }
-  }
-
-  void _loadDummyMessages() {
-    if (_conversation == null) return;
-    
-    _messages = [
-      ChatMessage()
-        ..id = "1"
-        ..conversationId = _conversation!.id
-        ..senderId = _conversation!.senderId
-        ..senderName = _conversation!.senderName
-        ..senderAvatar = _conversation!.senderAvatar
-        ..content = "Hello! How can I help you today?"
-        ..timestamp = DateTime.now().subtract(const Duration(hours: 2))
-        ..isSent = false
-        ..isRead = true,
-      ChatMessage()
-        ..id = "2"
-        ..conversationId = _conversation!.id
-        ..senderId = _currentUserId
-        ..senderName = _currentUserName
-        ..content = "Hi! I need help with my course assignment."
-        ..timestamp = DateTime.now().subtract(const Duration(hours: 1, minutes: 45))
-        ..isSent = true
-        ..isRead = true,
-      ChatMessage()
-        ..id = "3"
-        ..conversationId = _conversation!.id
-        ..senderId = _conversation!.senderId
-        ..senderName = _conversation!.senderName
-        ..content = "Sure, I'd be happy to help. Which course are you working on?"
-        ..timestamp = DateTime.now().subtract(const Duration(hours: 1, minutes: 30))
-        ..isSent = false
-        ..isRead = true,
-      ChatMessage()
-        ..id = "4"
-        ..conversationId = _conversation!.id
-        ..senderId = _currentUserId
-        ..senderName = _currentUserName
-        ..content = "It's the Sustainable Farming course, Module 3."
-        ..timestamp = DateTime.now().subtract(const Duration(minutes: 30))
-        ..isSent = true
-        ..isRead = true,
-    ];
-    setState(() {});
   }
 
   Future<void> _sendMessage() async {
-    if (_conversation == null || _messageController == null || _messageController!.text.trim().isEmpty) {
+    if (_courseId == null || _recipientId == null || _messageController == null || 
+        _messageController!.text.trim().isEmpty || _currentUserId == null) {
       return;
     }
 
-    final newMessage = ChatMessage()
+    final messageText = _messageController!.text.trim();
+    _messageController!.clear();
+
+    // Optimistically add message to UI
+    final tempMessage = ChatMessage()
       ..id = DateTime.now().millisecondsSinceEpoch.toString()
-      ..conversationId = _conversation!.id
+      ..conversationId = _conversation?.id ?? '${_courseId}-$_recipientId'
       ..senderId = _currentUserId
       ..senderName = _currentUserName
       ..senderAvatar = _currentUserAvatar
-      ..content = _messageController!.text.trim()
+      ..content = messageText
       ..timestamp = DateTime.now()
       ..isSent = true
       ..isRead = false
       ..type = 'text';
 
     setState(() {
-      _messages.add(newMessage);
-      _messageController!.clear();
+      _messages.add(tempMessage);
     });
 
     _scrollToBottom();
 
-    // Save to storage
+    // Send to API
     try {
-      final allMessagesJson = await Keys.chatMessages.read<List>() ?? [];
-      allMessagesJson.add(newMessage.toJson());
-      await Keys.chatMessages.save(allMessagesJson);
-      
-      // Update conversation
-      final conversationsJson = await Keys.messages.read<List>() ?? [];
-      final convIndex = conversationsJson.indexWhere((c) => c['id'] == _conversation!.id);
-      if (convIndex != -1) {
-        conversationsJson[convIndex]['last_message_preview'] = newMessage.content;
-        conversationsJson[convIndex]['last_message_time'] = newMessage.timestamp?.toIso8601String();
-        await Keys.messages.save(conversationsJson);
+      final response = await api<ApiService>(
+        (request) => request.sendMessage({
+          'course_id': _courseId,
+          'recipient_id': _recipientId,
+          'message': messageText,
+          'subject': null, // Optional subject
+        }),
+      );
+
+      if (response != null) {
+        // Update message with real ID from server
+        final msgData = response is Map ? response : response['data'];
+        if (msgData != null && msgData['id'] != null) {
+          tempMessage.id = msgData['id']?.toString();
+          tempMessage.timestamp = msgData['created_at'] != null
+              ? DateTime.tryParse(msgData['created_at'].toString())
+              : DateTime.now();
+        }
+        setState(() {});
       }
     } catch (e) {
-      print('Error saving message: $e');
+      print('Error sending message: $e');
+      // Show error to user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to send message. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -182,10 +226,7 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
       }
     });
   }
-  */
 
-  // Commented out - messaging coming soon
-  /*
   String _formatTime(DateTime? dateTime) {
     if (dateTime == null) return '';
     
@@ -218,13 +259,28 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
       return '$month/$day $displayHour:$minute $period';
     }
   }
-  */
+
+  String _formatDate(DateTime? dateTime) {
+    if (dateTime == null) return '';
+    
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+    
+    if (messageDate == today) {
+      return 'Today';
+    } else if (messageDate == today.subtract(const Duration(days: 1))) {
+      return 'Yesterday';
+    } else {
+      final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return '${months[dateTime.month - 1]} ${dateTime.day}, ${dateTime.year}';
+    }
+  }
 
   @override
   void dispose() {
-    // Commented out - messaging coming soon
-    // _messageController?.dispose();
-    // _scrollController.dispose();
+    _messageController?.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -247,49 +303,167 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
-          "Chat",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        title: Row(
           children: [
-            Icon(
-              Icons.chat_bubble_outline,
-              size: 80,
-              color: secondaryTextColor.withOpacity(0.5),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              "Coming Soon",
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
-                color: textColor,
+            if (_conversation?.senderAvatar != null)
+              Container(
+                width: 40,
+                height: 40,
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: NetworkImage(_conversation!.senderAvatar!),
+                    fit: BoxFit.cover,
+                    onError: (_, __) {},
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 48),
+            Expanded(
               child: Text(
-                "Messaging feature is under development. Stay tuned for updates!",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: secondaryTextColor,
-                  height: 1.5,
+                _conversation?.senderName ?? "Chat",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ],
         ),
       ),
+      body: _conversation == null && _courseId == null
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.chat_bubble_outline,
+                    size: 80,
+                    color: secondaryTextColor.withValues(alpha: 0.5),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    "Conversation not found",
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      color: textColor,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : Column(
+              children: [
+                // Messages List
+                Expanded(
+                  child: _isLoading
+                      ? Center(child: CircularProgressIndicator(color: secondary))
+                      : ListView.builder(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          itemCount: _messages.length,
+                          itemBuilder: (context, index) {
+                            final message = _messages[index];
+                            final showDateDivider = index == 0 ||
+                                (_messages[index - 1].timestamp != null &&
+                                    message.timestamp != null &&
+                                    DateTime(
+                                          _messages[index - 1].timestamp!.year,
+                                          _messages[index - 1].timestamp!.month,
+                                          _messages[index - 1].timestamp!.day,
+                                        ) !=
+                                        DateTime(
+                                          message.timestamp!.year,
+                                          message.timestamp!.month,
+                                          message.timestamp!.day,
+                                        ));
+                            
+                            return Column(
+                              children: [
+                                if (showDateDivider)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    child: Text(
+                                      _formatDate(message.timestamp),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: secondaryTextColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                _buildMessageBubble(
+                                  message,
+                                  textColor,
+                                  secondaryTextColor,
+                                  isDark,
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                ),
+                // Input Area
+                Container(
+                  padding: EdgeInsets.only(
+                    left: 8,
+                    right: 8,
+                    top: 8,
+                    bottom: 8 + MediaQuery.of(context).padding.bottom,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isDark ? backgroundDark : Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 4,
+                        offset: const Offset(0, -2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200],
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          child: TextField(
+                            controller: _messageController,
+                            style: TextStyle(color: textColor),
+                            decoration: InputDecoration(
+                              hintText: "Type a message",
+                              hintStyle: TextStyle(color: secondaryTextColor),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            ),
+                            maxLines: null,
+                            textCapitalization: TextCapitalization.sentences,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Material(
+                        color: secondary,
+                        borderRadius: BorderRadius.circular(24),
+                        child: InkWell(
+                          onTap: _sendMessage,
+                          borderRadius: BorderRadius.circular(24),
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            child: const Icon(Icons.send, color: Colors.white, size: 20),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
       // Commented out - messaging functionality
       /*
       if (_conversation == null) {
@@ -323,7 +497,7 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                         )
                       : null,
                   color: _conversation!.senderAvatar == null || _conversation!.senderAvatar!.isEmpty
-                      ? Colors.white.withOpacity(0.2)
+                      ? Colors.white.withValues(alpha: 0.2)
                       : null,
                 ),
                 child: _conversation!.senderAvatar == null || _conversation!.senderAvatar!.isEmpty
@@ -458,7 +632,7 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                 color: isDark ? backgroundDark : Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 4,
                     offset: const Offset(0, -2),
                   ),
@@ -481,7 +655,7 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200],
+                        color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200],
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: TextField(
@@ -522,25 +696,6 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
     );
   }
 
-  // Commented out - messaging coming soon
-  /*
-  String _formatDate(DateTime? dateTime) {
-    if (dateTime == null) return '';
-    
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
-    
-    if (messageDate == today) {
-      return 'Today';
-    } else if (messageDate == today.subtract(const Duration(days: 1))) {
-      return 'Yesterday';
-    } else {
-      final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      return '${months[dateTime.month - 1]} ${dateTime.day}, ${dateTime.year}';
-    }
-  }
-
   Widget _buildMessageBubble(
     ChatMessage message,
     Color textColor,
@@ -569,7 +724,7 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                       )
                     : null,
                 color: message.senderAvatar == null || message.senderAvatar!.isEmpty
-                    ? primary.withOpacity(0.2)
+                    ? primary.withValues(alpha: 0.2)
                     : null,
               ),
               child: message.senderAvatar == null || message.senderAvatar!.isEmpty
@@ -592,8 +747,8 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: isSent
-                    ? (isDark ? secondary.withOpacity(0.3) : sentMessageColor)
-                    : (isDark ? Colors.white.withOpacity(0.1) : receivedMessageColor),
+                    ? (isDark ? secondary.withValues(alpha: 0.3) : sentMessageColor)
+                    : (isDark ? Colors.white.withValues(alpha: 0.1) : receivedMessageColor),
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(8),
                   topRight: const Radius.circular(8),
@@ -655,5 +810,4 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
       ),
     );
   }
-  */
 }

@@ -64,7 +64,7 @@ class _ResetPasswordPageState extends NyPage<ResetPasswordPage> {
     final bgColor = isDark ? backgroundDark : backgroundLight;
     final textColor = isDark ? Colors.white : const Color(0xFF131515);
     final secondaryTextColor = isDark ? Colors.grey[400]! : const Color(0xFF6F7B7B);
-    final borderColor = isDark ? Colors.white.withOpacity(0.1) : const Color(0xFFDFE2E2);
+    final borderColor = isDark ? Colors.white.withValues(alpha: 0.1) : const Color(0xFFDFE2E2);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -78,7 +78,7 @@ class _ResetPasswordPageState extends NyPage<ResetPasswordPage> {
                 color: bgColor,
                 border: Border(
                   bottom: BorderSide(
-                    color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+                    color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
                   ),
                 ),
               ),
@@ -132,7 +132,7 @@ class _ResetPasswordPageState extends NyPage<ResetPasswordPage> {
                           width: 80,
                           height: 80,
                           decoration: BoxDecoration(
-                            color: primary.withOpacity(0.1),
+                            color: primary.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -293,7 +293,7 @@ class _ResetPasswordPageState extends NyPage<ResetPasswordPage> {
                 color: bgColor,
                 border: Border(
                   top: BorderSide(
-                    color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+                    color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
                   ),
                 ),
               ),
@@ -311,7 +311,7 @@ class _ResetPasswordPageState extends NyPage<ResetPasswordPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: 4,
-                        shadowColor: primary.withOpacity(0.3),
+                        shadowColor: primary.withValues(alpha: 0.3),
                       ),
                       icon: const Icon(Icons.lock_reset, size: 20),
                       label: _isLoading

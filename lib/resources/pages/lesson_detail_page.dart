@@ -545,7 +545,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
               border: Border(
                 bottom: BorderSide(
                   color: isDark
-                      ? Colors.white.withOpacity(0.05)
+                      ? Colors.white.withValues(alpha: 0.05)
                       : Colors.grey[200]!,
                   width: 1,
                 ),
@@ -621,7 +621,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                               height: 24,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: accent.withOpacity(0.2),
+                                color: accent.withValues(alpha: 0.2),
                               ),
                               child: Center(
                                 child: Container(
@@ -657,7 +657,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                         // Divider
                         Divider(
                             color: isDark
-                                ? Colors.white.withOpacity(0.05)
+                                ? Colors.white.withValues(alpha: 0.05)
                                 : Colors.grey[200]),
               const SizedBox(height: 24),
                         // Notes Section
@@ -685,11 +685,11 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             decoration: BoxDecoration(
-              color: bgColor.withOpacity(0.95),
+              color: bgColor.withValues(alpha: 0.95),
               border: Border(
                 top: BorderSide(
                   color: isDark
-                      ? Colors.white.withOpacity(0.05)
+                      ? Colors.white.withValues(alpha: 0.05)
                       : Colors.grey[200]!,
                   width: 1,
                 ),
@@ -707,7 +707,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: isDark
-                            ? Colors.white.withOpacity(0.1)
+                            ? Colors.white.withValues(alpha: 0.1)
                             : Colors.grey[200]!,
                       ),
                     ),
@@ -839,7 +839,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                               height: 32,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                               ),
                               child: const Icon(Icons.arrow_forward, size: 20),
                             ),
@@ -937,7 +937,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
           color: surfaceColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
           ),
         ),
         child: Row(
@@ -946,9 +946,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: accent.withOpacity(0.1),
+                color: accent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: accent.withOpacity(0.2)),
+                border: Border.all(color: accent.withValues(alpha: 0.2)),
               ),
               child: Icon(Icons.download, color: accent, size: 24),
             ),
@@ -975,7 +975,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: accent.withOpacity(0.6), size: 20),
+            Icon(Icons.chevron_right, color: accent.withValues(alpha: 0.6), size: 20),
           ],
         ),
       ),
@@ -1163,7 +1163,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
           color: surfaceColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
+            color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[200]!,
           ),
         ),
         child: Column(
@@ -1214,7 +1214,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
               colors: [brandBg, backgroundDark],
             ),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1222,9 +1222,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: accent.withOpacity(0.2),
+                  color: accent.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: accent.withOpacity(0.3)),
+                  border: Border.all(color: accent.withValues(alpha: 0.3)),
                 ),
                 child: Text(
                   "VR READY",
@@ -1305,9 +1305,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: accent.withOpacity(0.1),
+                color: accent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: accent.withOpacity(0.2)),
+                border: Border.all(color: accent.withValues(alpha: 0.2)),
               ),
               child: Text(
                 "$completedCount/$totalCount Completed",
@@ -1330,7 +1330,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
         borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color:
-                    isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
+                    isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[200]!,
               ),
       ),
       child: Text(
@@ -1352,7 +1352,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
         borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color:
-                    isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+                    isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
               ),
             ),
             child: ClipRRect(
@@ -1368,7 +1368,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color:
-                  isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
+                  isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[200]!,
             ),
       ),
       child: Column(
@@ -1463,7 +1463,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
             color: surfaceColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
             ),
           ),
           child: Column(
@@ -1629,7 +1629,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                 border: Border(
                   top: BorderSide(
                     color: isDark
-                        ? Colors.white.withOpacity(0.05)
+                        ? Colors.white.withValues(alpha: 0.05)
                         : Colors.grey[200]!,
                   ),
                 ),
@@ -1768,7 +1768,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                   border: Border(
                     top: BorderSide(
                       color: isDark
-                          ? Colors.white.withOpacity(0.1)
+                          ? Colors.white.withValues(alpha: 0.1)
                           : Colors.grey[200]!,
                     ),
                   ),
@@ -1786,7 +1786,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                             borderRadius: BorderRadius.circular(24),
                             borderSide: BorderSide(
                               color: isDark
-                                  ? Colors.white.withOpacity(0.1)
+                                  ? Colors.white.withValues(alpha: 0.1)
                                   : Colors.grey[300]!,
                             ),
                           ),
@@ -1794,7 +1794,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                             borderRadius: BorderRadius.circular(24),
                             borderSide: BorderSide(
                               color: isDark
-                                  ? Colors.white.withOpacity(0.1)
+                                  ? Colors.white.withValues(alpha: 0.1)
                                   : Colors.grey[300]!,
                             ),
                           ),
@@ -1852,7 +1852,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: accent.withOpacity(0.2),
+                backgroundColor: accent.withValues(alpha: 0.2),
                 backgroundImage:
                     comment.userAvatar != null && comment.userAvatar!.isNotEmpty
                         ? NetworkImage(comment.userAvatar!)
@@ -1879,7 +1879,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
+                              ? Colors.white.withValues(alpha: 0.1)
                               : Colors.grey[200]!,
                         ),
                       ),
@@ -2028,7 +2028,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                                   borderRadius: BorderRadius.circular(20),
                                   borderSide: BorderSide(
                                     color: isDark
-                                        ? Colors.white.withOpacity(0.1)
+                                        ? Colors.white.withValues(alpha: 0.1)
                                         : Colors.grey[300]!,
                                   ),
                                 ),
@@ -2036,7 +2036,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                                   borderRadius: BorderRadius.circular(20),
                                   borderSide: BorderSide(
                                     color: isDark
-                                        ? Colors.white.withOpacity(0.1)
+                                        ? Colors.white.withValues(alpha: 0.1)
                                         : Colors.grey[300]!,
                                   ),
                                 ),
@@ -2112,7 +2112,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: accent.withOpacity(0.2),
+            backgroundColor: accent.withValues(alpha: 0.2),
             backgroundImage:
                 reply.userAvatar != null && reply.userAvatar!.isNotEmpty
                     ? NetworkImage(reply.userAvatar!)
@@ -2140,7 +2140,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isDark
-                          ? Colors.white.withOpacity(0.05)
+                          ? Colors.white.withValues(alpha: 0.05)
                           : Colors.grey[200]!,
                     ),
                   ),

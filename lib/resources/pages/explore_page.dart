@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import 'package:nylo_framework/nylo_framework.dart';
 import '/app/models/course.dart';
 import '/app/controllers/courses_controller.dart';
@@ -35,7 +34,7 @@ class _ExplorePageState extends NyPage<ExplorePage> {
   @override
   Widget view(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = secondary.withOpacity(0.1); // Maintain background color
+    final bgColor = secondary.withValues(alpha: 0.1); // Maintain background color
     final cardColor = isDark ? surfaceDark : Colors.grey[200]!;
     final textColor = isDark ? Colors.white : Colors.grey[900];
     final secondaryTextColor = isDark ? Colors.grey[400] : Colors.grey[500];
@@ -102,13 +101,13 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                             end: Alignment.bottomRight,
                             colors: [
                               secondary,
-                              secondary.withOpacity(0.8),
-                              primary.withOpacity(0.6),
+                              secondary.withValues(alpha: 0.8),
+                              primary.withValues(alpha: 0.6),
                             ],
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: secondary.withOpacity(0.3),
+                              color: secondary.withValues(alpha: 0.3),
                               blurRadius: 20,
                               spreadRadius: 0,
                               offset: const Offset(0, 8),
@@ -126,7 +125,7 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                                 height: 120,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: primary.withOpacity(0.2),
+                                  color: primary.withValues(alpha: 0.2),
                                 ),
                               ),
                             ),
@@ -138,7 +137,7 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                                 height: 100,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: primary.withOpacity(0.15),
+                                  color: primary.withValues(alpha: 0.15),
                                 ),
                               ),
                             ),
@@ -163,7 +162,7 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                                     "Explore our curated collection of agriculture courses",
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: Colors.white.withOpacity(0.9),
+                                      color: Colors.white.withValues(alpha: 0.9),
                                     ),
                                   ),
                                 ],
@@ -309,7 +308,7 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Colors.black.withOpacity(0.8),
+                          Colors.black.withValues(alpha: 0.8),
                         ],
                       ),
                     ),
@@ -498,7 +497,7 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                             data: {"course": course}),
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
-                              index == 0 ? secondary.withOpacity(0.2) : primary,
+                              index == 0 ? secondary.withValues(alpha: 0.2) : primary,
                           foregroundColor: index == 0 ? primary : charcoal,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),

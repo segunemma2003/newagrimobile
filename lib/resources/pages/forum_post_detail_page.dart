@@ -343,7 +343,7 @@ class _ForumPostDetailPageState extends NyPage<ForumPostDetailPage> {
               color: bgColor,
               border: Border(
                 top: BorderSide(
-                  color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
+                  color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[200]!,
                 ),
               ),
             ),
@@ -357,7 +357,7 @@ class _ForumPostDetailPageState extends NyPage<ForumPostDetailPage> {
                       hintText: "Write a comment...",
                       hintStyle: TextStyle(color: secondaryTextColor),
                       filled: true,
-                      fillColor: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
+                      fillColor: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100],
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(24),
                         borderSide: BorderSide.none,
@@ -407,7 +407,7 @@ class _ForumPostDetailPageState extends NyPage<ForumPostDetailPage> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: (post.isVerified == true ? secondary : primary).withOpacity(0.2),
+                color: (post.isVerified == true ? secondary : primary).withValues(alpha: 0.2),
                 width: 2,
               ),
               image: post.userAvatar != null && post.userAvatar!.isNotEmpty
@@ -418,7 +418,7 @@ class _ForumPostDetailPageState extends NyPage<ForumPostDetailPage> {
                     )
                   : null,
               color: post.userAvatar == null || post.userAvatar!.isEmpty
-                  ? primary.withOpacity(0.1)
+                  ? primary.withValues(alpha: 0.1)
                   : null,
             ),
             child: post.userAvatar == null || post.userAvatar!.isEmpty
@@ -510,7 +510,7 @@ class _ForumPostDetailPageState extends NyPage<ForumPostDetailPage> {
                     )
                   : null,
               color: comment.userAvatar == null || comment.userAvatar!.isEmpty
-                  ? primary.withOpacity(0.1)
+                  ? primary.withValues(alpha: 0.1)
                   : null,
             ),
             child: comment.userAvatar == null || comment.userAvatar!.isEmpty

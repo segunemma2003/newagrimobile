@@ -16,6 +16,7 @@ class Course extends Model {
   int? totalLessons;
   int? completedLessons;
   bool? isCompleted;
+  bool? isEnrolled; // Real enrollment status from API
   String? updatedAt;
   String? projectId; // Reference to course capstone project
 
@@ -33,6 +34,7 @@ class Course extends Model {
     totalLessons = data['total_lessons'] ?? data['totalLessons'] ?? 0;
     completedLessons = data['completed_lessons'] ?? data['completedLessons'] ?? 0;
     isCompleted = data['is_completed'] ?? data['isCompleted'] ?? false;
+    isEnrolled = data['is_enrolled'] ?? data['isEnrolled'] ?? false;
     updatedAt = data['updated_at'] ?? data['updatedAt'];
     projectId = data['project_id']?.toString() ?? data['projectId']?.toString();
     
@@ -70,6 +72,7 @@ class Course extends Model {
         "total_lessons": totalLessons,
         "completed_lessons": completedLessons,
         "is_completed": isCompleted,
+        "is_enrolled": isEnrolled,
         "updated_at": updatedAt,
         "project_id": projectId,
         "category": category?.toJson(),

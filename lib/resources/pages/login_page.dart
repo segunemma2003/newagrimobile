@@ -109,7 +109,7 @@ class _LoginPageState extends NyPage<LoginPage> {
               right: 16,
             ),
             decoration: BoxDecoration(
-              color: backgroundDark.withOpacity(0.95),
+              color: backgroundDark.withValues(alpha: 0.95),
             ),
             child: Row(
               children: [
@@ -158,7 +158,7 @@ class _LoginPageState extends NyPage<LoginPage> {
                           height: 100,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: primary.withOpacity(0.2),
+                            color: primary.withValues(alpha: 0.2),
                           ),
                           child: BackdropFilter(
                             filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
@@ -173,12 +173,12 @@ class _LoginPageState extends NyPage<LoginPage> {
                             shape: BoxShape.circle,
                             color: secondary,
                             border: Border.all(
-                              color: primary.withOpacity(0.3),
+                              color: primary.withValues(alpha: 0.3),
                               width: 2,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
+                                color: Colors.black.withValues(alpha: 0.3),
                                 blurRadius: 10,
                                 spreadRadius: 0,
                               ),
@@ -417,7 +417,7 @@ class _LoginPageState extends NyPage<LoginPage> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                         elevation: 0,
-                        shadowColor: primary.withOpacity(0.2),
+                        shadowColor: primary.withValues(alpha: 0.2),
                       ),
                       child: const Text(
                         "Sign In",

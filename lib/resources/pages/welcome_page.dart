@@ -16,6 +16,11 @@ class _WelcomePageState extends NyPage<WelcomePage> {
   LoadingStyle get loadingStyle => LoadingStyle.none();
 
   @override
+  get init => () async {
+        print('WELCOME: init called');
+      };
+
+  @override
   Widget view(BuildContext context) {
     // Color scheme
     const primary = Color(0xFF3E6866);
@@ -33,7 +38,7 @@ class _WelcomePageState extends NyPage<WelcomePage> {
             center: Alignment.topCenter,
             radius: 1.5,
             colors: [
-              secondary.withOpacity(0.15),
+              secondary.withValues(alpha: 0.15),
               Colors.transparent,
             ],
             stops: const [0.0, 0.5],
@@ -77,7 +82,7 @@ class _WelcomePageState extends NyPage<WelcomePage> {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: secondary.withOpacity(0.2),
+                            color: secondary.withValues(alpha: 0.2),
                             shape: BoxShape.circle,
                           ),
                           child: Image.asset(
@@ -116,7 +121,7 @@ class _WelcomePageState extends NyPage<WelcomePage> {
                               height: 192,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: secondary.withOpacity(0.2),
+                                color: secondary.withValues(alpha: 0.2),
                               ),
                               child: BackdropFilter(
                                 filter:
@@ -130,9 +135,9 @@ class _WelcomePageState extends NyPage<WelcomePage> {
                               height: 128,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: secondary.withOpacity(0.1),
+                                color: secondary.withValues(alpha: 0.1),
                                 border: Border.all(
-                                  color: secondary.withOpacity(0.2),
+                                  color: secondary.withValues(alpha: 0.2),
                                   width: 1,
                                 ),
                               ),
@@ -230,11 +235,11 @@ class _WelcomePageState extends NyPage<WelcomePage> {
                             },
                             style: OutlinedButton.styleFrom(
                               backgroundColor: isDark
-                                  ? Colors.grey[800]!.withOpacity(0.5)
-                                  : secondary.withOpacity(0.1),
+                                  ? Colors.grey[800]!.withValues(alpha: 0.5)
+                                  : secondary.withValues(alpha: 0.1),
                               foregroundColor: isDark ? Colors.white : primary,
                               side: BorderSide(
-                                color: secondary.withOpacity(0.3),
+                                color: secondary.withValues(alpha: 0.3),
                                 width: 1,
                               ),
                               shape: RoundedRectangleBorder(
@@ -274,8 +279,8 @@ class _WelcomePageState extends NyPage<WelcomePage> {
                           height: 8,
                           decoration: BoxDecoration(
                             color: isDark
-                                ? Colors.grey[700]!.withOpacity(0.3)
-                                : Colors.grey[400]!.withOpacity(0.3),
+                                ? Colors.grey[700]!.withValues(alpha: 0.3)
+                                : Colors.grey[400]!.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(999),
                           ),
                         ),

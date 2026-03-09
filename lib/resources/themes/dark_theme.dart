@@ -23,9 +23,9 @@ ThemeData darkTheme(ColorStyles color) {
     datePickerTheme: DatePickerThemeData(
       headerForegroundColor: Colors.white,
       weekdayStyle: TextStyle(color: Colors.white),
-      dayForegroundColor: MaterialStateProperty.resolveWith<Color?>(
-          (Set<MaterialState> states) {
-        if (states.contains(MaterialState.selected)) {
+      dayForegroundColor: WidgetStateProperty.resolveWith<Color?>(
+          (Set<WidgetState> states) {
+        if (states.contains(WidgetState.selected)) {
           return Colors.black; // Color for selected date
         }
         return Colors.white; // Color for unselected dates

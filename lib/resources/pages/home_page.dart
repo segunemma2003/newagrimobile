@@ -105,7 +105,7 @@ class _HomePageState extends NyPage<HomePage> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border:
-                          Border.all(color: accent.withOpacity(0.2), width: 2),
+                          Border.all(color: accent.withValues(alpha: 0.2), width: 2),
                       image: userAvatar != null && userAvatar.isNotEmpty
                           ? DecorationImage(
                               image: NetworkImage(userAvatar),
@@ -118,7 +118,7 @@ class _HomePageState extends NyPage<HomePage> {
                         ? Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: primary.withOpacity(0.2),
+                              color: primary.withValues(alpha: 0.2),
                             ),
                             child: Center(
                               child: Text(
@@ -167,7 +167,7 @@ class _HomePageState extends NyPage<HomePage> {
                     height: 40,
                     decoration: BoxDecoration(
                       color: isDark
-                          ? Colors.white.withOpacity(0.05)
+                          ? Colors.white.withValues(alpha: 0.05)
                           : Colors.grey[50],
                       shape: BoxShape.circle,
                     ),
@@ -196,7 +196,7 @@ class _HomePageState extends NyPage<HomePage> {
                         height: 48,
                         decoration: BoxDecoration(
                           color: isDark
-                              ? Colors.white.withOpacity(0.05)
+                              ? Colors.white.withValues(alpha: 0.05)
                               : Colors.grey[50],
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
@@ -205,7 +205,7 @@ class _HomePageState extends NyPage<HomePage> {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.02),
+                              color: Colors.black.withValues(alpha: 0.02),
                               blurRadius: 4,
                               offset: const Offset(0, 1),
                             ),
@@ -310,8 +310,8 @@ class _HomePageState extends NyPage<HomePage> {
                                 icon: Icons.book,
                                 label: "My Courses",
                                 iconColor: accent,
-                                bgColor: accent.withOpacity(0.1),
-                                borderColor: accent.withOpacity(0.2),
+                                bgColor: accent.withValues(alpha: 0.1),
+                                borderColor: accent.withValues(alpha: 0.2),
                                 textColor: primary,
                                 isDark: isDark,
                                 onTap: () {
@@ -322,8 +322,8 @@ class _HomePageState extends NyPage<HomePage> {
                                 icon: Icons.workspace_premium,
                                 label: "Certificates",
                                 iconColor: primary,
-                                bgColor: primary.withOpacity(0.1),
-                                borderColor: primary.withOpacity(0.2),
+                                bgColor: primary.withValues(alpha: 0.1),
+                                borderColor: primary.withValues(alpha: 0.2),
                                 textColor: primary,
                                 isDark: isDark,
                                 onTap: () {
@@ -334,8 +334,8 @@ class _HomePageState extends NyPage<HomePage> {
                                 icon: Icons.groups,
                                 label: "Community",
                                 iconColor: primary,
-                                bgColor: primary.withOpacity(0.1),
-                                borderColor: primary.withOpacity(0.2),
+                                bgColor: primary.withValues(alpha: 0.1),
+                                borderColor: primary.withValues(alpha: 0.2),
                                 textColor: primary,
                                 isDark: isDark,
                                 onTap: () {
@@ -346,8 +346,8 @@ class _HomePageState extends NyPage<HomePage> {
                                 icon: Icons.support_agent,
                                 label: "Support",
                                 iconColor: accent,
-                                bgColor: accent.withOpacity(0.1),
-                                borderColor: accent.withOpacity(0.2),
+                                bgColor: accent.withValues(alpha: 0.1),
+                                borderColor: accent.withValues(alpha: 0.2),
                                 textColor: primary,
                                 isDark: isDark,
                                 onTap: () {
@@ -411,7 +411,7 @@ class _HomePageState extends NyPage<HomePage> {
       onTap: () => routeTo(CourseDetailPage.path, data: {"course": course}),
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: Colors.grey[50]!,
@@ -419,7 +419,7 @@ class _HomePageState extends NyPage<HomePage> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -459,7 +459,7 @@ class _HomePageState extends NyPage<HomePage> {
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(12)),
                       ),
@@ -546,7 +546,7 @@ class _HomePageState extends NyPage<HomePage> {
                         height: 8,
                         decoration: BoxDecoration(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
+                              ? Colors.white.withValues(alpha: 0.1)
                               : Colors.grey[100],
                           borderRadius: BorderRadius.circular(999),
                         ),
@@ -628,7 +628,7 @@ class _HomePageState extends NyPage<HomePage> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 4,
                       offset: const Offset(0, 1),
                     ),
@@ -668,7 +668,7 @@ class _HomePageState extends NyPage<HomePage> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[50],
+          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[50],
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: Colors.grey[100]!,
@@ -747,7 +747,7 @@ class _HomePageState extends NyPage<HomePage> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: accent.withOpacity(0.1),
+                          color: accent.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(

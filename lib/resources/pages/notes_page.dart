@@ -201,15 +201,15 @@ class _NotesPageState extends NyPage<NotesPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-                  color: isDark ? Colors.white.withOpacity(0.1) : (Colors.grey[200] ?? Colors.grey),
+                  color: isDark ? Colors.white.withValues(alpha: 0.1) : (Colors.grey[200] ?? Colors.grey),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),

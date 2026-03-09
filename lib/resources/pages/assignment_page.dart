@@ -257,7 +257,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
               color: bgColor,
               border: Border(
                 bottom: BorderSide(
-                  color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+                  color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
                 ),
               ),
             ),
@@ -327,10 +327,10 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: bgColor.withOpacity(0.95),
+                color: bgColor.withValues(alpha: 0.95),
                 border: Border(
                   top: BorderSide(
-                    color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+                    color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
                   ),
                 ),
               ),
@@ -344,7 +344,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                           foregroundColor: textColor,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           side: BorderSide(
-                            color: isDark ? Colors.white.withOpacity(0.2) : Colors.grey[300]!,
+                            color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey[300]!,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -414,7 +414,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
         color: surfaceColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
         ),
       ),
       child: Column(
@@ -457,9 +457,9 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.1),
+                        color: statusColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: statusColor.withOpacity(0.3)),
+                        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -681,7 +681,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
             color: surfaceColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
             ),
           ),
           child: Text(
@@ -716,7 +716,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
               color: surfaceColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
               ),
             ),
             child: Column(
@@ -734,10 +734,10 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
-                          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+                          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
                         ),
                       ),
-                      color: isCompleted ? primary.withOpacity(0.05) : Colors.transparent,
+                      color: isCompleted ? primary.withValues(alpha: 0.05) : Colors.transparent,
                     ),
                     child: Row(
                       children: [
@@ -782,7 +782,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
               color: surfaceColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
               ),
             ),
             child: Text(
@@ -853,7 +853,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                     color: surfaceColor,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+                      color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
                     ),
                   ),
                   child: Row(
@@ -862,7 +862,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: iconColor.withOpacity(0.1),
+                          color: iconColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(icon, color: iconColor, size: 24),
@@ -907,7 +907,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
               color: surfaceColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
               ),
             ),
             child: Text(
@@ -950,7 +950,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: primary.withOpacity(0.1),
+              color: primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: primary),
             ),
@@ -1000,7 +1000,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                 color: surfaceColor,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isDark ? Colors.white.withOpacity(0.2) : Colors.grey[300]!,
+                  color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey[300]!,
                   width: 2,
                   style: BorderStyle.solid,
                 ),
@@ -1010,7 +1010,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
+                      color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100],
                       shape: BoxShape.circle,
                     ),
                     child: Icon(

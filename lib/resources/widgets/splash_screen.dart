@@ -10,7 +10,7 @@ class SplashScreen extends StatefulWidget {
   static MaterialApp app() {
     return MaterialApp(
       home: SplashScreen(),
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: true,
     );
   }
 
@@ -25,17 +25,20 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+
     // The splash screen will be automatically replaced by the main app
     // after 5 seconds (handled in boot.dart)
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..repeat();
+    print('SplashScreen _animationController: $_animationController');
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    print('SplashScreen dispose');
     super.dispose();
   }
 
@@ -65,7 +68,7 @@ class _SplashScreenState extends State<SplashScreen>
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: const Color(0xFF0fbd38)
-                              .withOpacity(0.2), // primary/20
+                              .withValues(alpha: 0.2), // primary/20
                         ),
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
@@ -77,14 +80,16 @@ class _SplashScreenState extends State<SplashScreen>
                         padding: const EdgeInsets.all(24), // p-6
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.1), // white/10
+                          color:
+                              Colors.white.withValues(alpha: 0.1), // white/10
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.05), // white/5
+                            color:
+                                Colors.white.withValues(alpha: 0.05), // white/5
                             width: 1,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.black.withValues(alpha: 0.2),
                               blurRadius: 20,
                               spreadRadius: 0,
                             ),
@@ -150,7 +155,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: const Color(0xFF0fbd38)
-                                      .withOpacity(finalOpacity),
+                                      .withValues(alpha: finalOpacity),
                                 ),
                               ),
                             ),
@@ -177,7 +182,7 @@ class _SplashScreenState extends State<SplashScreen>
                       fontSize: 12, // text-xs
                       fontWeight: FontWeight.w500, // font-medium
                       color: const Color(0xFF0fbd38)
-                          .withOpacity(0.6), // primary/60
+                          .withValues(alpha: 0.6), // primary/60
                       letterSpacing: 2.4, // tracking-[0.2em]
                     ),
                   ),
@@ -188,7 +193,7 @@ class _SplashScreenState extends State<SplashScreen>
                     height: 5, // h-1.5 (approx)
                     decoration: BoxDecoration(
                       color: Colors.white
-                          .withOpacity(0.3), // rgba(255, 255, 255, 0.3)
+                          .withValues(alpha: 0.3), // rgba(255, 255, 255, 0.3)
                       borderRadius: BorderRadius.circular(100), // rounded-full
                     ),
                   ),

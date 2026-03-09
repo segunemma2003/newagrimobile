@@ -28,11 +28,8 @@ class Main extends StatefulWidget {
 }
 
 class _MainState extends NyPage<Main> {
-
   @override
-  get init => () {
-
-  };
+  get init => () {};
 
   /// Map of lifecycle actions
   @override
@@ -41,20 +38,16 @@ class _MainState extends NyPage<Main> {
   /// Loading style for the page.
   @override
   LoadingStyle get loadingStyle => LoadingStyle.normal(
-    child: MaterialApp(
-      color: Colors.white,
-      debugShowMaterialGrid: false,
-      showPerformanceOverlay: false,
-      checkerboardRasterCacheImages: false,
-      checkerboardOffscreenLayers: false,
-      showSemanticsDebugger: false,
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-          backgroundColor: Colors.white,
-          body: Loader()
-      ),
-    )
-  );
+          child: MaterialApp(
+        color: Colors.white,
+        debugShowMaterialGrid: false,
+        showPerformanceOverlay: false,
+        checkerboardRasterCacheImages: false,
+        checkerboardOffscreenLayers: false,
+        showSemanticsDebugger: false,
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(backgroundColor: Colors.white, body: Loader()),
+      ));
 
   /// The [view] method displays your page.
   @override

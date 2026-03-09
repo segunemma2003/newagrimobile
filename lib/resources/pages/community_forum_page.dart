@@ -214,7 +214,7 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
   Widget view(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? backgroundDark : backgroundLight;
-    final surfaceColor = isDark ? Colors.white.withOpacity(0.05) : surfaceLight;
+    final surfaceColor = isDark ? Colors.white.withValues(alpha: 0.05) : surfaceLight;
     final textColor = isDark ? Colors.white : textMain;
     final secondaryTextColor = isDark ? Colors.grey[400]! : textSub;
 
@@ -227,10 +227,10 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: bgColor.withOpacity(0.8),
+                color: bgColor.withValues(alpha: 0.8),
                 border: Border(
                   bottom: BorderSide(
-                    color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+                    color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
                   ),
                 ),
               ),
@@ -428,7 +428,7 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
           decoration: BoxDecoration(
             color: isSelected
                 ? primary
-                : (isDark ? Colors.white.withOpacity(0.1) : surfaceLight),
+                : (isDark ? Colors.white.withValues(alpha: 0.1) : surfaceLight),
             borderRadius: BorderRadius.circular(18),
             border: isSelected
                 ? null
@@ -473,7 +473,7 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+                color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
               ),
             ),
           ),
@@ -487,7 +487,7 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: (post.isVerified == true ? secondary : primary).withOpacity(0.2),
+                    color: (post.isVerified == true ? secondary : primary).withValues(alpha: 0.2),
                     width: 2,
                   ),
                   image: post.userAvatar != null && post.userAvatar!.isNotEmpty
@@ -498,7 +498,7 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
                         )
                       : null,
                   color: post.userAvatar == null || post.userAvatar!.isEmpty
-                      ? primary.withOpacity(0.1)
+                      ? primary.withValues(alpha: 0.1)
                       : null,
                 ),
                 child: post.userAvatar == null || post.userAvatar!.isEmpty

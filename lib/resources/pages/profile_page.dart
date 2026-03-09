@@ -196,7 +196,7 @@ class _ProfilePageState extends NyPage<ProfilePage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
-                color: backgroundLight.withOpacity(0.8),
+                color: backgroundLight.withValues(alpha: 0.8),
                 border: Border(
                   bottom: BorderSide(
                     color: Colors.grey[100]!,
@@ -242,7 +242,7 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            brandDark.withOpacity(0.05),
+                            brandDark.withValues(alpha: 0.05),
                             Colors.transparent,
                           ],
                         ),
@@ -263,7 +263,7 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: Colors.black.withValues(alpha: 0.1),
                                       blurRadius: 20,
                                       spreadRadius: 0,
                                     ),
@@ -281,7 +281,7 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                                     ? Container(
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: brandDark.withOpacity(0.1),
+                                          color: brandDark.withValues(alpha: 0.1),
                                         ),
                                         child: Center(
                                           child: Text(
@@ -314,7 +314,7 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
+                                        color: Colors.black.withValues(alpha: 0.2),
                                         blurRadius: 8,
                                         spreadRadius: 0,
                                       ),
@@ -639,10 +639,10 @@ class _ProfilePageState extends NyPage<ProfilePage> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
-        color: isHighlighted ? primary.withOpacity(0.1) : surfaceMuted,
+        color: isHighlighted ? primary.withValues(alpha: 0.1) : surfaceMuted,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isHighlighted ? primary.withOpacity(0.2) : Colors.grey[100]!,
+          color: isHighlighted ? primary.withValues(alpha: 0.2) : Colors.grey[100]!,
           width: 1,
         ),
       ),
@@ -663,7 +663,7 @@ class _ProfilePageState extends NyPage<ProfilePage> {
               fontSize: 10,
               fontWeight: FontWeight.w600,
               color:
-                  isHighlighted ? primary.withOpacity(0.7) : Colors.grey[400],
+                  isHighlighted ? primary.withValues(alpha: 0.7) : Colors.grey[400],
               letterSpacing: 1.0,
             ),
           ),

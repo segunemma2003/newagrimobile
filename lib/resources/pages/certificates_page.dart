@@ -112,7 +112,7 @@ class _CertificatesPageState extends NyPage<CertificatesPage> {
     final Color surfaceColor = isDark ? Colors.grey[900]! : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF131515);
     final secondaryTextColor = isDark ? Colors.grey[400]! : const Color(0xFF6F7B7B);
-    final Color borderColor = isDark ? Colors.white.withOpacity(0.1) : Colors.grey[100]!;
+    final Color borderColor = isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[100]!;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -126,7 +126,7 @@ class _CertificatesPageState extends NyPage<CertificatesPage> {
                 color: surfaceColor,
                 border: Border(
                   bottom: BorderSide(
-                    color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+                    color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
                   ),
                 ),
               ),
@@ -319,7 +319,7 @@ class _CertificatesPageState extends NyPage<CertificatesPage> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -423,7 +423,7 @@ class _CertificatesPageState extends NyPage<CertificatesPage> {
                       width: 48,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: primary.withOpacity(0.1),
+                        color: primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
@@ -464,14 +464,14 @@ class _CertificatesPageState extends NyPage<CertificatesPage> {
                   shape: BoxShape.circle,
                   color: isActive
                       ? (icon == Icons.bolt || icon == Icons.groups
-                          ? secondary.withOpacity(0.1)
-                          : primary.withOpacity(0.1))
+                          ? secondary.withValues(alpha: 0.1)
+                          : primary.withValues(alpha: 0.1))
                       : (isDark ? Colors.grey[800] : Colors.grey[200]),
                   border: Border.all(
                     color: isActive
                         ? (icon == Icons.bolt || icon == Icons.groups
-                            ? secondary.withOpacity(0.3)
-                            : primary.withOpacity(0.3))
+                            ? secondary.withValues(alpha: 0.3)
+                            : primary.withValues(alpha: 0.3))
                         : (isDark ? Colors.grey[700]! : Colors.grey[200]!),
                     width: 2,
                   ),

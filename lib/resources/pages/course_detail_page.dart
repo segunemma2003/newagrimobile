@@ -38,11 +38,15 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
   static const Color backgroundDark = Color(0xFF121212);
   static const Color surfaceDark = Color(0xFF1E1E1E);
 
-  // Check if course is enrolled (for demo, consider enrolled if course has modules)
+  // Check if course is enrolled - uses real API data
   bool _isEnrolled(Course course) {
-    // For demo purposes, consider enrolled if course has modules
-    // This makes all courses with modules show "Start Course" or "Continue Course"
-    return course.modules != null && course.modules!.isNotEmpty;
+    // Use real enrollment status from API
+    // Fallback to checking if user has progress (for offline scenarios)
+    if (course.isEnrolled == true) {
+      return true;
+    }
+    // If API data not available, check if there's progress (offline fallback)
+    return course.completedLessons != null && course.completedLessons! > 0;
   }
 
   // Get button text based on enrollment status
@@ -307,8 +311,8 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                                 end: Alignment.bottomCenter,
                                 colors: [
                                   Colors.transparent,
-                                  Colors.black.withOpacity(0.2),
-                                  Colors.black.withOpacity(0.9),
+                                  Colors.black.withValues(alpha: 0.2),
+                                  Colors.black.withValues(alpha: 0.9),
                                 ],
                                 stops: const [0.0, 0.5, 1.0],
                               ),
@@ -330,10 +334,10 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                                 height: 64,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: accent.withOpacity(0.9),
+                                  color: accent.withValues(alpha: 0.9),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: accent.withOpacity(0.3),
+                                      color: accent.withValues(alpha: 0.3),
                                       blurRadius: 20,
                                       spreadRadius: 0,
                                     ),
@@ -356,10 +360,10 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.6),
+                              color: Colors.black.withValues(alpha: 0.6),
                               borderRadius: BorderRadius.circular(999),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                                 width: 1,
                               ),
                             ),
@@ -424,7 +428,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                                   horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: (Colors.yellow[400] ?? Colors.yellow)
-                                    .withOpacity(0.1),
+                                    .withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Row(
@@ -485,7 +489,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                             border: Border(
                               bottom: BorderSide(
                                 color: isDark
-                                    ? Colors.white.withOpacity(0.05)
+                                    ? Colors.white.withValues(alpha: 0.05)
                                     : Colors.grey[200]!,
                                 width: 1,
                               ),
@@ -544,11 +548,11 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
-              color: bgColor.withOpacity(0.95),
+              color: bgColor.withValues(alpha: 0.95),
               border: Border(
                 top: BorderSide(
                   color: isDark
-                      ? Colors.white.withOpacity(0.1)
+                      ? Colors.white.withValues(alpha: 0.1)
                       : (Colors.grey[200] ?? Colors.grey),
                   width: 1,
                 ),
@@ -624,7 +628,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                           borderRadius: BorderRadius.circular(999),
                         ),
                         elevation: 4,
-                        shadowColor: accent.withOpacity(0.25),
+                        shadowColor: accent.withValues(alpha: 0.25),
                       ),
                     ),
                   ),
@@ -772,13 +776,13 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: isDark
-                      ? Colors.white.withOpacity(0.05)
+                      ? Colors.white.withValues(alpha: 0.05)
                       : (Colors.grey[100] ?? Colors.grey),
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Colors.black.withValues(alpha: 0.02),
                     blurRadius: 4,
                     offset: const Offset(0, 1),
                   ),
@@ -792,7 +796,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border:
-                          Border.all(color: primary.withOpacity(0.2), width: 2),
+                          Border.all(color: primary.withValues(alpha: 0.2), width: 2),
                       image: const DecorationImage(
                         image: NetworkImage(
                           "https://lh3.googleusercontent.com/aida-public/AB6AXuAhD1RwfKRpUV04ISP13wL1krvVmkyGLSw5zrZQpXAUMjapggW1ifrtuSTHeIHB7OYMVjJ-gtWZRGJMn3wHRkebJZIBLMYWSdhbFQGwe2jiyhidev_GJg9nT6tbJSGBA9jW4YPZHcSP3S2-kGc7I-wJKLBv5UcIwb-6zBjzhAhFZ-QmxY7mqqPMjG_qjUcPs2F3qmrn5Bah2UwWp81npnW3Pyhebyi0pWx18lQAJKzcyqyFc65OjIzWNLRmTgXaNlPOzBIFAnhOrSY",
@@ -891,13 +895,13 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: isDark
-                      ? Colors.white.withOpacity(0.05)
+                      ? Colors.white.withValues(alpha: 0.05)
                       : (Colors.grey[100] ?? Colors.grey),
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Colors.black.withValues(alpha: 0.02),
                     blurRadius: 4,
                     offset: const Offset(0, 1),
                   ),
@@ -914,7 +918,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: accent.withOpacity(0.1),
+                            color: accent.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Center(
@@ -959,13 +963,13 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                   Divider(
                       height: 1,
                       color: isDark
-                          ? Colors.white.withOpacity(0.05)
+                          ? Colors.white.withValues(alpha: 0.05)
                           : (Colors.grey[100] ?? Colors.grey)),
                   // Week 2 (Locked)
                   Container(
                     padding: const EdgeInsets.all(16),
                     color: isDark
-                        ? Colors.white.withOpacity(0.02)
+                        ? Colors.white.withValues(alpha: 0.02)
                         : Colors.grey[50],
                     child: Row(
                       children: [
@@ -974,7 +978,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                           height: 32,
                           decoration: BoxDecoration(
                             color: isDark
-                                ? Colors.white.withOpacity(0.1)
+                                ? Colors.white.withValues(alpha: 0.1)
                                 : Colors.grey[100],
                             shape: BoxShape.circle,
                           ),
@@ -993,7 +997,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: textColor.withOpacity(0.7),
+                                  color: textColor.withValues(alpha: 0.7),
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -1051,13 +1055,13 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: isDark
-                      ? Colors.white.withOpacity(0.05)
+                      ? Colors.white.withValues(alpha: 0.05)
                       : (Colors.grey[100] ?? Colors.grey),
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Colors.black.withValues(alpha: 0.02),
                     blurRadius: 4,
                     offset: const Offset(0, 1),
                   ),
@@ -1128,7 +1132,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: isDark
-                            ? Colors.white.withOpacity(0.05)
+                            ? Colors.white.withValues(alpha: 0.05)
                             : Colors.grey[50],
                         foregroundColor: textColor,
                         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -1195,12 +1199,12 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         color: surfaceColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -1252,7 +1256,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
           child: Container(
             height: 6,
             decoration: BoxDecoration(
-              color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[100],
+              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[100],
               borderRadius: BorderRadius.circular(999),
             ),
             child: FractionallySizedBox(
@@ -1260,7 +1264,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
               widthFactor: percentage,
               child: Container(
                 decoration: BoxDecoration(
-                  color: percentage > 0.5 ? accent : accent.withOpacity(0.4),
+                  color: percentage > 0.5 ? accent : accent.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
@@ -1429,23 +1433,23 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: isLocked
-            ? (isDark ? Colors.white.withOpacity(0.02) : Colors.grey[50])
+            ? (isDark ? Colors.white.withValues(alpha: 0.02) : Colors.grey[50])
             : (isModuleActive
-                ? (isDark ? accent.withOpacity(0.05) : accent.withOpacity(0.05))
+                ? (isDark ? accent.withValues(alpha: 0.05) : accent.withValues(alpha: 0.05))
                 : surfaceColor),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isModuleActive
-              ? accent.withOpacity(0.3)
+              ? accent.withValues(alpha: 0.3)
               : (isDark
-                  ? Colors.white.withOpacity(0.05)
+                  ? Colors.white.withValues(alpha: 0.05)
                   : (Colors.grey[100] ?? Colors.grey)),
           width: isModuleActive ? 1.5 : 1,
         ),
         boxShadow: isModuleActive
             ? [
                 BoxShadow(
-                  color: accent.withOpacity(0.2),
+                  color: accent.withValues(alpha: 0.2),
                   blurRadius: 8,
                   spreadRadius: 0,
                   offset: const Offset(0, 2),
@@ -1453,7 +1457,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
               ]
             : [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
+                  color: Colors.black.withValues(alpha: 0.02),
                   blurRadius: 4,
                   offset: const Offset(0, 1),
                 ),
@@ -1496,7 +1500,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: isLocked
-                                ? textColor.withOpacity(0.7)
+                                ? textColor.withValues(alpha: 0.7)
                                 : textColor,
                           ),
                         ),
@@ -1651,7 +1655,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[100],
+          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[100],
           shape: BoxShape.circle,
         ),
         child: Icon(Icons.lock, size: 18, color: secondaryTextColor),
@@ -1663,7 +1667,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: accent.withOpacity(0.2),
+          color: accent.withValues(alpha: 0.2),
           shape: BoxShape.circle,
         ),
         child: Icon(Icons.check, size: 20, color: accent),
@@ -1686,7 +1690,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                 value: progressPercent / 100,
                 strokeWidth: 3,
                 backgroundColor:
-                    isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200],
+                    isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200],
                 valueColor: AlwaysStoppedAnimation<Color>(accent),
               ),
             ),
@@ -1709,7 +1713,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
       width: 32,
       height: 32,
       decoration: BoxDecoration(
-        color: accent.withOpacity(0.1),
+        color: accent.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
       child: Center(
@@ -1759,10 +1763,10 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         margin: const EdgeInsets.only(left: 44, right: 16, top: 8, bottom: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[50],
+          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[50],
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.2) : Colors.grey[300]!,
+            color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey[300]!,
             width: 1,
             style: BorderStyle.solid,
           ),
@@ -1774,7 +1778,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
+                color: Colors.orange.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -1873,14 +1877,14 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
       decoration: BoxDecoration(
         color: isLocked
             ? (isDark
-                ? Colors.white.withOpacity(0.01)
-                : Colors.grey[50]?.withOpacity(0.5))
-            : (isDark ? Colors.white.withOpacity(0.02) : Colors.grey[50]),
+                ? Colors.white.withValues(alpha: 0.01)
+                : Colors.grey[50]?.withValues(alpha: 0.5))
+            : (isDark ? Colors.white.withValues(alpha: 0.02) : Colors.grey[50]),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.03)
-              : (Colors.grey[100] ?? Colors.grey).withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.03)
+              : (Colors.grey[100] ?? Colors.grey).withValues(alpha: 0.5),
           width: 1,
         ),
       ),
@@ -1906,11 +1910,11 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                 decoration: BoxDecoration(
                   color: isLocked
                       ? (isDark
-                          ? Colors.white.withOpacity(0.05)
+                          ? Colors.white.withValues(alpha: 0.05)
                           : Colors.grey[200])
                       : (lesson.isCompleted == true
-                          ? accent.withOpacity(0.2)
-                          : accent.withOpacity(0.1)),
+                          ? accent.withValues(alpha: 0.2)
+                          : accent.withValues(alpha: 0.1)),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -1940,7 +1944,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color:
-                            isLocked ? textColor.withOpacity(0.6) : textColor,
+                            isLocked ? textColor.withValues(alpha: 0.6) : textColor,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -1979,7 +1983,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                 Icons.chevron_right,
                 size: 18,
                 color: isLocked
-                    ? secondaryTextColor.withOpacity(0.5)
+                    ? secondaryTextColor.withValues(alpha: 0.5)
                     : secondaryTextColor,
               ),
             ],
@@ -2061,7 +2065,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: isDark
-                      ? Colors.white.withOpacity(0.05)
+                      ? Colors.white.withValues(alpha: 0.05)
                       : (Colors.grey[100] ?? Colors.grey),
                   width: 1,
                 ),
@@ -2090,7 +2094,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                                 size: 20, color: accent);
                           } else {
                             return Icon(Icons.star_border,
-                                size: 20, color: accent.withOpacity(0.3));
+                                size: 20, color: accent.withValues(alpha: 0.3));
                           }
                         }),
                       ),
@@ -2132,7 +2136,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
             Divider(
                 height: 1,
                 color:
-                    isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]),
+                    isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]),
             const SizedBox(height: 12),
             // Filter Chips
             SingleChildScrollView(
@@ -2165,7 +2169,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: isDark
-                      ? Colors.white.withOpacity(0.1)
+                      ? Colors.white.withValues(alpha: 0.1)
                       : Colors.grey[200]!,
                 ),
               ),
@@ -2216,7 +2220,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
+                              ? Colors.white.withValues(alpha: 0.1)
                               : Colors.grey[300]!,
                         ),
                       ),
@@ -2224,7 +2228,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
+                              ? Colors.white.withValues(alpha: 0.1)
                               : Colors.grey[300]!,
                         ),
                       ),
@@ -2234,7 +2238,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                       ),
                       filled: true,
                       fillColor: isDark
-                          ? Colors.white.withOpacity(0.05)
+                          ? Colors.white.withValues(alpha: 0.05)
                           : Colors.grey[50],
                     ),
                   ),
@@ -2328,7 +2332,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         color: surfaceColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
         ),
       ),
       child: Column(
@@ -2338,7 +2342,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: accent.withOpacity(0.2),
+                backgroundColor: accent.withValues(alpha: 0.2),
                 backgroundImage:
                     review.userAvatar != null && review.userAvatar!.isNotEmpty
                         ? NetworkImage(review.userAvatar!)
@@ -2455,13 +2459,13 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
           border: Border.all(
             color: isSelected
                 ? accent
-                : (isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!),
+                : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!),
             width: 1,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: accent.withOpacity(0.2),
+                    color: accent.withValues(alpha: 0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -2504,13 +2508,13 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDark
-                  ? Colors.white.withOpacity(0.05)
+                  ? Colors.white.withValues(alpha: 0.05)
                   : (Colors.grey[100] ?? Colors.grey),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 4,
                 offset: const Offset(0, 1),
               ),
@@ -2523,7 +2527,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                 height: 56,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: primary.withOpacity(0.2), width: 2),
+                  border: Border.all(color: primary.withValues(alpha: 0.2), width: 2),
                   image: const DecorationImage(
                     image: NetworkImage(
                       "https://lh3.googleusercontent.com/aida-public/AB6AXuAhD1RwfKRpUV04ISP13wL1krvVmkyGLSw5zrZQpXAUMjapggW1ifrtuSTHeIHB7OYMVjJ-gtWZRGJMn3wHRkebJZIBLMYWSdhbFQGwe2jiyhidev_GJg9nT6tbJSGBA9jW4YPZHcSP3S2-kGc7I-wJKLBv5UcIwb-6zBjzhAhFZ-QmxY7mqqPMjG_qjUcPs2F3qmrn5Bah2UwWp81npnW3Pyhebyi0pWx18lQAJKzcyqyFc65OjIzWNLRmTgXaNlPOzBIFAnhOrSY",
@@ -2635,10 +2639,10 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         margin: const EdgeInsets.only(left: 44, right: 16, top: 8, bottom: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[50],
+          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[50],
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.2) : Colors.grey[300]!,
+            color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey[300]!,
             width: 1,
           ),
         ),
@@ -2648,7 +2652,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: accent.withOpacity(0.1),
+                color: accent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(Icons.assignment, color: accent, size: 24),
@@ -2707,7 +2711,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -2718,9 +2722,9 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: accent.withOpacity(0.2),
+                  color: accent.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: accent.withOpacity(0.3)),
+                  border: Border.all(color: accent.withValues(alpha: 0.3)),
                 ),
                 child: Text(
                   "VR READY",
@@ -2787,10 +2791,10 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
       margin: const EdgeInsets.only(left: 44, right: 16, top: 8, bottom: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[50],
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[50],
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.2) : Colors.grey[300]!,
+          color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey[300]!,
           width: 1,
         ),
       ),
@@ -2813,9 +2817,9 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: accent.withOpacity(0.1),
+                  color: accent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: accent.withOpacity(0.2)),
+                  border: Border.all(color: accent.withValues(alpha: 0.2)),
                 ),
                 child: Text(
                   "${diyLessons.length} Activities",
@@ -2846,7 +2850,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: isDark
-                        ? Colors.white.withOpacity(0.05)
+                        ? Colors.white.withValues(alpha: 0.05)
                         : Colors.grey[200]!,
                   ),
                 ),
@@ -2942,11 +2946,11 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
           color: surfaceColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -2958,7 +2962,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: accent.withOpacity(0.1),
+                color: accent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(Icons.workspace_premium, color: accent, size: 28),

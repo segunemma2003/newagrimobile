@@ -4,7 +4,7 @@ class PushNotificationsProvider implements NyProvider {
   @override
   boot(Nylo nylo) async {
     nylo.useLocalNotifications();
-
+    print('PushNotificationsProvider boot');
     return nylo;
   }
 

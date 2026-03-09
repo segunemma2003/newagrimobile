@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
-// Commented out - messaging coming soon
-// import '/app/models/message.dart';
-// import '/config/keys.dart';
-// import '/resources/pages/chat_detail_page.dart';
+import '/app/models/message.dart';
+import '/app/networking/api_service.dart';
+import '/config/keys.dart';
+import '/resources/pages/chat_detail_page.dart';
 
 class MessagesPage extends NyStatefulWidget {
   static RouteView path = ("/messages", (_) => MessagesPage());
@@ -12,11 +12,12 @@ class MessagesPage extends NyStatefulWidget {
 }
 
 class _MessagesPageState extends NyPage<MessagesPage> {
-  // Commented out - messaging coming soon
-  // String _selectedFilter = "All";
-  // String _searchQuery = "";
-  // List<Message> _conversations = [];
-  // TextEditingController? _searchController;
+  String _selectedFilter = "All";
+  String _searchQuery = "";
+  List<Message> _conversations = [];
+  TextEditingController? _searchController;
+  bool _isLoading = true;
+  String? _errorMessage;
 
   // Color scheme - maintain from other pages
   static const Color accent = Color(0xFF50C1AE);
@@ -27,103 +28,162 @@ class _MessagesPageState extends NyPage<MessagesPage> {
 
   @override
   get init => () async {
-        // Commented out - messaging coming soon
-        // _searchController = TextEditingController();
-        // await _loadConversations();
+        _searchController = TextEditingController();
+        await _loadConversations();
       };
 
-  // Commented out - messaging coming soon
-  /*
   Future<void> _loadConversations() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
     try {
-      final conversationsJson = await Keys.messages.read<List>();
-      if (conversationsJson != null) {
-        _conversations = conversationsJson
-            .map((m) => Message.fromJson(m))
-            .toList();
-        
-        // Sort: pinned first, then by last message time
-        _conversations.sort((a, b) {
-          if (a.isPinned == true && b.isPinned != true) return -1;
-          if (a.isPinned != true && b.isPinned == true) return 1;
-          final aTime = a.lastMessageTime ?? a.timestamp ?? DateTime(2000);
-          final bTime = b.lastMessageTime ?? b.timestamp ?? DateTime(2000);
-          return bTime.compareTo(aTime);
+      // Get current user
+      final userData = await Keys.auth.read<Map<String, dynamic>>();
+      final currentUserId = userData?['id']?.toString();
+
+      if (currentUserId == null) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = 'Please login to view messages';
         });
-        
-        setState(() {});
-      } else {
-        // Load dummy data
-        _loadDummyConversations();
+        return;
       }
+
+      // Get user's enrolled courses
+      final enrollmentsResponse = await api<ApiService>(
+        (request) => request.fetchMyEnrollments(),
+      );
+
+      if (enrollmentsResponse == null) {
+        setState(() {
+          _isLoading = false;
+          _conversations = [];
+        });
+        return;
+      }
+
+      final enrollments = enrollmentsResponse['data'] ?? enrollmentsResponse;
+      final courses = enrollments is List
+          ? enrollments
+          : (enrollments is Map && enrollments['data'] != null
+              ? enrollments['data']
+              : []);
+
+      // Fetch messages for all enrolled courses
+      Map<String, Message> conversationMap = {};
+
+      for (var enrollment in courses) {
+        final courseId = enrollment['course_id']?.toString() ??
+            enrollment['course']?['id']?.toString();
+        if (courseId == null) continue;
+
+        try {
+          final messagesResponse = await api<ApiService>(
+            (request) => request.fetchCourseMessages(courseId),
+          );
+
+          if (messagesResponse != null) {
+            final messages = messagesResponse is List
+                ? messagesResponse
+                : (messagesResponse['data'] ?? []);
+
+            // Group messages by conversation (other person)
+            for (var msgData in messages) {
+              final senderId = msgData['sender_id']?.toString();
+              final recipientId = msgData['recipient_id']?.toString();
+
+              // Determine the other person in the conversation
+              String? otherUserId;
+              Map<String, dynamic>? otherUser;
+
+              if (senderId == currentUserId) {
+                otherUserId = recipientId;
+                otherUser = msgData['recipient'];
+              } else {
+                otherUserId = senderId;
+                otherUser = msgData['sender'];
+              }
+
+              if (otherUserId == null) continue;
+
+              // Create conversation key
+              final convKey = '$courseId-$otherUserId';
+
+              // Get or create conversation
+              if (!conversationMap.containsKey(convKey)) {
+                conversationMap[convKey] = Message()
+                  ..id = convKey
+                  ..conversationId = convKey
+                  ..senderId = otherUserId
+                  ..senderName = otherUser?['name'] ?? 'Unknown'
+                  ..senderAvatar = otherUser?['avatar']
+                  ..senderType = otherUser?['role'] == 'tutor' ||
+                          otherUser?['role'] == 'facilitator'
+                      ? 'instructor'
+                      : 'student'
+                  ..lastMessagePreview =
+                      msgData['message'] ?? msgData['subject'] ?? ''
+                  ..lastMessageTime = msgData['created_at'] != null
+                      ? DateTime.tryParse(msgData['created_at'].toString())
+                      : null
+                  ..isRead = msgData['is_read'] ?? false
+                  ..unreadCount = 0;
+              }
+
+              // Update conversation with latest message
+              final conv = conversationMap[convKey]!;
+              final msgTime = msgData['created_at'] != null
+                  ? DateTime.tryParse(msgData['created_at'].toString())
+                  : null;
+
+              if (msgTime != null &&
+                  (conv.lastMessageTime == null ||
+                      msgTime.isAfter(conv.lastMessageTime!))) {
+                conv.lastMessagePreview =
+                    msgData['message'] ?? msgData['subject'] ?? '';
+                conv.lastMessageTime = msgTime;
+                conv.isRead = msgData['is_read'] ?? false;
+              }
+
+              // Count unread messages
+              if (msgData['is_read'] == false && recipientId == currentUserId) {
+                conv.unreadCount = (conv.unreadCount ?? 0) + 1;
+              }
+            }
+          }
+        } catch (e) {
+          print('Error loading messages for course $courseId: $e');
+        }
+      }
+
+      _conversations = conversationMap.values.toList();
+
+      // Sort: pinned first, then by last message time
+      _conversations.sort((a, b) {
+        if (a.isPinned == true && b.isPinned != true) return -1;
+        if (a.isPinned != true && b.isPinned == true) return 1;
+        final aTime = a.lastMessageTime ?? a.timestamp ?? DateTime(2000);
+        final bTime = b.lastMessageTime ?? b.timestamp ?? DateTime(2000);
+        return bTime.compareTo(aTime);
+      });
+
+      setState(() {
+        _isLoading = false;
+      });
     } catch (e) {
       print('Error loading conversations: $e');
-      _loadDummyConversations();
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Failed to load messages. Please try again.';
+      });
     }
   }
 
-  void _loadDummyConversations() {
-    _conversations = [
-      Message()
-        ..id = "1"
-        ..senderName = "Dr. Amina"
-        ..senderAvatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuD6r7hxZTYPqrYdwI4uslBYqlxVWuvl0i_qFYRmt4oqb_nPeGshvQQS_5pSgmbqQkVTejT1OCBOdTXjNZyVkX3VwMjEpQOMAToskkDB1BeUMRmnZl-dd5Lwk1Q9oEqrJIZKaOQ6GQW9C9x7Rd-_L-fgUrJCXOYCa19SpoDFNePH1PLVFtCMCV_jAquM5ptlSNtAttJ47byuxbJ60kf1R2BVTrI9EW96pzXcyHyU2jpR-zW5rRlyJ7cx0WhsBayZLjl6ULSJp8LR7DI"
-        ..senderType = "instructor"
-        ..lastMessagePreview = "Please review the module 3 quiz results when you have a moment."
-        ..lastMessageTime = DateTime.now().subtract(const Duration(hours: 2))
-        ..unreadCount = 2
-        ..isPinned = true
-        ..isRead = false,
-      Message()
-        ..id = "2"
-        ..senderName = "Soil Science Group"
-        ..senderAvatar = null
-        ..senderType = "group"
-        ..lastMessagePreview = "Sarah: Does anyone have the notes for the last lecture?"
-        ..lastMessageTime = DateTime.now().subtract(const Duration(hours: 3, minutes: 45))
-        ..unreadCount = 1
-        ..isPinned = true
-        ..isRead = false,
-      Message()
-        ..id = "3"
-        ..senderName = "Marcus (Peer)"
-        ..senderAvatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuBIXkV5Uwbg10rXxbmJZt0wpbZ9P07C9dX5A-EDmDsJtHV8pNr_5b_5Ck35e6VNVuTjycvHiL1rq0fwAzUHtZfg503bCG3eI-JPscWd4ryVjcIS2tOxKXaVmSltws-BeXwJ7L_sowYZ7rSgs2J01oqY_zMZiFl8ZAVznlgkF3LnBgFK-czrPMiOPG8Vkew_DZ0-SUPQVQNke8IXwjnHW87fj45NpAbpuaYhvyDdKvhS0ycojZ-qUN7PsukAhQ_ab18FfGcNeht8oBQ"
-        ..senderType = "student"
-        ..lastMessagePreview = "Thanks for sharing that PDF!"
-        ..lastMessageTime = DateTime.now().subtract(const Duration(days: 1))
-        ..unreadCount = 0
-        ..isPinned = false
-        ..isRead = true,
-      Message()
-        ..id = "4"
-        ..senderName = "Agrisiti Bot"
-        ..senderAvatar = null
-        ..senderType = "bot"
-        ..lastMessagePreview = "Your \"Sustainable Farming\" certificate is ready."
-        ..lastMessageTime = DateTime.now().subtract(const Duration(days: 2))
-        ..unreadCount = 0
-        ..isPinned = false
-        ..isRead = true,
-      Message()
-        ..id = "5"
-        ..senderName = "Prof. Sarah J."
-        ..senderAvatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuDRJ4XA6Q9_sWfg4wWy-T02HcGtQk0lJRAljf_qzIwOmC4D3tj4bWa9K4WmUJ8PCmgOCvvAG4-ptwg2beCvkzHgqebsvlX5xR5x4qIClf-ao8nJ-1pHaku8PWsJJA6E9KBxfTXatmFLEAb7JNE8SpCrMDvHQrWTWYfa2M3OX7OHrCk2VszXQ3Nm4lgohSYIsaWK8_GdRmAx-5HZ3fz1hxqpODPRAkicZ6OXdRhXuEIU8Q8J7oXuZmVrXVKfwmsI_zmu_Y5qyV-oykQ"
-        ..senderType = "instructor"
-        ..lastMessagePreview = "The workshop has been rescheduled to Friday."
-        ..lastMessageTime = DateTime.now().subtract(const Duration(days: 2))
-        ..unreadCount = 0
-        ..isPinned = false
-        ..isRead = true,
-    ];
-    setState(() {});
-  }
-  */
-
-  // Commented out - messaging coming soon
-  /*
   List<Message> get _filteredConversations {
     var filtered = _conversations;
-    
+
     // Filter by search query
     if (_searchQuery.isNotEmpty) {
       final query = _searchQuery.toLowerCase();
@@ -133,7 +193,7 @@ class _MessagesPageState extends NyPage<MessagesPage> {
         return senderName.contains(query) || preview.contains(query);
       }).toList();
     }
-    
+
     // Filter by type
     if (_selectedFilter != "All") {
       filtered = filtered.where((conv) {
@@ -150,7 +210,7 @@ class _MessagesPageState extends NyPage<MessagesPage> {
         }
       }).toList();
     }
-    
+
     return filtered;
   }
 
@@ -161,16 +221,13 @@ class _MessagesPageState extends NyPage<MessagesPage> {
   List<Message> get _unpinnedConversations {
     return _filteredConversations.where((c) => c.isPinned != true).toList();
   }
-  */
 
-  // Commented out - messaging coming soon
-  /*
   String _formatTime(DateTime? dateTime) {
     if (dateTime == null) return '';
-    
+
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-    
+
     if (difference.inDays == 0) {
       // Today - show time
       final hour = dateTime.hour;
@@ -187,12 +244,10 @@ class _MessagesPageState extends NyPage<MessagesPage> {
       return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
     }
   }
-  */
 
   @override
   void dispose() {
-    // Commented out - messaging coming soon
-    // _searchController?.dispose();
+    _searchController?.dispose();
     super.dispose();
   }
 
@@ -205,9 +260,8 @@ class _MessagesPageState extends NyPage<MessagesPage> {
     final bgColor = isDark ? backgroundDark : backgroundLight;
     final surfaceColor = isDark ? surfaceDark : surfaceLight;
     final textColor = isDark ? Colors.white : const Color(0xFF131515);
-    final secondaryTextColor = isDark
-        ? const Color(0xFF9DB9A3)
-        : Colors.grey[600]!;
+    final secondaryTextColor =
+        isDark ? const Color(0xFF9DB9A3) : Colors.grey[600]!;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -221,7 +275,9 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                 color: surfaceColor,
                 border: Border(
                   bottom: BorderSide(
-                    color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.grey[200]!,
                   ),
                 ),
               ),
@@ -237,71 +293,31 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                       letterSpacing: -0.5,
                     ),
                   ),
-                  // Commented out - messaging coming soon
-                  // Material(
-                  //   color: Colors.transparent,
-                  //   child: InkWell(
-                  //     onTap: () {
-                  //       // TODO: Open new message dialog
-                  //     },
-                  //     borderRadius: BorderRadius.circular(20),
-                  //     child: Container(
-                  //       width: 40,
-                  //       height: 40,
-                  //       decoration: BoxDecoration(
-                  //         color: accent.withOpacity(0.1),
-                  //         shape: BoxShape.circle,
-                  //       ),
-                  //       child: Icon(
-                  //         Icons.edit_square,
-                  //         color: accent,
-                  //         size: 24,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                ],
-              ),
-            ),
-            // Coming Soon Message
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.chat_bubble_outline,
-                      size: 80,
-                      color: secondaryTextColor.withOpacity(0.5),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      "Coming Soon",
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w700,
-                        color: textColor,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 48),
-                      child: Text(
-                        "Messaging feature is under development. Stay tuned for updates!",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: secondaryTextColor,
-                          height: 1.5,
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        // TODO: Open new message dialog
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: accent.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.edit_square,
+                          color: accent,
+                          size: 24,
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            // Commented out - messaging functionality
-            /*
             // Search Bar
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -359,7 +375,168 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                       setState(() => _selectedFilter = "All");
                     }, isDark, accent),
                     const SizedBox(width: 12),
-                    _buildFilterChip("Instructors", _selectedFilter == "Instructors", () {
+                    _buildFilterChip(
+                        "Instructors", _selectedFilter == "Instructors", () {
+                      setState(() => _selectedFilter = "Instructors");
+                    }, isDark, accent),
+                    const SizedBox(width: 12),
+                    _buildFilterChip("Students", _selectedFilter == "Students",
+                        () {
+                      setState(() => _selectedFilter = "Students");
+                    }, isDark, accent),
+                  ],
+                ),
+              ),
+            ),
+            // Messages List
+            Expanded(
+              child: _isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(color: accent),
+                    )
+                  : _errorMessage != null
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.error_outline,
+                                  size: 64, color: secondaryTextColor),
+                              const SizedBox(height: 16),
+                              Text(
+                                _errorMessage!,
+                                style: TextStyle(color: secondaryTextColor),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: _loadConversations,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: accent,
+                                ),
+                                child: const Text("Retry",
+                                    style: TextStyle(color: Colors.white)),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          children: [
+                            // Pinned Section
+                            if (_pinnedConversations.isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              _buildSectionDivider(
+                                  "Pinned", isDark, secondaryTextColor),
+                              const SizedBox(height: 8),
+                              ..._pinnedConversations
+                                  .map((conv) => _buildConversationItem(
+                                        conv,
+                                        surfaceColor,
+                                        textColor,
+                                        secondaryTextColor,
+                                        isDark,
+                                        accent,
+                                      )),
+                            ],
+                            // Earlier Section
+                            if (_unpinnedConversations.isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              _buildSectionDivider(
+                                  "Earlier", isDark, secondaryTextColor),
+                              const SizedBox(height: 8),
+                              ..._unpinnedConversations
+                                  .map((conv) => _buildConversationItem(
+                                        conv,
+                                        surfaceColor,
+                                        textColor,
+                                        secondaryTextColor,
+                                        isDark,
+                                        accent,
+                                      )),
+                            ],
+                            if (_filteredConversations.isEmpty &&
+                                !_isLoading) ...[
+                              const SizedBox(height: 40),
+                              Center(
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.chat_bubble_outline,
+                                        size: 64, color: secondaryTextColor),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      "No conversations found",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: secondaryTextColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                            const SizedBox(height: 100),
+                          ],
+                        ),
+            ),
+            // Search Bar
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              color: surfaceColor,
+              child: Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: isDark ? surfaceDark : Colors.grey[100],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.transparent,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      child: Icon(
+                        Icons.search,
+                        color: secondaryTextColor,
+                        size: 24,
+                      ),
+                    ),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        style: TextStyle(color: textColor),
+                        decoration: InputDecoration(
+                          hintText: "Search conversations...",
+                          hintStyle: TextStyle(color: secondaryTextColor),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _searchQuery = value;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Filter Chips
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              color: surfaceColor,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildFilterChip("All", _selectedFilter == "All", () {
+                      setState(() => _selectedFilter = "All");
+                    }, isDark, accent),
+                    const SizedBox(width: 12),
+                    _buildFilterChip(
+                        "Instructors", _selectedFilter == "Instructors", () {
                       setState(() => _selectedFilter = "Instructors");
                     }, isDark, accent),
                     const SizedBox(width: 12),
@@ -367,7 +544,8 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                       setState(() => _selectedFilter = "Groups");
                     }, isDark, accent),
                     const SizedBox(width: 12),
-                    _buildFilterChip("Students", _selectedFilter == "Students", () {
+                    _buildFilterChip("Students", _selectedFilter == "Students",
+                        () {
                       setState(() => _selectedFilter = "Students");
                     }, isDark, accent),
                   ],
@@ -384,35 +562,38 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                     const SizedBox(height: 8),
                     _buildSectionDivider("Pinned", isDark, secondaryTextColor),
                     const SizedBox(height: 8),
-                    ..._pinnedConversations.map((conv) => _buildConversationItem(
-                      conv,
-                      surfaceColor,
-                      textColor,
-                      secondaryTextColor,
-                      isDark,
-                      accent,
-                    )),
+                    ..._pinnedConversations
+                        .map((conv) => _buildConversationItem(
+                              conv,
+                              surfaceColor,
+                              textColor,
+                              secondaryTextColor,
+                              isDark,
+                              accent,
+                            )),
                   ],
                   // Earlier Section
                   if (_unpinnedConversations.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     _buildSectionDivider("Earlier", isDark, secondaryTextColor),
                     const SizedBox(height: 8),
-                    ..._unpinnedConversations.map((conv) => _buildConversationItem(
-                      conv,
-                      surfaceColor,
-                      textColor,
-                      secondaryTextColor,
-                      isDark,
-                      accent,
-                    )),
+                    ..._unpinnedConversations
+                        .map((conv) => _buildConversationItem(
+                              conv,
+                              surfaceColor,
+                              textColor,
+                              secondaryTextColor,
+                              isDark,
+                              accent,
+                            )),
                   ],
                   if (_filteredConversations.isEmpty) ...[
                     const SizedBox(height: 40),
                     Center(
                       child: Column(
                         children: [
-                          Icon(Icons.chat_bubble_outline, size: 64, color: secondaryTextColor),
+                          Icon(Icons.chat_bubble_outline,
+                              size: 64, color: secondaryTextColor),
                           const SizedBox(height: 16),
                           Text(
                             "No conversations found",
@@ -429,25 +610,22 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                 ],
               ),
             ),
-            */
           ],
         ),
       ),
-      // Commented out - messaging coming soon
-      // floatingActionButton: FloatingActionButton(
-      //   heroTag: "messages_fab",
-      //   onPressed: () {
-      //     // TODO: Open new message dialog
-      //   },
-      //   backgroundColor: accent,
-      //   child: const Icon(Icons.add_comment, color: Colors.white),
-      // ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: "messages_fab",
+        onPressed: () {
+          // TODO: Open new message dialog
+        },
+        backgroundColor: accent,
+        child: const Icon(Icons.add_comment, color: Colors.white),
+      ),
     );
   }
 
-  // Commented out - messaging coming soon
-  /*
-  Widget _buildFilterChip(String label, bool isSelected, VoidCallback onTap, bool isDark, Color accent) {
+  Widget _buildFilterChip(String label, bool isSelected, VoidCallback onTap,
+      bool isDark, Color accent) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -457,9 +635,8 @@ class _MessagesPageState extends NyPage<MessagesPage> {
           height: 36,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: isSelected
-                ? accent
-                : (isDark ? surfaceDark : Colors.grey[200]),
+            color:
+                isSelected ? accent : (isDark ? surfaceDark : Colors.grey[200]),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
@@ -479,7 +656,8 @@ class _MessagesPageState extends NyPage<MessagesPage> {
     );
   }
 
-  Widget _buildSectionDivider(String label, bool isDark, Color secondaryTextColor) {
+  Widget _buildSectionDivider(
+      String label, bool isDark, Color secondaryTextColor) {
     return Row(
       children: [
         Text(
@@ -487,7 +665,7 @@ class _MessagesPageState extends NyPage<MessagesPage> {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: secondaryTextColor.withOpacity(0.6),
+            color: secondaryTextColor.withValues(alpha: 0.6),
             letterSpacing: 1.0,
           ),
         ),
@@ -495,7 +673,9 @@ class _MessagesPageState extends NyPage<MessagesPage> {
           child: Container(
             height: 1,
             margin: const EdgeInsets.only(left: 8),
-            color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200],
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.grey[200],
           ),
         ),
       ],
@@ -510,9 +690,10 @@ class _MessagesPageState extends NyPage<MessagesPage> {
     bool isDark,
     Color accent,
   ) {
-    final isUnread = conversation.isRead != true || (conversation.unreadCount ?? 0) > 0;
+    final isUnread =
+        conversation.isRead != true || (conversation.unreadCount ?? 0) > 0;
     final hasUnreadBadge = (conversation.unreadCount ?? 0) > 0;
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -524,7 +705,9 @@ class _MessagesPageState extends NyPage<MessagesPage> {
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.grey[100]!,
               ),
             ),
           ),
@@ -542,22 +725,28 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                         color: isDark ? backgroundDark : Colors.white,
                         width: 2,
                       ),
-                      image: conversation.senderAvatar != null && conversation.senderAvatar!.isNotEmpty
+                      image: conversation.senderAvatar != null &&
+                              conversation.senderAvatar!.isNotEmpty
                           ? DecorationImage(
                               image: NetworkImage(conversation.senderAvatar!),
                               fit: BoxFit.cover,
                             )
                           : null,
-                      color: conversation.senderAvatar == null || conversation.senderAvatar!.isEmpty
-                          ? _getAvatarColor(conversation.senderType ?? 'student')
+                      color: conversation.senderAvatar == null ||
+                              conversation.senderAvatar!.isEmpty
+                          ? _getAvatarColor(
+                              conversation.senderType ?? 'student')
                           : null,
                     ),
-                    child: conversation.senderAvatar == null || conversation.senderAvatar!.isEmpty
+                    child: conversation.senderAvatar == null ||
+                            conversation.senderAvatar!.isEmpty
                         ? _buildAvatarIcon(conversation.senderType ?? 'student')
                         : null,
                   ),
                   // Online indicator (for instructors/students)
-                  if (conversation.senderType != 'group' && conversation.senderType != 'bot' && isUnread)
+                  if (conversation.senderType != 'group' &&
+                      conversation.senderType != 'bot' &&
+                      isUnread)
                     Positioned(
                       bottom: 0,
                       right: 0,
@@ -599,10 +788,12 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          _formatTime(conversation.lastMessageTime ?? conversation.timestamp),
+                          _formatTime(conversation.lastMessageTime ??
+                              conversation.timestamp),
                           style: TextStyle(
                             fontSize: 12,
-                            fontWeight: isUnread ? FontWeight.w500 : FontWeight.normal,
+                            fontWeight:
+                                isUnread ? FontWeight.w500 : FontWeight.normal,
                             color: isUnread ? accent : secondaryTextColor,
                           ),
                         ),
@@ -616,7 +807,9 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                             conversation.lastMessagePreview ?? '',
                             style: TextStyle(
                               fontSize: 14,
-                              fontWeight: isUnread ? FontWeight.w500 : FontWeight.normal,
+                              fontWeight: isUnread
+                                  ? FontWeight.w500
+                                  : FontWeight.normal,
                               color: isUnread ? textColor : secondaryTextColor,
                             ),
                             maxLines: 1,
@@ -678,7 +871,7 @@ class _MessagesPageState extends NyPage<MessagesPage> {
       case 'bot':
         return Colors.teal[800]!;
       case 'instructor':
-        return accent.withOpacity(0.2);
+        return accent.withValues(alpha: 0.2);
       default:
         return Colors.grey[400]!;
     }
@@ -687,7 +880,7 @@ class _MessagesPageState extends NyPage<MessagesPage> {
   Widget _buildAvatarIcon(String senderType) {
     IconData icon;
     Color iconColor;
-    
+
     switch (senderType) {
       case 'group':
         icon = Icons.groups;
@@ -701,8 +894,7 @@ class _MessagesPageState extends NyPage<MessagesPage> {
         icon = Icons.person;
         iconColor = accent;
     }
-    
+
     return Icon(icon, color: iconColor, size: 28);
   }
-  */
 }

@@ -237,7 +237,7 @@ class _SettingsPageState extends NyPage<SettingsPage> {
                           id: getEnv(_isDarkMode ? 'DARK_THEME_ID' : 'LIGHT_THEME_ID'),
                         );
                       },
-                      activeColor: const Color(0xFF2D8659),
+                      activeThumbColor: const Color(0xFF2D8659),
                     ),
                     onTap: () {
                       setState(() {

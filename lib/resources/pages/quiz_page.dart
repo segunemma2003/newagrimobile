@@ -206,10 +206,10 @@ class _QuizPageState extends NyPage<QuizPage> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: primary.withOpacity(0.1),
+                    color: primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(999),
                     border: Border.all(
-                      color: primary.withOpacity(0.2),
+                      color: primary.withValues(alpha: 0.2),
                       width: 1,
                     ),
                   ),
@@ -288,13 +288,13 @@ class _QuizPageState extends NyPage<QuizPage> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isDark
-                      ? Colors.white.withOpacity(0.05)
+                      ? Colors.white.withValues(alpha: 0.05)
                       : Colors.grey[200]!,
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Colors.black.withValues(alpha: 0.02),
                     blurRadius: 4,
                     offset: const Offset(0, 1),
                   ),
@@ -399,7 +399,7 @@ class _QuizPageState extends NyPage<QuizPage> {
                                   end: Alignment.bottomCenter,
                                   colors: [
                                     Colors.transparent,
-                                    Colors.black.withOpacity(0.6),
+                                    Colors.black.withValues(alpha: 0.6),
                                   ],
                                 ),
                               ),
@@ -412,7 +412,7 @@ class _QuizPageState extends NyPage<QuizPage> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.5),
+                                color: Colors.black.withValues(alpha: 0.5),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
@@ -475,7 +475,7 @@ class _QuizPageState extends NyPage<QuizPage> {
               border: Border(
                 top: BorderSide(
                   color: isDark
-                      ? Colors.white.withOpacity(0.1)
+                      ? Colors.white.withValues(alpha: 0.1)
                       : Colors.grey[200]!,
                   width: 1,
                 ),
@@ -505,23 +505,23 @@ class _QuizPageState extends NyPage<QuizPage> {
     bool isDark,
   ) {
     Color borderColor =
-        isDark ? Colors.white.withOpacity(0.1) : Colors.grey[300]!;
+        isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[300]!;
     Color bgColor = isDark ? surfaceDark : Colors.white;
     Color optionTextColor = secondaryTextColor;
 
     if (showFeedback) {
       if (isCorrect) {
         borderColor = primary;
-        bgColor = primary.withOpacity(0.1);
+        bgColor = primary.withValues(alpha: 0.1);
         optionTextColor = textColor;
       } else if (isSelected && !isCorrect) {
         borderColor = Colors.red;
-        bgColor = Colors.red.withOpacity(0.1);
+        bgColor = Colors.red.withValues(alpha: 0.1);
         optionTextColor = textColor;
       }
     } else if (isSelected) {
       borderColor = primary;
-      bgColor = primary.withOpacity(0.05);
+      bgColor = primary.withValues(alpha: 0.05);
       optionTextColor = textColor;
     }
 
@@ -547,7 +547,7 @@ class _QuizPageState extends NyPage<QuizPage> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 4,
                 offset: const Offset(0, 1),
               ),
@@ -646,7 +646,7 @@ class _QuizPageState extends NyPage<QuizPage> {
                 foregroundColor: textColor,
                 side: BorderSide(
                   color: isDark
-                      ? Colors.white.withOpacity(0.2)
+                      ? Colors.white.withValues(alpha: 0.2)
                       : Colors.grey[300]!,
                   width: 1,
                 ),
@@ -691,7 +691,7 @@ class _QuizPageState extends NyPage<QuizPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               elevation: hasAnswered ? 4 : 0,
-              shadowColor: primary.withOpacity(0.25),
+              shadowColor: primary.withValues(alpha: 0.25),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -782,7 +782,7 @@ class _QuizPageState extends NyPage<QuizPage> {
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
             color:
-                passed ? primary.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                passed ? primary.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: passed ? primary : Colors.red,
@@ -841,7 +841,7 @@ class _QuizPageState extends NyPage<QuizPage> {
                     foregroundColor: textColor,
                     side: BorderSide(
                       color: isDark
-                          ? Colors.white.withOpacity(0.2)
+                          ? Colors.white.withValues(alpha: 0.2)
                           : Colors.grey[300]!,
                       width: 1,
                     ),
@@ -881,7 +881,7 @@ class _QuizPageState extends NyPage<QuizPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   elevation: 4,
-                  shadowColor: primary.withOpacity(0.25),
+                  shadowColor: primary.withValues(alpha: 0.25),
                 ),
               ),
             ),
@@ -932,7 +932,7 @@ class _QuizPageState extends NyPage<QuizPage> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color:
-                    isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+                    isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
               ),
             ),
             child: Column(
@@ -990,8 +990,8 @@ class _QuizPageState extends NyPage<QuizPage> {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: hasAnswer
-                          ? primary.withOpacity(0.3)
-                          : Colors.orange.withOpacity(0.3),
+                          ? primary.withValues(alpha: 0.3)
+                          : Colors.orange.withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
@@ -1006,8 +1006,8 @@ class _QuizPageState extends NyPage<QuizPage> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: hasAnswer
-                                  ? primary.withOpacity(0.2)
-                                  : Colors.orange.withOpacity(0.2),
+                                  ? primary.withValues(alpha: 0.2)
+                                  : Colors.orange.withValues(alpha: 0.2),
                             ),
                             child: Center(
                               child: Text(
@@ -1072,7 +1072,7 @@ class _QuizPageState extends NyPage<QuizPage> {
               border: Border(
                 top: BorderSide(
                   color: isDark
-                      ? Colors.white.withOpacity(0.1)
+                      ? Colors.white.withValues(alpha: 0.1)
                       : Colors.grey[200]!,
                 ),
               ),
@@ -1199,8 +1199,8 @@ class _QuizPageState extends NyPage<QuizPage> {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: passed
-                    ? primary.withOpacity(0.1)
-                    : Colors.red.withOpacity(0.1),
+                    ? primary.withValues(alpha: 0.1)
+                    : Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: passed ? primary : Colors.red,
@@ -1272,7 +1272,7 @@ class _QuizPageState extends NyPage<QuizPage> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isDark
-                        ? Colors.white.withOpacity(0.1)
+                        ? Colors.white.withValues(alpha: 0.1)
                         : Colors.grey[200]!,
                   ),
                 ),
@@ -1338,7 +1338,7 @@ class _QuizPageState extends NyPage<QuizPage> {
                       minimumSize: const Size(double.infinity, 50),
                       side: BorderSide(
                         color: isDark
-                            ? Colors.white.withOpacity(0.2)
+                            ? Colors.white.withValues(alpha: 0.2)
                             : Colors.grey[300]!,
                       ),
                       shape: RoundedRectangleBorder(

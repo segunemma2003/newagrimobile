@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import 'package:nylo_framework/nylo_framework.dart';
 import '/app/models/course.dart';
 import '/app/controllers/courses_controller.dart';
@@ -64,7 +63,7 @@ class _CoursesPageState extends NyPage<CoursesPage> {
   @override
   Widget view(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = accent.withOpacity(0.1); // Maintain background color
+    final bgColor = accent.withValues(alpha: 0.1); // Maintain background color
     final cardColor = isDark ? surfaceDark : Colors.white;
     final textColor = isDark ? Colors.white : Colors.grey[900];
     final secondaryTextColor = isDark ? Colors.grey[400] : Colors.grey[500];
@@ -108,7 +107,7 @@ class _CoursesPageState extends NyPage<CoursesPage> {
                             ? Container(
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: primary.withOpacity(0.2),
+                                  color: primary.withValues(alpha: 0.2),
                                 ),
                                 child: Center(
                                   child: Text(
@@ -443,7 +442,7 @@ class _CoursesPageState extends NyPage<CoursesPage> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -484,7 +483,7 @@ class _CoursesPageState extends NyPage<CoursesPage> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
+                        color: Colors.black.withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -556,7 +555,7 @@ class _CoursesPageState extends NyPage<CoursesPage> {
                         child: Container(
                           height: 8,
                           color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white.withOpacity(0.1)
+                              ? Colors.white.withValues(alpha: 0.1)
                               : Colors.grey[200],
                           child: FractionallySizedBox(
                             alignment: Alignment.centerLeft,
