@@ -47,8 +47,12 @@ import 'package:nylo_framework/nylo_framework.dart';
 |-------------------------------------------------------------------------- */
 
 appRouter() => nyRoutes((router) {
-      router.add(IntroPage.path).initialRoute();
-      router.add(WelcomePage.path);
+      print('ROUTER: Setting WelcomePage as initial route');
+      router
+          .add(WelcomePage.path)
+          .initialRoute(); // TEMP: Test if WelcomePage works
+      print('ROUTER: WelcomePage path = ${WelcomePage.path}');
+      router.add(IntroPage.path);
       router.add(LoginPage.path);
       router.add(RegisterPage.path);
       router.add(ForgotPasswordPage.path);

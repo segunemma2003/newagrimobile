@@ -18,15 +18,21 @@ class Boot {
 
     if (getEnv('SHOW_SPLASH_SCREEN', defaultValue: false)) {
       runApp(SplashScreen.app());
-      // Wait 5 seconds before continuing with app initialization
-      await Future.delayed(const Duration(seconds: 5));
+      // Wait 2 seconds before continuing with app initialization (reduced from 5 to save memory)
+      await Future.delayed(const Duration(seconds: 2));
     }
 
     print('Boot nylo: _setup');
     await _setup();
     print('Boot nylo: bootApplication');
     try {
-      final nylo = await bootApplication(providers);
+      final nylo = await bootApplication(providers).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          print('Boot nylo: bootApplication timed out');
+          throw TimeoutException('bootApplication timed out');
+        },
+      );
       print('Boot nylo: bootApplication (after)');
       return nylo;
     } catch (e, st) {
@@ -38,9 +44,15 @@ class Boot {
 
   /// This method is called after Learn with Agrisiti is initialized.
   static Future<void> finished(Nylo nylo) async {
-    await bootFinished(nylo, providers);
-    print('Boot nylo: finished');
-    runApp(Main(nylo));
+    try {
+      await bootFinished(nylo, providers);
+      print('Boot nylo: finished');
+      runApp(Main(nylo));
+    } catch (e, stackTrace) {
+      print('FATAL ERROR in Boot.finished: $e');
+      print('Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 }
 
@@ -51,11 +63,14 @@ class Boot {
 |-------------------------------------------------------------------------- */
 
 _setup() async {
-  /// Example: Initializing StorageConfig
-  // StorageConfig.init(
-  //   androidOptions: AndroidOptions(
-  //     resetOnError: true,
-  //     encryptedSharedPreferences: false
-  //   )
-  // );
+  // Initialize secure storage / keychain behavior for Nylo.
+  StorageConfig.init(
+    androidOptions: const AndroidOptions(
+      resetOnError: true,
+      encryptedSharedPreferences: false,
+    ),
+    iosOptions: const IOSOptions(
+      accessibility: KeychainAccessibility.first_unlock,
+    ),
+  );
 }

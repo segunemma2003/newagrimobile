@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import 'dart:math' as math;
 import 'package:nylo_framework/nylo_framework.dart';
 
@@ -61,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen>
                   Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Subtle Glow behind logo (blur-[60px] scale-150)
+                      // Subtle Glow behind logo (simplified to reduce memory)
                       Container(
                         width: 192, // scale-150 on 128px base
                         height: 192,
@@ -69,10 +68,6 @@ class _SplashScreenState extends State<SplashScreen>
                           shape: BoxShape.circle,
                           color: const Color(0xFF0fbd38)
                               .withValues(alpha: 0.2), // primary/20
-                        ),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
-                          child: Container(),
                         ),
                       ),
                       // Logo
@@ -95,15 +90,13 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                           ],
                         ),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(
-                              sigmaX: 10, sigmaY: 10), // backdrop-blur-sm
-                          child: Image.asset(
-                            "logo-without.png",
-                            width: 84,
-                            height: 84,
-                            fit: BoxFit.contain,
-                          ).localAsset(),
+                        child: Image.asset(
+                          "logo-without.png",
+                          width: 84,
+                          height: 84,
+                          fit: BoxFit.contain,
+                          cacheWidth: 84,
+                          cacheHeight: 84,
                         ),
                       ),
                     ],

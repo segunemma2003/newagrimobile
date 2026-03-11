@@ -41,7 +41,12 @@ class AppProvider implements NyProvider {
     nylo.addFormStyle(formStyle);
     nylo.addAuthKey(Keys.auth);
     try {
-      await nylo.syncKeys(Keys.syncedOnBoot);
+      await nylo.syncKeys(Keys.syncedOnBoot).timeout(
+        const Duration(seconds: 3),
+        onTimeout: () {
+          print('Warning: syncKeys timed out, continuing without sync');
+        },
+      );
     } catch (e) {
       if (!e.toString().contains('-34018')) {
         print('Warning: Failed to sync keys from storage: $e');

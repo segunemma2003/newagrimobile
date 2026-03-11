@@ -16,93 +16,161 @@ class _IntroPageState extends NyPage<IntroPage> {
 
   @override
   get init => () async {
-        print('INTRO: init called on intro');
-        // Check if intro has already been seen
-        try {
-          final hasSeenIntro = await Keys.hasSeenIntro.read<bool>() ?? false;
-          print('INTRO: hasSeenIntro: $hasSeenIntro');
-          if (hasSeenIntro) {
-            // Check if user is authenticated
-            final isAuthenticated = await Auth.isAuthenticated();
-            if (isAuthenticated) {
-              routeTo("/main");
-            } else {
-              routeTo("/login");
-            }
-          }
-          print('INTRO: init called on intro (after)');
-        } catch (e) {
-          // Handle storage errors gracefully - assume intro hasn't been seen
-          // Suppress error logging for Keychain issues on simulator
-          if (!e.toString().contains('-34018')) {
-            print('Warning: Failed to read intro status: $e');
-          }
-        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _checkIntroStatus();
+        });
       };
+
+  Future<void> _checkIntroStatus() async {
+    print('INTRO: checking intro status');
+    try {
+      final hasSeenIntro = await Keys.hasSeenIntro
+              .read<bool>()
+              .timeout(const Duration(seconds: 3)) ??
+          false;
+
+      print('INTRO: hasSeenIntro: $hasSeenIntro');
+
+      if (!hasSeenIntro) return;
+
+      final isAuthenticated =
+          await Auth.isAuthenticated().timeout(const Duration(seconds: 3));
+
+      if (mounted) {
+        if (isAuthenticated) {
+          routeTo("/main");
+        } else {
+          routeTo("/login");
+        }
+      }
+    } catch (e) {
+      print('INTRO: storage check failed or timed out: $e');
+    }
+  }
 
   @override
   LoadingStyle get loadingStyle => LoadingStyle.none();
 
   void _skipIntro() async {
     try {
-      await Keys.hasSeenIntro.save(true);
+      await Keys.hasSeenIntro.save(true).timeout(const Duration(seconds: 3));
     } catch (e) {
       if (!e.toString().contains('-34018')) {
         print('Warning: Failed to save intro status: $e');
       }
     }
-    routeTo("/login");
+    if (mounted) routeTo("/login");
   }
 
   @override
   Widget view(BuildContext context) {
-    return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _currentPage = index;
+    print('INTRO: view() called - building IntroPage');
+    print('INTRO: context = $context');
+    print('INTRO: mounted = $mounted');
+
+    try {
+      // Return widget that prints when built
+      return Builder(
+        builder: (BuildContext ctx) {
+          print('INTRO: Builder.build() called - widget is being built!');
+          print('INTRO: Builder context = $ctx');
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            print('INTRO: PostFrameCallback - widget should be visible now');
           });
+
+          return Scaffold(
+            backgroundColor: Colors.green, // Bright color to verify visibility
+            body: SafeArea(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 300,
+                      height: 300,
+                      color: Colors.red,
+                      child: Center(
+                        child: Text(
+                          'INTRO PAGE\nTEST\nSUCCESS!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 32,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 40),
+                    Container(
+                      padding: EdgeInsets.all(20),
+                      color: Colors.blue,
+                      child: Text(
+                        'If you see this green/red/blue,\nthe page IS rendering!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
         },
-        children: [
-          _buildScreen1(context),
-          _buildScreen2(context),
-          _buildScreen3(context),
-        ],
-      ),
-    );
+      );
+    } catch (e, st) {
+      print('INTRO: ERROR in view(): $e');
+      print(st);
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Error loading IntroPage: $e',
+                  style: TextStyle(color: Colors.red)),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => setState(() {}),
+                child: Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 
   // Screen 1: Light background - Empowering Agriculture
   Widget _buildScreen1(BuildContext context) {
     print('INTRO: _buildScreen1 called');
-    // Color scheme
     const primary = Color(0xFF3E6866);
     const secondary = Color(0xFF50C1AE);
 
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: secondary.withValues(
-          alpha: 0.1), // Light teal background (#50C1AE with opacity)
+      color: Colors.white,
       child: SafeArea(
         child: Column(
           children: [
-            // Header with logo and Skip
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Logo
                   Row(
                     children: [
                       Container(
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: primary.withValues(alpha: 0.2), // primary/20
+                          color: primary.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
                         child: Padding(
@@ -112,7 +180,12 @@ class _IntroPageState extends NyPage<IntroPage> {
                             width: 28,
                             height: 28,
                             fit: BoxFit.contain,
-                          ).localAsset(),
+                            errorBuilder: (context, error, stackTrace) {
+                              print('ERROR loading logo: $error');
+                              return Icon(Icons.image,
+                                  size: 28, color: primary);
+                            },
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -121,14 +194,12 @@ class _IntroPageState extends NyPage<IntroPage> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
-                          color: const Color(
-                              0xFF0d5c63), // Darker teal for better visibility
+                          color: const Color(0xFF0d5c63),
                           letterSpacing: -0.5,
                         ),
                       ),
                     ],
                   ),
-                  // Skip button
                   TextButton(
                     onPressed: _skipIntro,
                     child: Text(
@@ -136,14 +207,13 @@ class _IntroPageState extends NyPage<IntroPage> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: primary.withValues(alpha: 0.6), // primary/60
+                        color: primary.withValues(alpha: 0.6),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            // Hero Section - Image
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -153,13 +223,12 @@ class _IntroPageState extends NyPage<IntroPage> {
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: primary.withValues(alpha: 0.1), // primary/10
+                        color: primary.withValues(alpha: 0.1),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Stack(
                           children: [
-                            // Background image
                             Image.asset(
                               "public/images/A-01.png",
                               fit: BoxFit.cover,
@@ -168,7 +237,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                                 color: primary.withValues(alpha: 0.1),
                               ),
                             ),
-                            // Gradient overlay (from bottom to top)
                             Positioned.fill(
                               child: Container(
                                 decoration: BoxDecoration(
@@ -176,8 +244,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter,
                                     colors: [
-                                      primary.withValues(
-                                          alpha: 0.4), // primary/40
+                                      primary.withValues(alpha: 0.4),
                                       Colors.transparent,
                                     ],
                                   ),
@@ -192,13 +259,11 @@ class _IntroPageState extends NyPage<IntroPage> {
                 ),
               ),
             ),
-            // Content Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 children: [
                   const SizedBox(height: 32),
-                  // Title
                   RichText(
                     textAlign: TextAlign.center,
                     text: TextSpan(
@@ -211,7 +276,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                             color:
                                 Theme.of(context).brightness == Brightness.dark
                                     ? Colors.white
-                                    : primary, // primary
+                                    : primary,
                             height: 1.2,
                             letterSpacing: -0.5,
                           ),
@@ -221,7 +286,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                           style: TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.w700,
-                            color: secondary, // secondary
+                            color: secondary,
                             height: 1.2,
                             letterSpacing: -0.5,
                           ),
@@ -230,7 +295,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  // Description
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Text(
@@ -239,12 +303,11 @@ class _IntroPageState extends NyPage<IntroPage> {
                       style: TextStyle(
                         fontSize: 16,
                         height: 1.5,
-                        color: primary.withValues(alpha: 0.8), // primary/80
+                        color: primary.withValues(alpha: 0.8),
                       ),
                     ),
                   ),
                   const SizedBox(height: 32),
-                  // Page Indicators
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
@@ -254,15 +317,14 @@ class _IntroPageState extends NyPage<IntroPage> {
                             Theme.of(context).brightness == Brightness.dark;
                         return Container(
                           margin: const EdgeInsets.symmetric(horizontal: 6),
-                          width: index == 0 ? 24 : 10, // First dot is elongated
+                          width: index == 0 ? 24 : 10,
                           height: 10,
                           decoration: BoxDecoration(
                             color: index == 0
-                                ? secondary // secondary
+                                ? secondary
                                 : (isDark
                                     ? Colors.white.withValues(alpha: 0.2)
-                                    : primary.withValues(
-                                        alpha: 0.2)), // primary/20
+                                    : primary.withValues(alpha: 0.2)),
                             borderRadius: BorderRadius.circular(999),
                           ),
                         );
@@ -270,7 +332,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  // Get Started Button
                   SizedBox(
                     width: double.infinity,
                     height: 56,
@@ -282,13 +343,10 @@ class _IntroPageState extends NyPage<IntroPage> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            primary, // primary (same as second intro page)
-                        foregroundColor: Colors
-                            .white, // white text (same as second intro page)
+                        backgroundColor: primary,
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(999), // full rounded
+                          borderRadius: BorderRadius.circular(999),
                         ),
                         elevation: 8,
                         shadowColor: primary.withValues(alpha: 0.2),
@@ -313,7 +371,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                 ],
               ),
             ),
-            // iOS Home Indicator
             Container(
               height: 32,
               width: double.infinity,
@@ -337,7 +394,6 @@ class _IntroPageState extends NyPage<IntroPage> {
 
   // Screen 2: Dark background - Master Agriculture Step-by-Step
   Widget _buildScreen2(BuildContext context) {
-    // Color scheme
     const primary = Color(0xFF3E6866);
     const secondary = Color(0xFF50C1AE);
     const backgroundDark = Color(0xFF102214);
@@ -346,18 +402,15 @@ class _IntroPageState extends NyPage<IntroPage> {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: secondary.withValues(
-          alpha: 0.1), // Light teal background (#50C1AE with opacity)
+      color: Colors.white,
       child: SafeArea(
         child: Column(
           children: [
-            // Top Navigation
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Back button
                   Container(
                     width: 40,
                     height: 40,
@@ -376,7 +429,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                       padding: EdgeInsets.zero,
                     ),
                   ),
-                  // Logo (centered)
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -385,32 +437,33 @@ class _IntroPageState extends NyPage<IntroPage> {
                         width: 24,
                         height: 24,
                         fit: BoxFit.contain,
-                      ).localAsset(),
+                        errorBuilder: (context, error, stackTrace) {
+                          print('ERROR loading logo: $error');
+                          return Icon(Icons.image, size: 24, color: primary);
+                        },
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         "Agrisiti",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
-                          color: primary, // Dark text for white background
+                          color: primary,
                           letterSpacing: -0.5,
                         ),
                       ),
                     ],
                   ),
-                  // Spacer for symmetry
                   const SizedBox(width: 40),
                 ],
               ),
             ),
-            // Content Area
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Column(
                   children: [
                     const SizedBox(height: 16),
-                    // Hero Image
                     Container(
                       height: 280,
                       width: double.infinity,
@@ -438,21 +491,18 @@ class _IntroPageState extends NyPage<IntroPage> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Headline Section
                     Text(
                       "Master Agriculture Step-by-Step",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.w700,
-                        color: const Color(
-                            0xFF1e293b), // Dark text for white background
+                        color: const Color(0xFF1e293b),
                         height: 1.2,
                         letterSpacing: -0.5,
                       ),
                     ),
                     const SizedBox(height: 12),
-                    // Description
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
@@ -461,16 +511,13 @@ class _IntroPageState extends NyPage<IntroPage> {
                         style: TextStyle(
                           fontSize: 16,
                           height: 1.5,
-                          color: const Color(
-                              0xFF475569), // Dark text for white background
+                          color: const Color(0xFF475569),
                         ),
                       ),
                     ),
                     const SizedBox(height: 32),
-                    // Module Cards with decorative glow
                     Stack(
                       children: [
-                        // Decorative Teal Glow
                         Positioned(
                           top: -40,
                           left: MediaQuery.of(context).size.width / 2 - 96,
@@ -487,10 +534,8 @@ class _IntroPageState extends NyPage<IntroPage> {
                             ),
                           ),
                         ),
-                        // Module Cards
                         Column(
                           children: [
-                            // Completed Module Card
                             Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
@@ -624,7 +669,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            // In Progress Module Card
                             Container(
                               padding: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
@@ -733,7 +777,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                                     ],
                                   ),
                                   const SizedBox(height: 12),
-                                  // Progress Bar
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(999),
                                     child: Container(
@@ -778,7 +821,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            // Locked Module Card
                             Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
@@ -877,19 +919,17 @@ class _IntroPageState extends NyPage<IntroPage> {
                 ),
               ),
             ),
-            // Navigation Footer
             Padding(
               padding: const EdgeInsets.all(32.0),
               child: Column(
                 children: [
-                  // Progress Dots
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
                       3,
                       (index) => Container(
                         margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: index == 1 ? 24 : 8, // Second dot is elongated
+                        width: index == 1 ? 24 : 8,
                         height: 8,
                         decoration: BoxDecoration(
                           color: index == 1
@@ -901,7 +941,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  // Buttons
                   Row(
                     children: [
                       Expanded(
@@ -960,7 +999,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16), // Safe area spacer
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -972,7 +1011,6 @@ class _IntroPageState extends NyPage<IntroPage> {
 
   // Screen 3: Dark background - Mastery Through Action
   Widget _buildScreen3(BuildContext context) {
-    // Color scheme
     const primary = Color(0xFF3E6866);
     const secondary = Color(0xFF50C1AE);
     const backgroundDark = Color(0xFF102214);
@@ -980,19 +1018,16 @@ class _IntroPageState extends NyPage<IntroPage> {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: secondary.withValues(
-          alpha: 0.1), // Light teal background (#50C1AE with opacity)
+      color: Colors.white,
       child: SafeArea(
         child: Column(
           children: [
-            // Header with logo and Skip
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Logo
                   Container(
                     width: 48,
                     height: 48,
@@ -1005,9 +1040,12 @@ class _IntroPageState extends NyPage<IntroPage> {
                       width: 28,
                       height: 28,
                       fit: BoxFit.contain,
-                    ).localAsset(),
+                      errorBuilder: (context, error, stackTrace) {
+                        print('ERROR loading logo: $error');
+                        return Icon(Icons.image, size: 28, color: primary);
+                      },
+                    ),
                   ),
-                  // Skip button
                   TextButton(
                     onPressed: _skipIntro,
                     child: Text(
@@ -1015,7 +1053,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF9db9a3), // dark:text-[#9db9a3]
+                        color: const Color(0xFF9db9a3),
                         letterSpacing: 0.015,
                       ),
                     ),
@@ -1023,7 +1061,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                 ],
               ),
             ),
-            // Main content
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
@@ -1032,16 +1069,15 @@ class _IntroPageState extends NyPage<IntroPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const SizedBox(height: 24),
-                      // Hero Graphic Section
                       Container(
-                        height: 320, // min-h-80
+                        height: 320,
                         width: double.infinity,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              primary.withValues(alpha: 0.2), // primary/20
+                              primary.withValues(alpha: 0.2),
                               backgroundDark,
                             ],
                           ),
@@ -1062,7 +1098,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                           borderRadius: BorderRadius.circular(12),
                           child: Stack(
                             children: [
-                              // Background image
                               Positioned.fill(
                                 child: Image.asset(
                                   "public/images/C-01.png",
@@ -1078,12 +1113,19 @@ class _IntroPageState extends NyPage<IntroPage> {
                                         width: 200,
                                         color:
                                             Colors.white.withValues(alpha: 0.2),
-                                      ).localAsset(),
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          print('ERROR loading logo: $error');
+                                          return Icon(Icons.image,
+                                              size: 200,
+                                              color: Colors.white
+                                                  .withValues(alpha: 0.2));
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                              // Backdrop blur overlay
                               Positioned.fill(
                                 child: Container(
                                   color: backgroundDark.withValues(alpha: 0.4),
@@ -1094,7 +1136,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                                   ),
                                 ),
                               ),
-                              // VR Icon in center with pulsing animation
                               Center(
                                 child: _PulsingVRIcon(primary: primary),
                               ),
@@ -1103,12 +1144,10 @@ class _IntroPageState extends NyPage<IntroPage> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      // Text Content
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Column(
                           children: [
-                            // Title
                             RichText(
                               textAlign: TextAlign.center,
                               text: TextSpan(
@@ -1118,8 +1157,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                                     style: TextStyle(
                                       fontSize: 32,
                                       fontWeight: FontWeight.w700,
-                                      color: const Color(
-                                          0xFF1e293b), // Dark text for white background
+                                      color: const Color(0xFF1e293b),
                                       height: 1.2,
                                       letterSpacing: -0.5,
                                     ),
@@ -1129,8 +1167,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                                     style: TextStyle(
                                       fontSize: 32,
                                       fontWeight: FontWeight.w700,
-                                      color:
-                                          secondary, // primary (secondary color)
+                                      color: secondary,
                                       height: 1.2,
                                       letterSpacing: -0.5,
                                     ),
@@ -1139,7 +1176,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            // Description
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 8.0),
@@ -1149,8 +1185,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                                 style: TextStyle(
                                   fontSize: 16,
                                   height: 1.5,
-                                  color: const Color(
-                                      0xFF475569), // Dark text for white background
+                                  color: const Color(0xFF475569),
                                 ),
                               ),
                             ),
@@ -1158,7 +1193,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                         ),
                       ),
                       const SizedBox(height: 40),
-                      // Progress Indicators
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                         child: Row(
@@ -1174,7 +1208,7 @@ class _IntroPageState extends NyPage<IntroPage> {
                                 height: 8,
                                 decoration: BoxDecoration(
                                   color: isActive
-                                      ? secondary // primary (secondary color)
+                                      ? secondary
                                       : (Theme.of(context).brightness ==
                                               Brightness.dark
                                           ? secondary.withValues(alpha: 0.2)
@@ -1197,12 +1231,10 @@ class _IntroPageState extends NyPage<IntroPage> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      // CTA Section
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Column(
                           children: [
-                            // Get Started Button
                             SizedBox(
                               width: double.infinity,
                               height: 56,
@@ -1216,11 +1248,10 @@ class _IntroPageState extends NyPage<IntroPage> {
                                           'Warning: Failed to save intro status: $e');
                                     }
                                   }
-                                  routeTo("/welcome");
+                                  if (mounted) routeTo("/welcome");
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      secondary, // primary (secondary color)
+                                  backgroundColor: secondary,
                                   foregroundColor: backgroundDark,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(999),
@@ -1245,7 +1276,6 @@ class _IntroPageState extends NyPage<IntroPage> {
                               ),
                             ),
                             const SizedBox(height: 24),
-                            // Footer text
                             Text(
                               "Part of the Agrisiti Ecosystem",
                               textAlign: TextAlign.center,
@@ -1255,8 +1285,8 @@ class _IntroPageState extends NyPage<IntroPage> {
                                 color: Theme.of(context).brightness ==
                                         Brightness.dark
                                     ? Colors.grey[500]
-                                    : const Color(0xFF64748b), // text-slate-500
-                                letterSpacing: 2.4, // tracking-widest
+                                    : const Color(0xFF64748b),
+                                letterSpacing: 2.4,
                               ),
                             ),
                           ],
@@ -1322,7 +1352,7 @@ class _PulsingVRIconState extends State<_PulsingVRIcon>
               ),
             ),
             child: Icon(
-              Icons.vrpano, // VR icon
+              Icons.vrpano,
               color: widget.primary,
               size: 60,
             ),
@@ -1333,7 +1363,6 @@ class _PulsingVRIconState extends State<_PulsingVRIcon>
   }
 }
 
-// Custom painter for digital interface overlay (circular network pattern)
 class DigitalInterfacePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -1345,17 +1374,14 @@ class DigitalInterfacePainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width * 0.3;
 
-    // Draw circular network pattern
     for (int i = 0; i < 3; i++) {
       canvas.drawCircle(center, radius - (i * 30), paint);
     }
 
-    // Draw connecting lines (simplified)
     final linePaint = Paint()
       ..color = Colors.white.withValues(alpha: 0.2)
       ..strokeWidth = 1.5;
 
-    // Draw some connecting lines
     for (int i = 0; i < 8; i++) {
       final angle = (i / 8) * 2 * math.pi;
       final x = center.dx + (radius - 30) * math.cos(angle);
