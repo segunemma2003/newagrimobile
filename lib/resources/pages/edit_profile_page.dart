@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '/config/keys.dart';
+import '/app/helpers/storage_helper.dart';
+import '/app/helpers/image_helper.dart';
+import '/app/networking/api_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -15,6 +18,7 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
   TextEditingController? _nameController;
   TextEditingController? _emailController;
   TextEditingController? _phoneController;
+  TextEditingController? _locationController;
   Map<String, dynamic>? _userData;
   String? _selectedImagePath;
   final ImagePicker _imagePicker = ImagePicker();
@@ -31,13 +35,14 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
         _nameController = TextEditingController(text: _userData?['name'] ?? '');
         _emailController = TextEditingController(text: _userData?['email'] ?? '');
         _phoneController = TextEditingController(text: _userData?['phone'] ?? '');
+        _locationController = TextEditingController(text: _userData?['location'] ?? '');
       };
 
   Future<void> _loadUserData() async {
     try {
       _userData = await Keys.auth.read<Map<String, dynamic>>();
       if (_userData == null) {
-        _userData = backpackRead(Keys.auth);
+        _userData = safeReadAuthData();
       }
       if (_userData == null) {
         // Default dummy data
@@ -53,7 +58,7 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
       if (!e.toString().contains('-34018')) {
         print('Warning: Failed to load user data: $e');
       }
-      _userData = backpackRead(Keys.auth) ?? {
+      _userData = safeReadAuthData() ?? {
         'name': 'Jane Doe',
         'email': 'jane.doe@agrisiti.edu',
         'phone': '+1 202 555 0124',
@@ -93,21 +98,35 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
     }
 
     try {
-      // Update user data
-      final updatedData = Map<String, dynamic>.from(_userData ?? {});
-      updatedData['name'] = _nameController?.text.trim();
-      updatedData['email'] = _emailController?.text.trim();
-      updatedData['phone'] = _phoneController?.text.trim();
-      
-      if (_selectedImagePath != null) {
-        // In a real app, you would upload the image and get the URL
-        // For now, we'll just store the path locally
-        updatedData['avatar'] = _selectedImagePath;
-      }
+      // Prepare update data
+      final updateData = {
+        'name': _nameController?.text.trim() ?? '',
+        'email': _emailController?.text.trim() ?? '',
+        'phone': _phoneController?.text.trim(),
+        'location': _locationController?.text.trim(),
+      };
 
-      // Save to storage
-      await Keys.auth.save(updatedData);
-      backpackSave(Keys.auth, updatedData);
+      // Remove null/empty values
+      updateData.removeWhere((key, value) => value == null || (value is String && value.isEmpty));
+
+      // Update via API
+      final api = ApiService();
+      final response = await api.updateProfile(updateData);
+
+      // Update local storage with response
+      if (response['data'] != null && response['data']['user'] != null) {
+        final userData = response['data']['user'];
+        if (userData is Map<String, dynamic>) {
+          await Keys.auth.save(userData);
+          backpackSave(Keys.auth, userData);
+        }
+      } else {
+        // Fallback: update local data
+        final updatedData = Map<String, dynamic>.from(_userData ?? {});
+        updatedData.addAll(updateData);
+        await Keys.auth.save(updatedData);
+        backpackSave(Keys.auth, updatedData);
+      }
 
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -124,7 +143,7 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
       print('Error saving profile: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error saving profile: $e'),
+          content: Text('Error saving profile: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -136,6 +155,7 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
     _nameController?.dispose();
     _emailController?.dispose();
     _phoneController?.dispose();
+    _locationController?.dispose();
     super.dispose();
   }
 
@@ -154,7 +174,7 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
     final currentAvatar = _selectedImagePath != null
         ? FileImage(File(_selectedImagePath!))
         : (_userData?['avatar'] != null && _userData!['avatar'].toString().isNotEmpty
-            ? NetworkImage(_userData!['avatar'])
+            ? NetworkImage(getImageUrl(_userData!['avatar']))
             : null);
 
     return Scaffold(
@@ -371,6 +391,19 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
                           }
                           return null;
                         },
+                      ),
+                      const SizedBox(height: 8),
+                      // Location
+                      _buildTextField(
+                        label: "Location",
+                        controller: _locationController,
+                        hintText: "City, Country",
+                        textColor: textColor,
+                        secondaryTextColor: secondaryTextColor,
+                        borderColor: borderColor,
+                        inputBgColor: inputBgColor,
+                        isDark: isDark,
+                        validator: null, // Optional field
                       ),
                       const SizedBox(height: 100), // Space for bottom button
                     ],

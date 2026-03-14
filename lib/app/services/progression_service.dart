@@ -2,6 +2,7 @@ import 'package:nylo_framework/nylo_framework.dart';
 import '/app/models/course.dart';
 import '/app/models/module.dart';
 import '/app/models/lesson.dart';
+import '/app/helpers/storage_helper.dart';
 import '/config/keys.dart';
 
 class ProgressionService {
@@ -158,11 +159,36 @@ class ProgressionService {
   /// Save course to storage
   static Future<void> _saveCourse(Course course) async {
     try {
-      // Use the same pattern as course_detail_controller
-      final coursesJson = await Keys.courses.read<List>();
+      // Use safe helper to read courses data
       List<Map<String, dynamic>> courses = [];
-      if (coursesJson != null) {
-        courses = List<Map<String, dynamic>>.from(coursesJson);
+      
+      try {
+        final data = await Keys.courses.read<List>();
+        if (data != null) {
+          courses = data.map((item) {
+            if (item is Map<String, dynamic>) {
+              return item;
+            } else if (item is Map) {
+              return Map<String, dynamic>.from(item);
+            }
+            return <String, dynamic>{};
+          }).where((item) => item.isNotEmpty).toList();
+        }
+      } catch (e) {
+        if (!e.toString().contains('-34018')) {
+          print("Warning: Error reading courses in progression service: $e");
+        }
+        final safeData = safeReadCoursesData();
+        if (safeData != null) {
+          courses = safeData;
+        }
+      }
+      
+      if (courses.isEmpty) {
+        final safeData = safeReadCoursesData();
+        if (safeData != null) {
+          courses = safeData;
+        }
       }
 
       final index = courses.indexWhere((c) => c['id'] == course.id);

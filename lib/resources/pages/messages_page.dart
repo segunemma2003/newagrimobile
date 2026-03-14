@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '/app/models/message.dart';
 import '/app/networking/api_service.dart';
-import '/config/keys.dart';
+import '/app/helpers/storage_helper.dart';
+import '/app/helpers/image_helper.dart';
 import '/resources/pages/chat_detail_page.dart';
 
 class MessagesPage extends NyStatefulWidget {
@@ -39,8 +40,8 @@ class _MessagesPageState extends NyPage<MessagesPage> {
     });
 
     try {
-      // Get current user
-      final userData = await Keys.auth.read<Map<String, dynamic>>();
+      // Get current user (use safe helper to handle old/corrupt storage)
+      final userData = safeReadAuthData();
       final currentUserId = userData?['id']?.toString();
 
       if (currentUserId == null) {
@@ -64,12 +65,22 @@ class _MessagesPageState extends NyPage<MessagesPage> {
         return;
       }
 
-      final enrollments = enrollmentsResponse['data'] ?? enrollmentsResponse;
-      final courses = enrollments is List
-          ? enrollments
-          : (enrollments is Map && enrollments['data'] != null
-              ? enrollments['data']
-              : []);
+      // Handle both raw List and {data: [...]} shapes safely
+      dynamic enrollments;
+      if (enrollmentsResponse is List) {
+        enrollments = enrollmentsResponse;
+      } else if (enrollmentsResponse is Map) {
+        final data = enrollmentsResponse['data'];
+        if (data is List) {
+          enrollments = data;
+        } else {
+          enrollments = <dynamic>[];
+        }
+      } else {
+        enrollments = <dynamic>[];
+      }
+
+      final courses = enrollments is List ? enrollments : <dynamic>[];
 
       // Fetch messages for all enrolled courses
       Map<String, Message> conversationMap = {};
@@ -478,138 +489,6 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                           ],
                         ),
             ),
-            // Search Bar
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: surfaceColor,
-              child: Container(
-                height: 48,
-                decoration: BoxDecoration(
-                  color: isDark ? surfaceDark : Colors.grey[100],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.transparent,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      child: Icon(
-                        Icons.search,
-                        color: secondaryTextColor,
-                        size: 24,
-                      ),
-                    ),
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        style: TextStyle(color: textColor),
-                        decoration: InputDecoration(
-                          hintText: "Search conversations...",
-                          hintStyle: TextStyle(color: secondaryTextColor),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            _searchQuery = value;
-                          });
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            // Filter Chips
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: surfaceColor,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildFilterChip("All", _selectedFilter == "All", () {
-                      setState(() => _selectedFilter = "All");
-                    }, isDark, accent),
-                    const SizedBox(width: 12),
-                    _buildFilterChip(
-                        "Instructors", _selectedFilter == "Instructors", () {
-                      setState(() => _selectedFilter = "Instructors");
-                    }, isDark, accent),
-                    const SizedBox(width: 12),
-                    _buildFilterChip("Groups", _selectedFilter == "Groups", () {
-                      setState(() => _selectedFilter = "Groups");
-                    }, isDark, accent),
-                    const SizedBox(width: 12),
-                    _buildFilterChip("Students", _selectedFilter == "Students",
-                        () {
-                      setState(() => _selectedFilter = "Students");
-                    }, isDark, accent),
-                  ],
-                ),
-              ),
-            ),
-            // Messages List
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  // Pinned Section
-                  if (_pinnedConversations.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    _buildSectionDivider("Pinned", isDark, secondaryTextColor),
-                    const SizedBox(height: 8),
-                    ..._pinnedConversations
-                        .map((conv) => _buildConversationItem(
-                              conv,
-                              surfaceColor,
-                              textColor,
-                              secondaryTextColor,
-                              isDark,
-                              accent,
-                            )),
-                  ],
-                  // Earlier Section
-                  if (_unpinnedConversations.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    _buildSectionDivider("Earlier", isDark, secondaryTextColor),
-                    const SizedBox(height: 8),
-                    ..._unpinnedConversations
-                        .map((conv) => _buildConversationItem(
-                              conv,
-                              surfaceColor,
-                              textColor,
-                              secondaryTextColor,
-                              isDark,
-                              accent,
-                            )),
-                  ],
-                  if (_filteredConversations.isEmpty) ...[
-                    const SizedBox(height: 40),
-                    Center(
-                      child: Column(
-                        children: [
-                          Icon(Icons.chat_bubble_outline,
-                              size: 64, color: secondaryTextColor),
-                          const SizedBox(height: 16),
-                          Text(
-                            "No conversations found",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: secondaryTextColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 100),
-                ],
-              ),
-            ),
           ],
         ),
       ),
@@ -728,7 +607,8 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                       image: conversation.senderAvatar != null &&
                               conversation.senderAvatar!.isNotEmpty
                           ? DecorationImage(
-                              image: NetworkImage(conversation.senderAvatar!),
+                              image: NetworkImage(
+                                  getImageUrl(conversation.senderAvatar!)),
                               fit: BoxFit.cover,
                             )
                           : null,

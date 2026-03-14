@@ -1,0 +1,37 @@
+{
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/PusherSwift/Sources/Extensions/URL+Pusher.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/URL+Pusher.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/URL+Pusher.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/URL+Pusher.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/URL+Pusher.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/URL+Pusher.swiftdeps"
+  },
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/PusherSwift/Sources/Models/PusherPresenceChannel.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannel.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannel.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannel.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannel.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannel.swiftdeps"
+  },
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/PusherSwift/Sources/Models/PusherPresenceChannelMember.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannelMember.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannelMember.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannelMember.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannelMember.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannelMember.swiftdeps"
+  },
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/PusherSwift/Sources/Models/QueuedClientEvent.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/QueuedClientEvent.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/QueuedClientEvent.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/QueuedClientEvent.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/QueuedClientEvent.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/QueuedClientEvent.swiftdeps"
+  },
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/PusherSwift/Sources/PusherSwift.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift.swiftdeps"
+  }
+}

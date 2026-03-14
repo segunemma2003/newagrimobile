@@ -19,10 +19,12 @@ class _RegisterPageState extends NyPage<RegisterPage> {
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
   late TextEditingController _confirmPasswordController;
+  late TextEditingController _locationController;
   late FocusNode _nameFocusNode;
   late FocusNode _emailFocusNode;
   late FocusNode _passwordFocusNode;
   late FocusNode _confirmPasswordFocusNode;
+  late FocusNode _locationFocusNode;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _agreeToTerms = false;
@@ -41,10 +43,12 @@ class _RegisterPageState extends NyPage<RegisterPage> {
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
+    _locationController = TextEditingController();
     _nameFocusNode = FocusNode();
     _emailFocusNode = FocusNode();
     _passwordFocusNode = FocusNode();
     _confirmPasswordFocusNode = FocusNode();
+    _locationFocusNode = FocusNode();
   }
 
   @override
@@ -66,10 +70,13 @@ class _RegisterPageState extends NyPage<RegisterPage> {
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
+    final location = _locationController.text.trim();
+
     if (name.isEmpty ||
         email.isEmpty ||
         password.isEmpty ||
-        confirmPassword.isEmpty) {
+        confirmPassword.isEmpty ||
+        location.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in all fields'),
@@ -103,6 +110,7 @@ class _RegisterPageState extends NyPage<RegisterPage> {
     _form.data()['Email'] = email;
     _form.data()['Password'] = password;
     _form.data()['Password Confirmation'] = confirmPassword;
+    _form.data()['Location'] = location;
 
     final success = await widget.controller.register(_form);
 
@@ -365,6 +373,81 @@ class _RegisterPageState extends NyPage<RegisterPage> {
                                 hintStyle: TextStyle(color: Colors.grey[500]),
                                 prefixIcon: Icon(
                                   Icons.mail,
+                                  color: isFocused ? primary : Colors.grey[400],
+                                  size: 20,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(color: borderTeal),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(color: borderTeal),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: primary,
+                                    width: 2,
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: surfaceDark,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 18,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  // Location Field
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                          text: "Location ",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: "*",
+                              style: TextStyle(color: primary),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Focus(
+                        onFocusChange: (hasFocus) => setState(() {}),
+                        child: Builder(
+                          builder: (context) {
+                            final isFocused = _locationFocusNode.hasFocus;
+                            return TextField(
+                              controller: _locationController,
+                              focusNode: _locationFocusNode,
+                              textInputAction: TextInputAction.next,
+                              onSubmitted: (_) {
+                                _locationFocusNode.unfocus();
+                                _passwordFocusNode.requestFocus();
+                              },
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: "City, Country",
+                                hintStyle: TextStyle(color: Colors.grey[500]),
+                                prefixIcon: Icon(
+                                  Icons.location_on,
                                   color: isFocused ? primary : Colors.grey[400],
                                   size: 20,
                                 ),
@@ -706,10 +789,12 @@ class _RegisterPageState extends NyPage<RegisterPage> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _locationController.dispose();
     _nameFocusNode.dispose();
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
     _confirmPasswordFocusNode.dispose();
+    _locationFocusNode.dispose();
     super.dispose();
   }
 }

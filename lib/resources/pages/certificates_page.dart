@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '/app/models/certificate.dart';
+import '/app/networking/api_service.dart';
 import '/config/keys.dart';
 
 class CertificatesPage extends NyStatefulWidget {
@@ -29,36 +30,42 @@ class _CertificatesPageState extends NyPage<CertificatesPage> {
 
   Future<void> _loadCertificates() async {
     try {
+      // First, try to load from API
+      Map<String, dynamic>? response = await api<ApiService>(
+        (request) => request.fetchUserCertificates(),
+      );
+
+      if (response != null && response['data'] != null) {
+        final List<dynamic> data = response['data'] is List
+            ? response['data']
+            : [response['data']];
+        _certificates =
+            data.map((json) => Certificate.fromJson(json)).toList();
+
+        // Persist to local storage for offline support
+        try {
+          await Keys.certificates
+              .save(_certificates.map((c) => c.toJson()).toList());
+        } catch (e) {
+          if (!e.toString().contains('-34018')) {
+            print("Warning: Failed to save certificates to storage: $e");
+          }
+        }
+
+        setState(() {});
+        return;
+      }
+
+      // If API data not available, fall back to local storage
       final certificatesJson = await Keys.certificates.read<List>();
       if (certificatesJson != null) {
-        _certificates = certificatesJson
-            .map((c) => Certificate.fromJson(c))
-            .toList();
+        _certificates =
+            certificatesJson.map((c) => Certificate.fromJson(c)).toList();
         setState(() {});
-      } else {
-        // Load dummy data
-        _loadDummyCertificates();
       }
     } catch (e) {
       print('Error loading certificates: $e');
-      _loadDummyCertificates();
     }
-  }
-
-  void _loadDummyCertificates() {
-    _certificates = [
-      Certificate()
-        ..id = "1"
-        ..courseName = "Sustainable Urban Farming"
-        ..certificateImageUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuALC_hKO4kNq8I2Cj5EfUeThP3ZRrnK-Cksqkml7egbZPQIB--M69mJ_mJXozuh0GlJX62X3ZsoQQGdZ_eZeGVb9AUJBVbSjerRR0h9DhtDF5wwQ0Suo1iQoYmmHgexLy52XeUNUxX1YKvjDY2gmQwXdv3AcZmuwdO3NE6Z1FQ3swX0qXR9B9DZAdCbOZmLr5U_mXOUN_yCtHuwO16sZWRPR8VYirCGXhFoJ6GbH3mzjRao7MmMsywCUfvwuURPN3Ul1ji1EgXBRpk"
-        ..completedDate = DateTime(2023, 10, 12),
-      Certificate()
-        ..id = "2"
-        ..courseName = "Agribusiness Management"
-        ..certificateImageUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuBBdsXGTzEMXq2lxVYSdlvbuB0MOdwYy9DV_IGc5Z4Mi8EL36QfUnKry2hEQbUPrVKnwSWYYd_R8TR9cegJ5v6MSMk1oBz5eDm7oW6cGgDM15yvoD7jqPRhyu7cMSxi1VAw4f7p93FGVGV6qMnWZXfe2WQb3fgazcseRgTaE8YPLf0RwLpuquAPlW0HarQSMDnwtaMiez15vLlmgs-jz-4lr8UkeEhW2w5mNsKMCL72BNnwHupr5kUwSNqkWfyoZWAmm5aJyj_KmNs"
-        ..completedDate = DateTime(2023, 9, 5),
-    ];
-    setState(() {});
   }
 
   List<Certificate> get _filteredCertificates {

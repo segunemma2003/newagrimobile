@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '/config/keys.dart';
+import '/app/helpers/storage_helper.dart';
+import '/app/helpers/image_helper.dart';
 import '/resources/pages/notification_settings_page.dart';
 import '/resources/pages/help_support_page.dart';
 import '/resources/pages/terms_conditions_page.dart';
@@ -33,14 +35,14 @@ class _ProfilePageState extends NyPage<ProfilePage> {
     try {
       _userData = await Keys.auth.read<Map<String, dynamic>>();
       if (_userData == null) {
-        _userData = backpackRead(Keys.auth);
+        _userData = safeReadAuthData();
       }
       setState(() {});
     } catch (e) {
       if (!e.toString().contains('-34018')) {
         print('Warning: Failed to load user data: $e');
       }
-      _userData = backpackRead(Keys.auth);
+      _userData = safeReadAuthData();
       setState(() {});
     }
   }
@@ -157,8 +159,8 @@ class _ProfilePageState extends NyPage<ProfilePage> {
       // await api<ApiService>((request) => request.deleteAccount());
 
       if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
             content: Text("Account deleted successfully"),
             backgroundColor: Colors.green,
           ),
@@ -171,9 +173,9 @@ class _ProfilePageState extends NyPage<ProfilePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Error deleting account: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -186,6 +188,13 @@ class _ProfilePageState extends NyPage<ProfilePage> {
     final userName = _userData?['name']?.toString() ?? "Alex Doe";
     final userEmail = _userData?['email']?.toString() ?? "alex.doe@example.com";
     final userAvatar = _userData?['avatar']?.toString();
+    final coursesCount =
+        _userData?['courses_enrolled'] ?? _userData?['coursesEnrolled'] ?? 0;
+    final hoursLearned =
+        _userData?['hours_learned'] ?? _userData?['hoursLearned'] ?? 0;
+    final certificatesAcquired = _userData?['certificates_acquired'] ??
+        _userData?['certificatesAcquired'] ??
+        0;
 
     return Scaffold(
       backgroundColor: backgroundLight,
@@ -218,19 +227,19 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                       ),
                     ),
                   ),
-            IconButton(
+                  IconButton(
                     icon: const Icon(Icons.more_vert, size: 24),
                     color: brandDark,
-              onPressed: () {
+                    onPressed: () {
                       // TODO: Show more options
-              },
-            ),
-        ],
-      ),
+                    },
+                  ),
+                ],
+              ),
             ),
             // Scrollable Content
             Expanded(
-        child: SingleChildScrollView(
+              child: SingleChildScrollView(
                 child: Column(
                   children: [
                     // Profile Section with Gradient Background
@@ -263,7 +272,8 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.1),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.1),
                                       blurRadius: 20,
                                       spreadRadius: 0,
                                     ),
@@ -271,7 +281,8 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                                   image: userAvatar != null &&
                                           userAvatar.isNotEmpty
                                       ? DecorationImage(
-                                          image: NetworkImage(userAvatar),
+                                          image: NetworkImage(
+                                              getImageUrl(userAvatar)),
                                           fit: BoxFit.cover,
                                           onError: (_, __) {},
                                         )
@@ -281,7 +292,8 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                                     ? Container(
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: brandDark.withValues(alpha: 0.1),
+                                          color:
+                                              brandDark.withValues(alpha: 0.1),
                                         ),
                                         child: Center(
                                           child: Text(
@@ -314,7 +326,8 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.2),
+                                        color:
+                                            Colors.black.withValues(alpha: 0.2),
                                         blurRadius: 8,
                                         spreadRadius: 0,
                                       ),
@@ -331,22 +344,22 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                                 ),
                               ),
                             ],
-                    ),
-                    const SizedBox(height: 16),
+                          ),
+                          const SizedBox(height: 16),
                           // Name and Email
-                    Text(
+                          Text(
                             userName,
                             style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
                               color: brandDark,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
                             userEmail,
                             style: TextStyle(
-                        fontSize: 14,
+                              fontSize: 14,
                               color: Colors.grey[500],
                             ),
                           ),
@@ -372,20 +385,20 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                                 borderRadius: BorderRadius.circular(999),
                               ),
                               elevation: 2,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
                     // Stats Grid
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 24, vertical: 16),
                       child: Row(
-                  children: [
+                        children: [
                           Expanded(
                             child: _buildStatCard(
-                              value: "12",
+                              value: coursesCount.toString(),
                               label: "Courses",
                               isHighlighted: false,
                             ),
@@ -393,7 +406,7 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                           const SizedBox(width: 16),
                           Expanded(
                             child: _buildStatCard(
-                              value: "48",
+                              value: hoursLearned.toString(),
                               label: "Hours",
                               isHighlighted: true,
                             ),
@@ -401,20 +414,20 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                           const SizedBox(width: 16),
                           Expanded(
                             child: _buildStatCard(
-                              value: "5",
+                              value: certificatesAcquired.toString(),
                               label: "Certs",
                               isHighlighted: false,
                             ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
                     // Settings Sections
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           const SizedBox(height: 16),
                           // Video Preferences Section
                           _buildSectionTitle("Video Preferences"),
@@ -449,10 +462,10 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                                   title: "Video Quality",
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
-                      children: [
+                                    children: [
                                       Text(
                                         "Auto (1080p)",
-                          style: TextStyle(
+                                        style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
                                           color: Colors.grey[400],
@@ -546,11 +559,11 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                                   onTap: () {
                                     routeTo(TermsConditionsPage.path);
                                   },
-                        ),
-                      ],
-                    ),
-                      ),
-                      const SizedBox(height: 16),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
                           // Delete Account Button
                           SizedBox(
                             width: double.infinity,
@@ -569,11 +582,11 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                                 ),
                               ),
                             ),
-                      ),
-                      const SizedBox(height: 16),
+                          ),
+                          const SizedBox(height: 16),
                           // Sign Out Button
-                      SizedBox(
-                        width: double.infinity,
+                          SizedBox(
+                            width: double.infinity,
                             child: OutlinedButton.icon(
                               onPressed: _handleLogout,
                               icon: const Icon(Icons.logout, size: 18),
@@ -583,7 +596,7 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                                 side: BorderSide(color: primary, width: 2),
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
+                                shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                               ),
@@ -594,7 +607,7 @@ class _ProfilePageState extends NyPage<ProfilePage> {
                           Center(
                             child: Text(
                               "Version 2.4.0 (182)",
-                            style: TextStyle(
+                              style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.grey[300],
@@ -642,7 +655,9 @@ class _ProfilePageState extends NyPage<ProfilePage> {
         color: isHighlighted ? primary.withValues(alpha: 0.1) : surfaceMuted,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isHighlighted ? primary.withValues(alpha: 0.2) : Colors.grey[100]!,
+          color: isHighlighted
+              ? primary.withValues(alpha: 0.2)
+              : Colors.grey[100]!,
           width: 1,
         ),
       ),
@@ -662,8 +677,9 @@ class _ProfilePageState extends NyPage<ProfilePage> {
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w600,
-              color:
-                  isHighlighted ? primary.withValues(alpha: 0.7) : Colors.grey[400],
+              color: isHighlighted
+                  ? primary.withValues(alpha: 0.7)
+                  : Colors.grey[400],
               letterSpacing: 1.0,
             ),
           ),
@@ -690,10 +706,10 @@ class _ProfilePageState extends NyPage<ProfilePage> {
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-        title,
-        style: TextStyle(
+                  title,
+                  style: TextStyle(
                     fontSize: 14,
-          fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w500,
                     color: Colors.grey[700],
                   ),
                 ),

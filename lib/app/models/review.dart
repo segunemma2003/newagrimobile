@@ -19,12 +19,20 @@ class Review extends Model {
   Review.fromJson(dynamic data) {
     id = data['id']?.toString();
     userId = data['user_id']?.toString() ?? data['userId']?.toString();
-    userName = data['user_name'] ?? data['userName'] ?? 'Anonymous';
-    userAvatar = data['user_avatar'] ?? data['userAvatar'];
+    // Try direct fields, then nested user relationship
+    userName = data['user_name'] ??
+        data['userName'] ??
+        (data['user'] != null ? data['user']['name'] : null) ??
+        'Anonymous';
+    userAvatar = data['user_avatar'] ??
+        data['userAvatar'] ??
+        (data['user'] != null ? data['user']['avatar'] : null);
     courseId = data['course_id']?.toString() ?? data['courseId']?.toString();
     rating = data['rating'] ?? 5;
-    comment = data['comment'] ?? data['content'];
-    isVerified = data['is_verified'] ?? data['isVerified'] ?? false;
+    // Backend uses 'review' field for comment content
+    comment = data['comment'] ?? data['review'] ?? data['content'];
+    isVerified =
+        data['is_verified'] ?? data['isVerified'] ?? data['is_verified_purchase'] ?? false;
     
     if (data['created_at'] != null || data['createdAt'] != null) {
       createdAt = DateTime.tryParse(

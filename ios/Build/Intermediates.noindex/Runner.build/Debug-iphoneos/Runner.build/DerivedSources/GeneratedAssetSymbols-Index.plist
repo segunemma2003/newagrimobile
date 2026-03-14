@@ -16,16 +16,6 @@
 			<key>swiftSymbol</key>
 			<string>launch</string>
 		</dict>
-		<dict>
-			<key>catalogPath</key>
-			<string>/Users/mac/Projects/agrisiti_mobile/ios/Runner/Assets.xcassets</string>
-			<key>objcSymbol</key>
-			<string>ACImageNameIcon</string>
-			<key>relativePath</key>
-			<string>./icon.imageset</string>
-			<key>swiftSymbol</key>
-			<string>icon</string>
-		</dict>
 	</array>
 	<key>symbols</key>
 	<array/>

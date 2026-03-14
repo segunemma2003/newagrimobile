@@ -29,7 +29,8 @@ class Comment extends Model {
     courseId = data['course_id']?.toString() ?? data['courseId']?.toString();
     moduleId = data['module_id']?.toString() ?? data['moduleId']?.toString();
     parentId = data['parent_id']?.toString() ?? data['parentId']?.toString();
-    content = data['content'];
+    // Backend may return the text field as "comment" or "content"
+    content = data['content'] ?? data['comment'] ?? '';
     likes = data['likes'] ?? 0;
     isLiked = data['is_liked'] ?? data['isLiked'] ?? false;
     

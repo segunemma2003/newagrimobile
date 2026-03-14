@@ -1,0 +1,23 @@
+{
+  "version": 0,
+  "use-external-names": false,
+  "case-sensitive": false,
+  "roots": [{
+    "type": "directory",
+    "name": "/Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/PusherSwift/PusherSwift.framework/Modules",
+    "contents": [{
+      "type": "file",
+      "name": "module.modulemap",
+      "external-contents": "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/unextended-module.modulemap",
+    }]
+    },
+    {
+    "type": "directory",
+    "name": "/Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/PusherSwift/PusherSwift.framework/Headers",
+    "contents": [{
+      "type": "file",
+      "name": "PusherSwift-Swift.h",
+      "external-contents": "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/unextended-interface-header.h",
+    }]
+  }]
+}

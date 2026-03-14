@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '/app/models/course.dart';
 import '/app/controllers/courses_controller.dart';
+import '/app/helpers/storage_helper.dart';
+import '/app/helpers/image_helper.dart';
 import '/resources/pages/course_detail_page.dart';
 import '/resources/pages/notifications_page.dart';
 import '/config/keys.dart';
@@ -20,27 +22,53 @@ class _CoursesPageState extends NyPage<CoursesPage> {
   static const Color primary = Color(0xFF3E6866);
   static const Color accent = Color(0xFF50C1AE);
   static const Color surfaceDark = Color(0xFF1E1E1E);
+  static const Color backgroundLight = Color(0xFFFFFFFF);
+  static const Color backgroundDark = Color(0xFF161c1b);
 
   @override
   get init => () async {
+        // Load user data first (fast)
         await _loadUserData();
-        await widget.controller.loadCourses();
-        await widget.controller.loadCategories();
+
+        // Load courses from storage immediately (fast)
+        await widget.controller.loadCoursesFromStorage();
+
+        // Update UI immediately with cached data
         setState(() {});
+
+        // Load categories in background (non-blocking)
+        widget.controller.loadCategories().then((_) {
+          if (mounted) {
+            setState(() {});
+          }
+        }).catchError((e) {
+          print("Error loading categories: $e");
+        });
+
+        // Sync courses in background (non-blocking) - don't block UI
+        // Only sync if online, don't await it
+        widget.controller.syncCourses().then((_) {
+          // Update UI after sync completes
+          if (mounted) {
+            setState(() {});
+          }
+        }).catchError((e) {
+          print("Error syncing courses: $e");
+        });
       };
 
   Future<void> _loadUserData() async {
     try {
       _userData = await Keys.auth.read<Map<String, dynamic>>();
       if (_userData == null) {
-        _userData = backpackRead(Keys.auth);
+        _userData = safeReadAuthData();
       }
       setState(() {});
     } catch (e) {
       if (!e.toString().contains('-34018')) {
         print('Warning: Failed to load user data: $e');
       }
-      _userData = backpackRead(Keys.auth);
+      _userData = safeReadAuthData();
       setState(() {});
     }
   }
@@ -63,7 +91,7 @@ class _CoursesPageState extends NyPage<CoursesPage> {
   @override
   Widget view(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = accent.withValues(alpha: 0.1); // Maintain background color
+    final bgColor = isDark ? backgroundDark : backgroundLight;
     final cardColor = isDark ? surfaceDark : Colors.white;
     final textColor = isDark ? Colors.white : Colors.grey[900];
     final secondaryTextColor = isDark ? Colors.grey[400] : Colors.grey[500];
@@ -84,6 +112,15 @@ class _CoursesPageState extends NyPage<CoursesPage> {
               ),
               child: Row(
                 children: [
+                  // Back button to main home page
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                    color: textColor,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  const SizedBox(width: 4),
                   // User Avatar and Name
                   Row(
                     children: [
@@ -96,7 +133,8 @@ class _CoursesPageState extends NyPage<CoursesPage> {
                           image: _userData?['avatar'] != null &&
                                   _userData!['avatar'].toString().isNotEmpty
                               ? DecorationImage(
-                                  image: NetworkImage(_userData!['avatar']),
+                                  image: NetworkImage(
+                                      getImageUrl(_userData!['avatar'])),
                                   fit: BoxFit.cover,
                                   onError: (_, __) {},
                                 )
@@ -164,187 +202,196 @@ class _CoursesPageState extends NyPage<CoursesPage> {
             ),
             // Scrollable Content
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // My Learning Title and Tabs
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "My Learning",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              color: textColor,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          // Tabs
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                _buildTab(
-                                    "Ongoing",
-                                    _selectedTab == "Ongoing",
-                                    cardColor,
-                                    textColor ?? Colors.grey[900]!,
-                                    secondaryTextColor ?? Colors.grey[500]!,
-                                    isDark),
-                                const SizedBox(width: 12),
-                                _buildTab(
-                                    "Completed",
-                                    _selectedTab == "Completed",
-                                    cardColor,
-                                    textColor ?? Colors.grey[900]!,
-                                    secondaryTextColor ?? Colors.grey[500]!,
-                                    isDark),
-                                const SizedBox(width: 12),
-                                _buildTab(
-                                    "Saved",
-                                    _selectedTab == "Saved",
-                                    cardColor,
-                                    textColor ?? Colors.grey[900]!,
-                                    secondaryTextColor ?? Colors.grey[500]!,
-                                    isDark),
-                                const SizedBox(width: 12),
-                                _buildTab(
-                                    "Certificates",
-                                    _selectedTab == "Certificates",
-                                    cardColor,
-                                    textColor ?? Colors.grey[900]!,
-                                    secondaryTextColor ?? Colors.grey[500]!,
-                                    isDark),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Active Courses Section
-                    if (_selectedTab == "Ongoing") ...[
+              child: Container(
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // My Learning Title and Tabs
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Active Courses",
+                              "My Learning",
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 24,
                                 fontWeight: FontWeight.w700,
                                 color: textColor,
                                 letterSpacing: -0.5,
                               ),
                             ),
-                            Text(
-                              "${_ongoingCourses.length} Total",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: accent,
+                            const SizedBox(height: 16),
+                            // Tabs
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  _buildTab(
+                                      "Ongoing",
+                                      _selectedTab == "Ongoing",
+                                      cardColor,
+                                      textColor ?? Colors.grey[900]!,
+                                      secondaryTextColor ?? Colors.grey[500]!,
+                                      isDark),
+                                  const SizedBox(width: 12),
+                                  _buildTab(
+                                      "Completed",
+                                      _selectedTab == "Completed",
+                                      cardColor,
+                                      textColor ?? Colors.grey[900]!,
+                                      secondaryTextColor ?? Colors.grey[500]!,
+                                      isDark),
+                                  const SizedBox(width: 12),
+                                  _buildTab(
+                                      "Saved",
+                                      _selectedTab == "Saved",
+                                      cardColor,
+                                      textColor ?? Colors.grey[900]!,
+                                      secondaryTextColor ?? Colors.grey[500]!,
+                                      isDark),
+                                  const SizedBox(width: 12),
+                                  _buildTab(
+                                      "Certificates",
+                                      _selectedTab == "Certificates",
+                                      cardColor,
+                                      textColor ?? Colors.grey[900]!,
+                                      secondaryTextColor ?? Colors.grey[500]!,
+                                      isDark),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
-                      // Course Cards
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          children: _ongoingCourses.take(3).map((course) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-                              child: _buildCourseCard(
-                                course,
-                                cardColor,
-                                textColor ?? Colors.grey[900]!,
-                                secondaryTextColor ?? Colors.grey[500]!,
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
-                    // Completed Courses
-                    if (_selectedTab == "Completed") ...[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Completed Courses",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                color: textColor,
-                                letterSpacing: -0.5,
-                              ),
-                            ),
-                            Text(
-                              "${_completedCourses.length} Total",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: accent,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Column(
-                          children: _completedCourses.map((course) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-                              child: _buildCourseCard(
-                                course,
-                                cardColor,
-                                textColor ?? Colors.grey[900]!,
-                                secondaryTextColor ?? Colors.grey[500]!,
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
-                    // Empty states for other tabs
-                    if (_selectedTab != "Ongoing" &&
-                        _selectedTab != "Completed") ...[
-                      Padding(
-                        padding: const EdgeInsets.all(40),
-                        child: Center(
-                          child: Column(
+                      // Active Courses Section
+                      if (_selectedTab == "Ongoing") ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Icon(
-                                Icons.book_outlined,
-                                size: 64,
-                                color: secondaryTextColor,
-                              ),
-                              const SizedBox(height: 16),
                               Text(
-                                "No ${_selectedTab.toLowerCase()} courses",
+                                "Active Courses",
                                 style: TextStyle(
-                                  fontSize: 16,
-                                  color: secondaryTextColor,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: textColor,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              Text(
+                                "${_ongoingCourses.length} Total",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: accent,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
+                        // Course Cards
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: _ongoingCourses.take(3).map((course) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: _buildCourseCard(
+                                  course,
+                                  cardColor,
+                                  textColor ?? Colors.grey[900]!,
+                                  secondaryTextColor ?? Colors.grey[500]!,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                      // Completed Courses
+                      if (_selectedTab == "Completed") ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Completed Courses",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: textColor,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              Text(
+                                "${_completedCourses.length} Total",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: accent,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Column(
+                            children: _completedCourses.map((course) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: _buildCourseCard(
+                                  course,
+                                  cardColor,
+                                  textColor ?? Colors.grey[900]!,
+                                  secondaryTextColor ?? Colors.grey[500]!,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                      // Empty states for other tabs
+                      if (_selectedTab != "Ongoing" &&
+                          _selectedTab != "Completed") ...[
+                        Padding(
+                          padding: const EdgeInsets.all(40),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.book_outlined,
+                                  size: 64,
+                                  color: secondaryTextColor,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  "No ${_selectedTab.toLowerCase()} courses",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: secondaryTextColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 100), // Space for bottom nav
                     ],
-                    const SizedBox(height: 100), // Space for bottom nav
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -388,51 +435,24 @@ class _CoursesPageState extends NyPage<CoursesPage> {
 
   Widget _buildCourseCard(Course course, Color cardColor, Color textColor,
       Color secondaryTextColor) {
-    final progress = course.totalLessons != null && course.totalLessons! > 0
-        ? (course.completedLessons ?? 0) / course.totalLessons!
-        : 0.0;
+    final totalUnits = course.totalLessons ?? course.lessonsCount ?? 0;
+    final completedUnits = course.completedLessons ?? 0;
+    final progress = totalUnits > 0 ? completedUnits / totalUnits : 0.0;
     final progressPercent = (progress * 100).toInt();
 
-    // Determine level based on progress or use placeholder
-    final level = progressPercent < 30
-        ? "Beginner"
-        : progressPercent < 70
-            ? "Intermediate"
-            : "Advanced";
-
-    // Course data with placeholders
-    final courseTitles = [
-      "Sustainable Crop Management",
-      "Hydroponics Basics",
-      "Precision Agri-Tech"
-    ];
-    final courseInstructors = [
-      "Dr. Sarah James",
-      "Prof. Marcus Chen",
-      "Dr. Elena Rodriguez"
-    ];
-    final courseProgress = [65, 22, 89];
-    final courseLevels = ["Intermediate", "Beginner", "Advanced"];
-    final courseImages = [
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBLxwirSVnr11yzO-QJFnYMKcSvuzT9oJROn-1RDVwIT5w561uc67Of8RlhLeyVR4ZOZ8-yYMMqL-3_h0ajhzI5Fi-eqz_5GEprZAC8_eoa0uX_N63YFzYD7tL2_RAFzjKhIQYlCSL063VlpZJ_4wTJcjLBPb9kxy4vN7JZHvp-ZfkyIsqKwK_bFXdzFM10PJofv6lnA1mng5mZkQ5nOu9trIKWTfnstLoC9EWAFb3xvBhhSWv8iG4AW4fItlbYcu-tw8xi1SwdNo8",
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCkmgxAhwO9byrfOwzBYvjEL_EI26zI45kfgUyFqZvKY_CUNd6G6Yo_ohNJply0jafw9vFu8jniOHT_no5o5bkoiOfHSoz-qertGQU-eacwgoHpsiL0NfZ2KU9E_JEUyXeODDALbPMrpKQHQGV_e7yEfb1Jfz3-yNbmAnsFukYQ8gT8f42f5mnHeMaJh2r2rp7FZu6wnpnkp2Qj4a0kZ2WP6kQLjnoMcbcYB3MITFCVxGnLbThr4QqZln_zH7rIZct5SnCChaSkv9A",
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuB6QqZAdcgkQ2dp14I4HTXNUtM7XHlIdFyPvdLbQA4S1nlvWHyksPj-SWh-yNm84OF9gMTfTAg9Sj4wX7VENcpBXVFGZiBgLtGcbHcF02CZSsAayBpwoON-MLeTR2sI5ghRtua8q4z4Yb-9-QP7lObYX-goxFN0MKXgLqe0GOokqwOSW26gOnlrIwuXMBybbilZr8Y1QRH8VDm8QiIVJ-I_lunjCYnOJP6AdlFr5uwynj3tvf12oj0SBRrMDfCcbtLqtekZUkVMzYk",
-    ];
-
-    final index = _ongoingCourses.indexOf(course);
-    final displayTitle = index < courseTitles.length
-        ? courseTitles[index]
-        : (course.title ?? "Untitled Course");
-    final displayInstructor = index < courseInstructors.length
-        ? courseInstructors[index]
-        : (course.category?.name ?? "Instructor");
-    final displayProgress =
-        index < courseProgress.length ? courseProgress[index] : progressPercent;
-    final displayLevel =
-        index < courseLevels.length ? courseLevels[index] : level;
-    final displayImage = index < courseImages.length
-        ? courseImages[index]
-        : (course.thumbnail ?? "");
+    // Use real data from API with sensible fallbacks
+    final displayTitle = course.title ?? "Untitled Course";
+    final displayInstructor =
+        course.tutor?.name ?? course.category?.name ?? "Instructor";
+    final displayProgress = progressPercent;
+    final displayLevel = course.level?.isNotEmpty == true
+        ? course.level!
+        : (progressPercent < 30
+            ? "Beginner"
+            : progressPercent < 70
+                ? "Intermediate"
+                : "Advanced");
+    final displayImage = course.thumbnail ?? "";
 
     return GestureDetector(
       onTap: () => routeTo(CourseDetailPage.path, data: {"course": course}),
@@ -462,7 +482,7 @@ class _CoursesPageState extends NyPage<CoursesPage> {
                       color: Colors.grey[300],
                       image: displayImage.isNotEmpty
                           ? DecorationImage(
-                              image: NetworkImage(displayImage),
+                              image: NetworkImage(getImageUrl(displayImage)),
                               fit: BoxFit.cover,
                               onError: (_, __) {},
                             )

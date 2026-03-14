@@ -5,6 +5,8 @@ import '/app/models/assignment.dart';
 import '/app/models/course.dart';
 import '/app/models/module.dart';
 import '/app/models/lesson.dart';
+import '/app/helpers/text_helper.dart';
+import '/app/helpers/image_helper.dart';
 import '/config/keys.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -426,7 +428,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
               image: course?.thumbnail != null
                   ? DecorationImage(
-                      image: NetworkImage(course!.thumbnail!),
+                      image: NetworkImage(getImageUrl(course!.thumbnail!)),
                       fit: BoxFit.cover,
                     )
                   : null,
@@ -685,7 +687,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
             ),
           ),
           child: Text(
-            assignment.brief ?? assignment.description ?? "No description available.",
+            stripHtmlTags(assignment.brief ?? assignment.description ?? "No description available."),
             style: TextStyle(
               fontSize: 16,
               color: textColor,

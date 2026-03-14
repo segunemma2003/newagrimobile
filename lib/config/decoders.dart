@@ -4,12 +4,14 @@ import '/app/controllers/register_controller.dart';
 import '/app/controllers/courses_controller.dart';
 import '/app/controllers/course_detail_controller.dart';
 import '/app/controllers/lesson_controller.dart';
+import '/app/controllers/notifications_controller.dart';
 import '/app/models/user.dart';
 import '/app/models/category.dart';
 import '/app/models/course.dart';
 import '/app/models/lesson.dart';
 import '/app/models/quiz.dart';
 import '/app/models/course_progress.dart';
+import '/app/models/notification.dart' as NotificationModel;
 import '/app/networking/api_service.dart';
 
 /* Model Decoders
@@ -46,6 +48,10 @@ final Map<Type, dynamic> modelDecoders = {
   List<CourseProgress>: (data) =>
       List.from(data).map((json) => CourseProgress.fromJson(json)).toList(),
   CourseProgress: (data) => CourseProgress.fromJson(data),
+
+  List<NotificationModel.Notification>: (data) =>
+      List.from(data).map((json) => NotificationModel.Notification.fromJson(json)).toList(),
+  NotificationModel.Notification: (data) => NotificationModel.Notification.fromJson(data),
 };
 
 /* API Decoders
@@ -75,6 +81,7 @@ final Map<Type, dynamic> controllers = {
   CoursesController: () => CoursesController(),
   CourseDetailController: () => CourseDetailController(),
   LessonController: () => LessonController(),
+  NotificationsController: () => NotificationsController(),
 
   // ...
 };

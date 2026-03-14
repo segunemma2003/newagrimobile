@@ -1,0 +1,19 @@
+{
+  "" : {
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/pusher_channels_flutter.build/Objects-normal/arm64/pusher_channels_flutter-primary.dia",
+    "emit-module-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/pusher_channels_flutter.build/Objects-normal/arm64/pusher_channels_flutter-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/pusher_channels_flutter.build/Objects-normal/arm64/pusher_channels_flutter-primary-emit-module.dia",
+    "pch" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/pusher_channels_flutter.build/Objects-normal/arm64/pusher_channels_flutter-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/pusher_channels_flutter.build/Objects-normal/arm64/pusher_channels_flutter-primary.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/pusher_channels_flutter-2.4.0/ios/Classes/SwiftPusherChannelsFlutterPlugin.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/pusher_channels_flutter.build/Objects-normal/arm64/SwiftPusherChannelsFlutterPlugin.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/pusher_channels_flutter.build/Objects-normal/arm64/SwiftPusherChannelsFlutterPlugin.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/pusher_channels_flutter.build/Objects-normal/arm64/SwiftPusherChannelsFlutterPlugin.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphoneos/pusher_channels_flutter.build/Objects-normal/arm64/SwiftPusherChannelsFlutterPlugin.o",
+    "llvm-bc" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/pusher_channels_flutter.build/Objects-normal/arm64/SwiftPusherChannelsFlutterPlugin.bc",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/pusher_channels_flutter.build/Objects-normal/arm64/SwiftPusherChannelsFlutterPlugin.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/pusher_channels_flutter.build/Objects-normal/arm64/SwiftPusherChannelsFlutterPlugin.swiftdeps",
+    "swiftmodule" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/pusher_channels_flutter.build/Objects-normal/arm64/SwiftPusherChannelsFlutterPlugin~partial.swiftmodule"
+  }
+}

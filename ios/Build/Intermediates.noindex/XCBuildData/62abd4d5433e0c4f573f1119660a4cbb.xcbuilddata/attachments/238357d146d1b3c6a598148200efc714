@@ -1,0 +1,29 @@
+{
+  "" : {
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/PusherTweetNacl-primary.dia",
+    "emit-module-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/PusherTweetNacl-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/PusherTweetNacl-primary-emit-module.dia",
+    "pch" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/PusherTweetNacl-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/PusherTweetNacl-primary.swiftdeps"
+  },
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/PusherTweetNacl/Sources/TweetNacl/Constant.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/Constant.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/Constant.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/Constant.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/Constant.o",
+    "llvm-bc" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/Constant.bc",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/Constant.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/Constant.swiftdeps",
+    "swiftmodule" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/Constant~partial.swiftmodule"
+  },
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/PusherTweetNacl/Sources/TweetNacl/TweetNacl.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/TweetNacl.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/TweetNacl.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/TweetNacl.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/TweetNacl.o",
+    "llvm-bc" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/TweetNacl.bc",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/TweetNacl.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/TweetNacl.swiftdeps",
+    "swiftmodule" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/TweetNacl~partial.swiftmodule"
+  }
+}

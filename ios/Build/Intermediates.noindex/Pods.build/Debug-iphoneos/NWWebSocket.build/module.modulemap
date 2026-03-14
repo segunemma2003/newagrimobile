@@ -1,0 +1,11 @@
+framework module NWWebSocket {
+  umbrella header "NWWebSocket-umbrella.h"
+
+  export *
+  module * { export * }
+}
+
+module NWWebSocket.Swift {
+  header "NWWebSocket-Swift.h"
+  requires objc
+}

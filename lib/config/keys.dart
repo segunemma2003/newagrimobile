@@ -41,6 +41,9 @@ class Keys {
   static StorageKey forumPosts = 'SK_FORUM_POSTS';
   static StorageKey forumComments = 'SK_FORUM_COMMENTS';
   static StorageKey chatMessages = 'SK_CHAT_MESSAGES';
+  static StorageKey notifications = 'SK_NOTIFICATIONS';
+  static StorageKey offlineQueue = 'SK_OFFLINE_QUEUE';
+  static StorageKey lastSyncTimestamp = 'SK_LAST_SYNC_TIMESTAMP';
 
   // static StorageKey coins = 'SK_COINS';
 

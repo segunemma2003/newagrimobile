@@ -1,0 +1,5 @@
+
+module pusher_channels_flutter.Swift {
+  header "pusher_channels_flutter-Swift.h"
+  requires objc
+}

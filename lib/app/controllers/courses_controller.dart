@@ -4,6 +4,7 @@ import '/app/models/category.dart';
 import '/app/models/lesson.dart';
 import '/app/networking/api_service.dart';
 import '/app/services/video_download_service.dart';
+import '/app/helpers/storage_helper.dart';
 import '/config/keys.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
@@ -21,12 +22,43 @@ class CoursesController extends NyController {
     }
   }
 
+  Future<void> loadCoursesFromStorage() async {
+    await _loadCoursesFromStorage();
+  }
+
   Future<void> _loadCoursesFromStorage() async {
     try {
-      final coursesJson = await Keys.courses.read<List>();
+      List<Map<String, dynamic>>? coursesJson;
+      
+      // Try reading from Keys.courses first
+      try {
+        final data = await Keys.courses.read<List>();
+        if (data != null) {
+          coursesJson = data.map((item) {
+            if (item is Map<String, dynamic>) {
+              return item;
+            } else if (item is Map) {
+              return Map<String, dynamic>.from(item);
+            }
+            return <String, dynamic>{};
+          }).where((item) => item.isNotEmpty).toList();
+        }
+      } catch (e) {
+        // If reading fails, try using safe helper
+        if (!e.toString().contains('-34018')) {
+          print("Warning: Error reading courses from Keys.courses: $e");
+        }
+        coursesJson = safeReadCoursesData();
+      }
+      
+      // Fallback to safe helper if still null
+      if (coursesJson == null) {
+        coursesJson = safeReadCoursesData();
+      }
+      
       if (coursesJson != null && coursesJson.isNotEmpty) {
         courses = coursesJson
-            .map((json) => Course.fromJson(json as Map<String, dynamic>))
+            .map((json) => Course.fromJson(json))
             .toList();
       }
     } catch (e) {

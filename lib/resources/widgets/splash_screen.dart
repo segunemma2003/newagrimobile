@@ -97,7 +97,7 @@ class _SplashScreenState extends State<SplashScreen>
                           fit: BoxFit.contain,
                           cacheWidth: 84,
                           cacheHeight: 84,
-                        ),
+                        ).localAsset(),
                       ),
                     ],
                   ),

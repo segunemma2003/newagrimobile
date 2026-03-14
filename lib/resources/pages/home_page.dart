@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '/app/models/course.dart';
 import '/app/controllers/courses_controller.dart';
+import '/app/helpers/text_helper.dart';
+import '/app/helpers/storage_helper.dart';
+import '/app/helpers/image_helper.dart';
 import '/resources/pages/course_detail_page.dart';
 import '/resources/pages/notifications_page.dart';
 import '/resources/pages/community_forum_page.dart';
@@ -38,14 +41,14 @@ class _HomePageState extends NyPage<HomePage> {
     try {
       _userData = await Keys.auth.read<Map<String, dynamic>>();
       if (_userData == null) {
-        _userData = backpackRead(Keys.auth);
+        _userData = safeReadAuthData();
       }
       setState(() {});
     } catch (e) {
       if (!e.toString().contains('-34018')) {
         print('Warning: Failed to load user data: $e');
       }
-      _userData = backpackRead(Keys.auth);
+      _userData = safeReadAuthData();
       setState(() {});
     }
   }
@@ -104,11 +107,11 @@ class _HomePageState extends NyPage<HomePage> {
                     height: 40,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border:
-                          Border.all(color: accent.withValues(alpha: 0.2), width: 2),
+                      border: Border.all(
+                          color: accent.withValues(alpha: 0.2), width: 2),
                       image: userAvatar != null && userAvatar.isNotEmpty
                           ? DecorationImage(
-                              image: NetworkImage(userAvatar),
+                              image: NetworkImage(getImageUrl(userAvatar)),
                               fit: BoxFit.cover,
                               onError: (_, __) {},
                             )
@@ -442,7 +445,8 @@ class _HomePageState extends NyPage<HomePage> {
                       image: course.thumbnail != null &&
                               course.thumbnail!.isNotEmpty
                           ? DecorationImage(
-                              image: NetworkImage(course.thumbnail!),
+                              image:
+                                  NetworkImage(getImageUrl(course.thumbnail!)),
                               fit: BoxFit.cover,
                               onError: (_, __) {},
                             )
@@ -507,7 +511,7 @@ class _HomePageState extends NyPage<HomePage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "By ${course.category?.name ?? 'Dr. Sarah Green'} • ${course.totalLessons ?? 12} Lessons",
+                    "By ${course.tutor?.name ?? course.category?.name ?? 'Instructor'} • ${course.moduleCount != null && course.moduleCount! > 0 ? '${course.moduleCount} Modules' : '${course.totalLessons ?? 12} Lessons'}",
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -668,7 +672,8 @@ class _HomePageState extends NyPage<HomePage> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[50],
+          color:
+              isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[50],
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: Colors.grey[100]!,
@@ -687,7 +692,7 @@ class _HomePageState extends NyPage<HomePage> {
                 color: Colors.grey[300],
                 image: course.thumbnail != null && course.thumbnail!.isNotEmpty
                     ? DecorationImage(
-                        image: NetworkImage(course.thumbnail!),
+                        image: NetworkImage(getImageUrl(course.thumbnail!)),
                         fit: BoxFit.cover,
                         onError: (_, __) {},
                       )
@@ -727,8 +732,8 @@ class _HomePageState extends NyPage<HomePage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        course.description ??
-                            "Essential guide to maintaining soil health for premium crop yields.",
+                        stripHtmlTags(course.description ??
+                            "Essential guide to maintaining soil health for premium crop yields."),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,

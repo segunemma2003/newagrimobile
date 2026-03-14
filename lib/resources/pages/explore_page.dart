@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '/app/models/course.dart';
 import '/app/controllers/courses_controller.dart';
+import '/app/networking/api_service.dart';
+import '/app/helpers/text_helper.dart';
+import '/app/helpers/image_helper.dart';
 import '/resources/pages/course_detail_page.dart';
 import '/resources/pages/notifications_page.dart';
 
@@ -13,6 +16,7 @@ class ExplorePage extends NyStatefulWidget<CoursesController> {
 
 class _ExplorePageState extends NyPage<ExplorePage> {
   List<Course> _allCourses = [];
+  List<Course> _recommendedCourses = [];
 
   // Color scheme from HTML
   static const Color primary = Color(0xFF50C1AE);
@@ -25,6 +29,16 @@ class _ExplorePageState extends NyPage<ExplorePage> {
         await widget.controller.loadCourses();
         await widget.controller.loadCategories();
         _allCourses = widget.controller.courses;
+
+        try {
+          final api = ApiService();
+          final recResponse = await api.fetchRecommendedCourses();
+          final recData = recResponse['data'] as List<dynamic>? ?? [];
+          _recommendedCourses = recData.map((c) => Course.fromJson(c)).toList();
+        } catch (e) {
+          print('Error loading recommended courses: $e');
+        }
+
         setState(() {});
       };
 
@@ -34,7 +48,8 @@ class _ExplorePageState extends NyPage<ExplorePage> {
   @override
   Widget view(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = secondary.withValues(alpha: 0.1); // Maintain background color
+    final bgColor =
+        secondary.withValues(alpha: 0.1); // Maintain background color
     final cardColor = isDark ? surfaceDark : Colors.grey[200]!;
     final textColor = isDark ? Colors.white : Colors.grey[900];
     final secondaryTextColor = isDark ? Colors.grey[400] : Colors.grey[500];
@@ -162,7 +177,8 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                                     "Explore our curated collection of agriculture courses",
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: Colors.white.withValues(alpha: 0.9),
+                                      color:
+                                          Colors.white.withValues(alpha: 0.9),
                                     ),
                                   ),
                                 ],
@@ -237,8 +253,10 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
-                        children: _allCourses
-                            .take(2)
+                        children: (_recommendedCourses.isNotEmpty
+                                ? _recommendedCourses
+                                : _allCourses)
+                            .take(4)
                             .toList()
                             .asMap()
                             .entries
@@ -291,7 +309,7 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                 color: Colors.grey[300],
                 image: course.thumbnail != null && course.thumbnail!.isNotEmpty
                     ? DecorationImage(
-                        image: NetworkImage(course.thumbnail!),
+                        image: NetworkImage(getImageUrl(course.thumbnail!)),
                         fit: BoxFit.cover,
                         onError: (_, __) {},
                       )
@@ -355,12 +373,12 @@ class _ExplorePageState extends NyPage<ExplorePage> {
             ),
             const SizedBox(height: 4),
             Text(
-              course.description?.substring(
+              stripHtmlTags(course.description?.substring(
                       0,
                       course.description!.length > 50
                           ? 50
                           : course.description!.length) ??
-                  "Master water management for efficiency",
+                  "Master water management for efficiency"),
               style: TextStyle(
                 fontSize: 14,
                 color: secondaryTextColor,
@@ -373,7 +391,11 @@ class _ExplorePageState extends NyPage<ExplorePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "\$49.99",
+                  course.isFree == true
+                      ? "Free"
+                      : (course.price != null && course.price!.isNotEmpty
+                          ? "\$${course.price}"
+                          : "Paid"),
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -385,7 +407,9 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                     const Icon(Icons.star, size: 16, color: Colors.amber),
                     const SizedBox(width: 4),
                     Text(
-                      "4.9 (1.2k)",
+                      (course.rating != null && course.rating!.isNotEmpty)
+                          ? "${course.rating} (${course.ratingCount ?? 0})"
+                          : "No ratings",
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -409,11 +433,6 @@ class _ExplorePageState extends NyPage<ExplorePage> {
     Color textColor,
     Color secondaryTextColor,
   ) {
-    final courseTitles = ["Digital Farming 101", "Sustainable Livestock"];
-    final courseSubtitles = ["By Dr. Elena Vance", "Animal Science Essentials"];
-    final coursePrices = ["\$24.00", "Free"];
-    final courseButtons = ["Enroll", "Start Now"];
-
     return GestureDetector(
       onTap: () => routeTo(CourseDetailPage.path, data: {"course": course}),
       child: Container(
@@ -437,7 +456,7 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                 color: Colors.grey[300],
                 image: course.thumbnail != null && course.thumbnail!.isNotEmpty
                     ? DecorationImage(
-                        image: NetworkImage(course.thumbnail!),
+                        image: NetworkImage(getImageUrl(course.thumbnail!)),
                         fit: BoxFit.cover,
                         onError: (_, __) {},
                       )
@@ -456,9 +475,7 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    index < courseTitles.length
-                        ? courseTitles[index]
-                        : (course.title ?? "Untitled Course"),
+                    course.title ?? "Untitled Course",
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -470,9 +487,7 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    index < courseSubtitles.length
-                        ? courseSubtitles[index]
-                        : "By ${course.category?.name ?? 'Instructor'}",
+                    "By ${course.tutor?.name ?? course.category?.name ?? 'Instructor'}",
                     style: TextStyle(
                       fontSize: 12,
                       color: secondaryTextColor,
@@ -483,9 +498,11 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        index < coursePrices.length
-                            ? coursePrices[index]
-                            : "\$24.00",
+                        course.isFree == true
+                            ? "Free"
+                            : (course.price != null && course.price!.isNotEmpty
+                                ? "\$${course.price}"
+                                : "Paid"),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -496,8 +513,9 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                         onPressed: () => routeTo(CourseDetailPage.path,
                             data: {"course": course}),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              index == 0 ? secondary.withValues(alpha: 0.2) : primary,
+                          backgroundColor: index == 0
+                              ? secondary.withValues(alpha: 0.2)
+                              : primary,
                           foregroundColor: index == 0 ? primary : charcoal,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
@@ -506,10 +524,8 @@ class _ExplorePageState extends NyPage<ExplorePage> {
                           ),
                           elevation: 0,
                         ),
-                        child: Text(
-                          index < courseButtons.length
-                              ? courseButtons[index]
-                              : "Enroll",
+                        child: const Text(
+                          "View",
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,

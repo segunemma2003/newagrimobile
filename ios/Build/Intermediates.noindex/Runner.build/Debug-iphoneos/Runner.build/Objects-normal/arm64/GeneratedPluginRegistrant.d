@@ -4,6 +4,7 @@ dependencies: \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/flutter_inappwebview_ios/flutter_inappwebview_ios.framework/Modules/module.modulemap \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/flutter_secure_storage/flutter_secure_storage.framework/Modules/module.modulemap \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/path_provider_foundation/path_provider_foundation.framework/Modules/module.modulemap \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/pusher_channels_flutter/pusher_channels_flutter.framework/Modules/module.modulemap \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/shared_preferences_foundation/shared_preferences_foundation.framework/Modules/module.modulemap \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/url_launcher_ios/url_launcher_ios.framework/Modules/module.modulemap \
   /Users/mac/Projects/agrisiti_mobile/ios/Runner/GeneratedPluginRegistrant.m \
@@ -21,6 +22,7 @@ dependencies: \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/image_picker_ios/image_picker_ios.framework/Headers/FLTImagePickerPlugin.h \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/package_info_plus/package_info_plus.framework/Modules/module.modulemap \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/package_info_plus/package_info_plus.framework/Headers/FPPPackageInfoPlusPlugin.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/pusher_channels_flutter/pusher_channels_flutter.framework/Headers/PusherChannelsFlutterPlugin.h \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/share_plus/share_plus.framework/Modules/module.modulemap \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/share_plus/share_plus.framework/Headers/FPPSharePlusPlugin.h \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/sqflite_darwin/sqflite_darwin.framework/Modules/module.modulemap \

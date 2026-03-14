@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '/app/models/forum_post.dart';
+import '/app/networking/api_service.dart';
+import '/app/helpers/text_helper.dart';
+import '/app/helpers/image_helper.dart';
 import '/config/keys.dart';
 import '/resources/pages/forum_post_detail_page.dart';
 
 class CommunityForumPage extends NyStatefulWidget {
   static RouteView path = ("/community-forum", (_) => CommunityForumPage());
 
-  CommunityForumPage({super.key}) : super(child: () => _CommunityForumPageState());
+  CommunityForumPage({super.key})
+      : super(child: () => _CommunityForumPageState());
 }
 
 class _CommunityForumPageState extends NyPage<CommunityForumPage> {
@@ -16,6 +22,9 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
   String _searchQuery = "";
   List<ForumPost> _posts = [];
   TextEditingController? _searchController;
+  TextEditingController? _newPostController;
+  String _selectedCategoryForPost = "General";
+  XFile? _selectedImageFile;
 
   // Color scheme - maintain from other pages
   static const Color primary = Color(0xFF3F6967);
@@ -29,67 +38,27 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
   @override
   get init => () async {
         _searchController = TextEditingController();
+        _newPostController = TextEditingController();
         await _loadPosts();
       };
 
   Future<void> _loadPosts() async {
     try {
-      final postsJson = await Keys.forumPosts.read<List>();
-      if (postsJson != null) {
-        _posts = postsJson.map((p) => ForumPost.fromJson(p)).toList();
-        _sortPosts();
-        setState(() {});
-      } else {
-        _loadDummyPosts();
-      }
+      final api = ApiService();
+      final response = await api.fetchForumPosts(
+        search: _searchQuery.isNotEmpty ? _searchQuery : null,
+        category: _selectedFilter != "Trending" && _selectedFilter != "Newest"
+            ? _selectedFilter
+            : null,
+        sort: _selectedFilter == "Trending" ? "trending" : "newest",
+      );
+      final data = response['data'] as List<dynamic>? ?? [];
+      _posts = data.map((p) => ForumPost.fromJson(p)).toList();
+      _sortPosts();
+      setState(() {});
     } catch (e) {
       print('Error loading posts: $e');
-      _loadDummyPosts();
     }
-  }
-
-  void _loadDummyPosts() {
-    _posts = [
-      ForumPost()
-        ..id = "1"
-        ..userName = "Amaka Okafor"
-        ..userAvatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuAJT8HrhyljJMy7ytV5cQY0SZ9Bekg79iONEpmJU72GdNFZ74cjM1tdJmezPd6_X7md4mDMNMlcI70afm_fmNvGLprPdC6h5_c_gYhgCyEOtQ5NCUOcT4UnPL4Kp3Jpn2cOgDleZr1hxOCQHiB5s2eJk1Cjh8D3ELqYmFhmycjNzn6IV6f2ekmsjZuKjRHUW1h70upOIqr4Q5BL0ttTKEdOr3kpCejSrYySJMYYOLJyXM1djeokhAHAO-t1nkYmM5blIr6tv75UDow"
-        ..isVerified = true
-        ..category = "Crop Science"
-        ..content = "What are the best organic pest control methods for tomato farming in Southern Nigeria during the rainy season? My leaves are spotting."
-        ..createdAt = DateTime.now().subtract(const Duration(hours: 2))
-        ..likes = 24
-        ..comments = 12
-        ..shares = 5
-        ..isLiked = false,
-      ForumPost()
-        ..id = "2"
-        ..userName = "Chidi Eze"
-        ..userAvatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuD4lbtsaY4k85t6TL_u4mMlWQJJXa_wOZX5bLOVIzah--Hup81cKmGIQRTs772nrD7ZgZexuVyv7zvpufR6A0oemcS0KCDyH2MNR_JvyOpvXS2YQ8yh3gJTeafAt-XMTjjk6R_ZOjDK2VJOWtyYFzBQWdxV-_-E9HfwHTMKJAAbRTUe-6-l4tSMoD8NSXT1rvZddngyK5oJe_MHRbRwBeCeGKVhijLZKYwKaw_ikp8KOaMYwUyB3cjHp7T4e-9jxouJAuXYXaasQIk"
-        ..isVerified = false
-        ..category = "Agribusiness"
-        ..content = "Just finished the \"Supply Chain 101\" module. It's fascinating how much waste can be reduced through better cold storage logistics! Anyone else working on solar cooling?"
-        ..imageUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuCj-i7d8rRUwqJQHBd5z3osr5aqawB1LjihGcOYmIIt2OHdfcAg-7bqGputt1GImeRKWKENwObFzK1HR_R1iq9Cc18WSRRkreB1V3PGtA0vn0MNtmkobZa48tZkW6a8mGg7z-GQ3wIC3RWdL_M-B8BSx_RL_LN8BfmBWSxdGddY8GFGs8saiDAypVyb5dYuwv4cpjxlmTCmOGvs72uS2IZTUgqXoYVMchanlxhIxwCnBNLvx0CHIjIK4D_PE7D8EZZhRTYaAaRkdC4"
-        ..createdAt = DateTime.now().subtract(const Duration(hours: 5))
-        ..likes = 89
-        ..comments = 31
-        ..shares = 14
-        ..isLiked = true,
-      ForumPost()
-        ..id = "3"
-        ..userName = "Grace Adeniyi"
-        ..userAvatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuDTP0jqZ8rFOAsvhg8z62_08xKGlKE2Atcrh7wMEGaaTXdOq6qaWhPjyeQ651HgbhMyZ1thYfEKvUEceNITQs5ZndTPXHjdoceqFqcUluQGy0CFGxogMGaxS_pa6FPZNH2dVZREliZxq04-1BbWI5f6Y_41bDZiTbiPXNPa2oCxEvIJsvhZVwwSNxUT0J2KqoWvIlm2iJ9aJnL2s6_D6mKtThs5LWXM65kaZzpTWQebePKadbBgO_1Gp2z1b7cHStcfG75A41EK1_w"
-        ..isVerified = false
-        ..category = "General"
-        ..content = "Is there a government subsidy currently available for smallholder irrigation kits in Lagos state?"
-        ..createdAt = DateTime.now().subtract(const Duration(hours: 8))
-        ..likes = 15
-        ..comments = 8
-        ..shares = 2
-        ..isLiked = false,
-    ];
-    _sortPosts();
-    setState(() {});
   }
 
   void _sortPosts() {
@@ -117,25 +86,33 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
 
   List<ForumPost> get _filteredPosts {
     var filtered = _posts;
-    
+
     if (_searchQuery.isNotEmpty) {
       filtered = filtered.where((post) {
-        final contentMatch = (post.content?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false);
-        final userNameMatch = (post.userName?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false);
-        final categoryMatch = (post.category?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false);
+        final contentMatch =
+            (post.content?.toLowerCase().contains(_searchQuery.toLowerCase()) ??
+                false);
+        final userNameMatch = (post.userName
+                ?.toLowerCase()
+                .contains(_searchQuery.toLowerCase()) ??
+            false);
+        final categoryMatch = (post.category
+                ?.toLowerCase()
+                .contains(_searchQuery.toLowerCase()) ??
+            false);
         return contentMatch || userNameMatch || categoryMatch;
       }).toList();
     }
-    
+
     return filtered;
   }
 
   String _formatTime(DateTime? dateTime) {
     if (dateTime == null) return '';
-    
+
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-    
+
     if (difference.inDays == 0) {
       if (difference.inHours == 0) {
         if (difference.inMinutes == 0) {
@@ -182,28 +159,353 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
       setState(() {
         post.shares = (post.shares ?? 0) + 1;
       });
-      
-      // Save to storage
-      final postsJson = _posts.map((p) => p.toJson()).toList();
-      await Keys.forumPosts.save(postsJson);
+
+      // Optionally sync shares count with backend in future
     } catch (e) {
       print('Error sharing post: $e');
     }
   }
 
   Future<void> _createNewPost() async {
-    // TODO: Navigate to create post page
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Create post feature coming soon"),
-        backgroundColor: Colors.orange,
-      ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? backgroundDark : backgroundLight;
+    final textColor = isDark ? Colors.white : textMain;
+    final secondaryTextColor = isDark ? Colors.grey[400]! : textSub;
+
+    _newPostController?.clear();
+    _selectedCategoryForPost = "General";
+    _selectedImageFile = null;
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.4,
+          maxChildSize: 0.95,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
+              ),
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 16,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+              ),
+              child: SingleChildScrollView(
+                controller: scrollController,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Image picker
+                    Row(
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: () async {
+                            final picker = ImagePicker();
+                            final picked = await picker.pickImage(
+                              source: ImageSource.gallery,
+                              imageQuality: 80,
+                              maxWidth: 1600,
+                            );
+                            if (picked != null) {
+                              setState(() {
+                                _selectedImageFile = picked;
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.image_outlined, size: 18),
+                          label: const Text(
+                            "Add image",
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                            side: BorderSide(
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.1)
+                                  : Colors.grey[300]!,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        if (_selectedImageFile != null)
+                          Expanded(
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(
+                                    File(_selectedImageFile!.path),
+                                    width: 40,
+                                    height: 40,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    "Image selected",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: secondaryTextColor,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.close,
+                                    size: 18,
+                                    color: secondaryTextColor,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _selectedImageFile = null;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      "Start a discussion",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Share a question, idea, or experience with the Agrisiti community.",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: secondaryTextColor,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      "Category",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: secondaryTextColor,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        for (final category in [
+                          "General",
+                          "Crop Science",
+                          "Livestock",
+                          "Agribusiness",
+                          "Soil Health",
+                          "Market Trends",
+                        ])
+                          ChoiceChip(
+                            label: Text(
+                              category,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: _selectedCategoryForPost == category
+                                    ? Colors.white
+                                    : secondaryTextColor,
+                              ),
+                            ),
+                            selected: _selectedCategoryForPost == category,
+                            selectedColor: primary,
+                            backgroundColor:
+                                isDark ? Colors.white12 : surfaceLight,
+                            onSelected: (selected) {
+                              if (selected) {
+                                setState(() {
+                                  _selectedCategoryForPost = category;
+                                });
+                              }
+                            },
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _newPostController,
+                      maxLines: 6,
+                      minLines: 4,
+                      style: TextStyle(color: textColor, fontSize: 14),
+                      decoration: InputDecoration(
+                        hintText:
+                            "What do you want to ask or share with the community?",
+                        hintStyle: TextStyle(
+                          color: secondaryTextColor,
+                          fontSize: 14,
+                        ),
+                        filled: true,
+                        fillColor: isDark
+                            ? Colors.white.withValues(alpha: 0.03)
+                            : surfaceLight,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: primary.withValues(alpha: 0.8),
+                            width: 1.5,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.1)
+                                    : Colors.grey[300]!,
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            ),
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(
+                                color: secondaryTextColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              final content =
+                                  _newPostController?.text.trim() ?? "";
+                              if (content.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        "Please write something before posting."),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              try {
+                                final api = ApiService();
+                                final response = await api.createForumPost(
+                                  category: _selectedCategoryForPost,
+                                  content: content,
+                                  imagePath: _selectedImageFile?.path,
+                                );
+                                final created = ForumPost.fromJson(
+                                    response['data'] ?? response);
+
+                                setState(() {
+                                  _posts.insert(0, created);
+                                  _sortPosts();
+                                });
+
+                                Navigator.of(context).pop();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Post published"),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              } catch (e) {
+                                print('Error creating post: $e');
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        "Failed to publish post. Please try again."),
+                                    backgroundColor: Colors.redAccent,
+                                  ),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primary,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            ),
+                            child: const Text(
+                              "Post",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
   @override
   void dispose() {
     _searchController?.dispose();
+    _newPostController?.dispose();
     super.dispose();
   }
 
@@ -214,7 +516,8 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
   Widget view(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? backgroundDark : backgroundLight;
-    final surfaceColor = isDark ? Colors.white.withValues(alpha: 0.05) : surfaceLight;
+    final surfaceColor =
+        isDark ? Colors.white.withValues(alpha: 0.05) : surfaceLight;
     final textColor = isDark ? Colors.white : textMain;
     final secondaryTextColor = isDark ? Colors.grey[400]! : textSub;
 
@@ -230,7 +533,9 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
                 color: bgColor.withValues(alpha: 0.8),
                 border: Border(
                   bottom: BorderSide(
-                    color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.grey[100]!,
                   ),
                 ),
               ),
@@ -311,7 +616,8 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
                         style: TextStyle(color: textColor, fontSize: 14),
                         decoration: InputDecoration(
                           hintText: "Search discussions, topics...",
-                          hintStyle: TextStyle(color: secondaryTextColor, fontSize: 14),
+                          hintStyle: TextStyle(
+                              color: secondaryTextColor, fontSize: 14),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.zero,
                         ),
@@ -333,7 +639,8 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  _buildFilterChip("Trending", _selectedFilter == "Trending", () {
+                  _buildFilterChip("Trending", _selectedFilter == "Trending",
+                      () {
                     setState(() {
                       _selectedFilter = "Trending";
                       _sortPosts();
@@ -347,14 +654,16 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
                     });
                   }, isDark, primary, secondary),
                   const SizedBox(width: 8),
-                  _buildFilterChip("Soil Health", _selectedFilter == "Soil Health", () {
+                  _buildFilterChip(
+                      "Soil Health", _selectedFilter == "Soil Health", () {
                     setState(() {
                       _selectedFilter = "Soil Health";
                       _sortPosts();
                     });
                   }, isDark, primary, secondary),
                   const SizedBox(width: 8),
-                  _buildFilterChip("Market Trends", _selectedFilter == "Market Trends", () {
+                  _buildFilterChip(
+                      "Market Trends", _selectedFilter == "Market Trends", () {
                     setState(() {
                       _selectedFilter = "Market Trends";
                       _sortPosts();
@@ -370,7 +679,8 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.forum_outlined, size: 64, color: secondaryTextColor),
+                          Icon(Icons.forum_outlined,
+                              size: 64, color: secondaryTextColor),
                           const SizedBox(height: 16),
                           Text(
                             "No posts found",
@@ -473,7 +783,9 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.grey[100]!,
               ),
             ),
           ),
@@ -487,12 +799,13 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: (post.isVerified == true ? secondary : primary).withValues(alpha: 0.2),
+                    color: (post.isVerified == true ? secondary : primary)
+                        .withValues(alpha: 0.2),
                     width: 2,
                   ),
                   image: post.userAvatar != null && post.userAvatar!.isNotEmpty
                       ? DecorationImage(
-                          image: NetworkImage(post.userAvatar!),
+                          image: NetworkImage(getImageUrl(post.userAvatar!)),
                           fit: BoxFit.cover,
                           onError: (_, __) {},
                         )
@@ -564,7 +877,7 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
                     const SizedBox(height: 8),
                     // Post Content
                     Text(
-                      post.content ?? '',
+                      stripHtmlTags(post.content ?? ''),
                       style: TextStyle(
                         fontSize: 14,
                         color: isDark ? Colors.grey[200] : textColor,
@@ -580,10 +893,11 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isDark ? Colors.grey[800]! : Colors.grey[100]!,
+                            color:
+                                isDark ? Colors.grey[800]! : Colors.grey[100]!,
                           ),
                           image: DecorationImage(
-                            image: NetworkImage(post.imageUrl!),
+                            image: NetworkImage(getImageUrl(post.imageUrl!)),
                             fit: BoxFit.cover,
                             onError: (_, __) {},
                           ),
@@ -595,7 +909,9 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
                     Row(
                       children: [
                         _buildActionButton(
-                          icon: post.isLiked == true ? Icons.favorite : Icons.favorite_outline,
+                          icon: post.isLiked == true
+                              ? Icons.favorite
+                              : Icons.favorite_outline,
                           label: "${post.likes ?? 0}",
                           isActive: post.isLiked == true,
                           activeColor: Colors.red,
@@ -609,7 +925,8 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
                           isActive: false,
                           activeColor: primary,
                           onTap: () {
-                            routeTo(ForumPostDetailPage.path, data: {'post': post});
+                            routeTo(ForumPostDetailPage.path,
+                                data: {'post': post});
                           },
                           secondaryTextColor: secondaryTextColor,
                         ),

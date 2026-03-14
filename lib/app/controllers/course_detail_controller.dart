@@ -2,6 +2,7 @@ import 'package:nylo_framework/nylo_framework.dart';
 import '/app/models/course.dart';
 import '/app/models/module.dart';
 import '/app/networking/api_service.dart';
+import '/app/helpers/storage_helper.dart';
 import '/config/keys.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
@@ -33,12 +34,38 @@ class CourseDetailController extends NyController {
 
     // Try to load from storage if API fails
     try {
-      final coursesJson = await Keys.courses.read<List>();
-      if (coursesJson != null) {
-        final courses = List<Map<String, dynamic>>.from(coursesJson);
-        final courseData = courses.firstWhere(
-          (c) => c['id'] == courseId,
-          orElse: () => {},
+      List<Map<String, dynamic>>? coursesJson;
+      
+      // Try reading from Keys.courses first
+      try {
+        final data = await Keys.courses.read<List>();
+        if (data != null) {
+          coursesJson = data.map((item) {
+            if (item is Map<String, dynamic>) {
+              return item;
+            } else if (item is Map) {
+              return Map<String, dynamic>.from(item);
+            }
+            return <String, dynamic>{};
+          }).where((item) => item.isNotEmpty).toList();
+        }
+      } catch (e) {
+        // If reading fails, try using safe helper
+        if (!e.toString().contains('-34018')) {
+          print("Warning: Error reading courses from Keys.courses: $e");
+        }
+        coursesJson = safeReadCoursesData();
+      }
+      
+      // Fallback to safe helper if still null
+      if (coursesJson == null) {
+        coursesJson = safeReadCoursesData();
+      }
+      
+      if (coursesJson != null && coursesJson.isNotEmpty) {
+        final courseData = coursesJson.firstWhere(
+          (c) => c['id']?.toString() == courseId,
+          orElse: () => <String, dynamic>{},
         );
         if (courseData.isNotEmpty) {
           course = Course.fromJson(courseData);

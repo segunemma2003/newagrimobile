@@ -1,0 +1,23 @@
+{
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/DKImagePickerController/Sources/DKImageDataManager/Model/DKAssetGroup.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroup.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroup.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroup.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroup.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroup.swiftdeps"
+  },
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/DKImagePickerController/Sources/DKImagePickerController/View/Cell/DKAssetGroupCellItemProtocol.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupCellItemProtocol.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupCellItemProtocol.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupCellItemProtocol.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupCellItemProtocol.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupCellItemProtocol.swiftdeps"
+  },
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/DKImagePickerController/Sources/DKImagePickerController/View/Cell/DKAssetGroupDetailBaseCell.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupDetailBaseCell.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupDetailBaseCell.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupDetailBaseCell.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupDetailBaseCell.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/DKImagePickerController.build/Objects-normal/arm64/DKAssetGroupDetailBaseCell.swiftdeps"
+  }
+}

@@ -235,7 +235,8 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
               final isCompleted = module.isCompleted == true;
               final testPassed = module.testPassed == true ||
                   (testScore != null && testScore >= 80);
-              final isLocked = module.isLocked == true;
+              final isLocked =
+                  (course?.isEnrolled == true) ? false : (module.isLocked == true);
 
               return _buildModuleCard(
                 module,
@@ -596,6 +597,7 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
                             "lesson": diyLessons.first,
                             "course": course,
                             "module": module,
+                            "isEnrolled": course?.isEnrolled == true,
                           });
                         }
                       },
@@ -787,8 +789,10 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       itemCount: lessons.length,
                       itemBuilder: (context, index) {
-                        final lesson = lessons[index];
-                        final isLocked = lesson.isLocked == true;
+                      final lesson = lessons[index];
+                      final isLocked = (course.isEnrolled == true)
+                          ? false
+                          : (lesson.isLocked == true);
                         final isCompleted = lesson.isCompleted == true;
 
                         return InkWell(
@@ -800,6 +804,7 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
                                     "lesson": lesson,
                                     "course": course,
                                     "module": module,
+                                    "isEnrolled": course.isEnrolled == true,
                                   });
                                 },
                           borderRadius: BorderRadius.circular(12),

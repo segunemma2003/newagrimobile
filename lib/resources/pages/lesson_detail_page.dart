@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:flutter_html/flutter_html.dart';
 import '/app/models/lesson.dart';
 import '/app/models/course.dart';
 import '/app/models/module.dart';
@@ -11,6 +13,11 @@ import '/resources/pages/assignment_page.dart';
 import '/app/models/assignment.dart';
 import '/app/models/comment.dart';
 import '/app/services/progression_service.dart';
+import '/app/services/video_download_service.dart';
+import '/app/networking/api_service.dart';
+import '/app/helpers/text_helper.dart';
+import '/app/helpers/storage_helper.dart';
+import '/app/helpers/image_helper.dart';
 import '/config/keys.dart';
 
 class LessonDetailPage extends NyStatefulWidget<LessonController> {
@@ -46,25 +53,40 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
 
   @override
   get init => () async {
+        // Lock orientation to portrait on page load
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+
         final data = widget.data<Map<String, dynamic>>();
+        bool isEnrolledFlag = false;
         if (data != null) {
           lesson = data['lesson'] as Lesson?;
           course = data['course'] as Course?;
           module = data['module'] as Module?;
+          isEnrolledFlag = data['isEnrolled'] == true;
         }
         if (lesson != null && module != null && course != null) {
-          // Check if lesson is locked
-          final isLocked =
-              await ProgressionService.isLessonLocked(lesson!, module!);
-          lesson!.isLocked = isLocked;
+          final isEnrolled = isEnrolledFlag || course!.isEnrolled == true;
 
-          // Update lesson locks
-          await ProgressionService.updateLessonLocks(module!);
+          // Only apply locking rules when the user is NOT enrolled.
+          // If enrolled, all lessons should be open.
+          if (!isEnrolled) {
+            final isLocked =
+                await ProgressionService.isLessonLocked(lesson!, module!);
+            lesson!.isLocked = isLocked;
 
-          // If lesson is locked, show message and return
-          if (isLocked) {
-            setState(() {});
-            return;
+            // Update lesson locks
+            await ProgressionService.updateLessonLocks(module!);
+
+            // If lesson is locked, show message and return
+            if (isLocked) {
+              setState(() {});
+              return;
+            }
+          } else {
+            lesson!.isLocked = false;
           }
           await widget.controller.loadLesson(lesson!);
           // Initialize YouTube player for video lessons
@@ -296,130 +318,121 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
     try {
       _currentUser = await Keys.auth.read<Map<String, dynamic>>();
       if (_currentUser == null) {
-        _currentUser = backpackRead(Keys.auth);
+        _currentUser = safeReadAuthData();
       }
       setState(() {});
     } catch (e) {
       if (!e.toString().contains('-34018')) {
         print('Warning: Failed to load user data: $e');
       }
-      _currentUser = backpackRead(Keys.auth);
+      _currentUser = safeReadAuthData();
       setState(() {});
     }
   }
 
   Future<void> _loadComments() async {
-    if (lesson?.id == null) return;
+    if (lesson?.id == null || course?.id == null) return;
 
     try {
-      final commentsJson = await Keys.comments.read<List>();
-      if (commentsJson != null) {
-        final allComments =
-            commentsJson.map((c) => Comment.fromJson(c)).toList();
+      final api = ApiService();
+      // Use a direct GET request here to avoid stale cached responses
+      // after posting a new comment.
+      final response =
+          await api.get('/courses/${course!.id}/topics/${lesson!.id}/comments');
+      final data = response['data'] as List<dynamic>? ?? [];
 
-        // Filter comments for this lesson and build thread structure
-        final lessonComments = allComments
-            .where((c) => c.lessonId == lesson!.id && c.parentId == null)
-            .toList();
+      final allComments = data.map((c) => Comment.fromJson(c)).toList();
 
-        // Attach replies to each comment
-        for (var comment in lessonComments) {
-          comment.replies =
-              allComments.where((c) => c.parentId == comment.id).toList();
-        }
+      // Filter comments for this lesson and build thread structure
+      final lessonComments =
+          allComments.where((c) => c.parentId == null).toList();
 
-        // Sort by creation date (newest first)
-        lessonComments.sort((a, b) {
-          final aDate = a.createdAt ?? DateTime(2000);
-          final bDate = b.createdAt ?? DateTime(2000);
-          return bDate.compareTo(aDate);
-        });
-
-        _comments = lessonComments;
-        setState(() {});
+      // Attach replies to each comment
+      for (var comment in lessonComments) {
+        comment.replies =
+            allComments.where((c) => c.parentId == comment.id).toList();
       }
+
+      // Sort by creation date (newest first)
+      lessonComments.sort((a, b) {
+        final aDate = a.createdAt ?? DateTime(2000);
+        final bDate = b.createdAt ?? DateTime(2000);
+        return bDate.compareTo(aDate);
+      });
+
+      _comments = lessonComments;
+      setState(() {});
     } catch (e) {
-      print('Error loading comments: $e');
-    }
-  }
-
-  Future<void> _saveComment(Comment comment) async {
-    try {
-      final commentsJson = await Keys.comments.read<List>() ?? [];
-      final allComments = commentsJson.map((c) => Comment.fromJson(c)).toList();
-
-      // Remove existing comment if updating
-      allComments.removeWhere((c) => c.id == comment.id);
-      allComments.add(comment);
-
-      await Keys.comments.save(allComments.map((c) => c.toJson()).toList());
-      await _loadComments();
-    } catch (e) {
-      print('Error saving comment: $e');
+      print('Error loading comments from API: $e');
     }
   }
 
   Future<void> _postComment(String content, {String? parentId}) async {
-    if (content.trim().isEmpty || lesson?.id == null) return;
+    if (content.trim().isEmpty || lesson?.id == null || course?.id == null)
+      return;
 
-    final comment = Comment()
-      ..id = DateTime.now().millisecondsSinceEpoch.toString()
-      ..userId = _currentUser?['id']?.toString() ??
-          _currentUser?['user_id']?.toString()
-      ..userName = _currentUser?['name'] ?? 'Anonymous User'
-      ..userAvatar = _currentUser?['avatar']
-      ..lessonId = lesson!.id
-      ..courseId = course?.id
-      ..moduleId = module?.id
-      ..parentId = parentId
-      ..content = content.trim()
-      ..likes = 0
-      ..isLiked = false
-      ..createdAt = DateTime.now()
-      ..updatedAt = DateTime.now();
+    try {
+      final api = ApiService();
+      await api.addLessonComment(
+        course!.id!,
+        lesson!.id!.toString(),
+        comment: content.trim(),
+        parentId: parentId != null ? int.tryParse(parentId) : null,
+      );
 
-    await _saveComment(comment);
+      // Refresh comments from API
+      await _loadComments();
 
-    // Clear controllers
-    if (parentId == null) {
-      _commentController?.clear();
-    } else {
-      _replyController?.clear();
-      _replyingToCommentId = null;
+      // Clear controllers
+      if (parentId == null) {
+        _commentController?.clear();
+      } else {
+        _replyController?.clear();
+        _replyingToCommentId = null;
+      }
+    } catch (e) {
+      print('Error posting comment: $e');
     }
-
-    setState(() {});
   }
 
   Future<void> _toggleLikeComment(String commentId) async {
+    // Backend doesn't currently support like toggling for lesson comments.
+    // For now, we just update the UI locally.
     try {
-      final commentsJson = await Keys.comments.read<List>() ?? [];
-      final allComments = commentsJson.map((c) => Comment.fromJson(c)).toList();
+      final updated = _comments.expand<Comment>((c) {
+        return [c, ...?c.replies];
+      }).toList();
 
-      final comment = allComments.firstWhere(
+      final target = updated.firstWhere(
         (c) => c.id == commentId,
         orElse: () => Comment(),
       );
 
-      if (comment.id != null) {
-        comment.isLiked = !(comment.isLiked ?? false);
-        if (comment.isLiked == true) {
-          comment.likes = (comment.likes ?? 0) + 1;
-        } else {
-          comment.likes = (comment.likes ?? 0) - 1;
-          if (comment.likes! < 0) comment.likes = 0;
-        }
-
-        await Keys.comments.save(allComments.map((c) => c.toJson()).toList());
-        await _loadComments();
+      if (target.id != null) {
+        setState(() {
+          target.isLiked = !(target.isLiked ?? false);
+          if (target.isLiked == true) {
+            target.likes = (target.likes ?? 0) + 1;
+          } else {
+            target.likes = (target.likes ?? 0) - 1;
+            if (target.likes! < 0) target.likes = 0;
+          }
+        });
       }
     } catch (e) {
-      print('Error toggling like: $e');
+      print('Error toggling like locally: $e');
     }
   }
 
   @override
   void dispose() {
+    // Restore all orientations when leaving the page
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     _youtubeController?.dispose();
     _noteController?.dispose();
     _commentController?.dispose();
@@ -460,19 +473,22 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
       );
     }
 
-    // Show locked state if lesson is locked
-    if (lesson!.isLocked == true) {
-    return Scaffold(
+    // Show locked state only for non-enrolled users
+    final isEnrolledForLesson = (course?.isEnrolled == true) ||
+        (widget.data<Map<String, dynamic>>()?['isEnrolled'] == true);
+
+    if (!isEnrolledForLesson && lesson!.isLocked == true) {
+      return Scaffold(
         backgroundColor: bgColor,
-      appBar: AppBar(
-        elevation: 0,
+        appBar: AppBar(
+          elevation: 0,
           backgroundColor: bgColor,
-        automaticallyImplyLeading: true,
-        leading: IconButton(
+          automaticallyImplyLeading: true,
+          leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             color: textColor,
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
           title: Text(lesson!.title ?? "Lesson",
               style: TextStyle(color: textColor)),
         ),
@@ -574,7 +590,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                         moduleTitle,
                         style: TextStyle(
                           fontSize: 14,
-            fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w600,
                           color: textColor,
                         ),
                       ),
@@ -591,7 +607,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
           ),
           // Main Content
           Expanded(
-        child: SingleChildScrollView(
+            child: SingleChildScrollView(
               child: Column(
                 children: [
                   // Video Player (Sticky)
@@ -599,9 +615,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                   // Content
                   Padding(
                     padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         // Lesson Title
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -636,14 +652,11 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                             ),
                           ],
                         ),
-              const SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         // Description
-                Text(
+                        _buildHtmlContent(
                           lesson!.description ?? lesson!.content ?? "",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: secondaryTextColor,
-                          ),
+                          secondaryTextColor,
                         ),
                         const SizedBox(height: 20),
                         // Download Offline Button
@@ -653,29 +666,29 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                         // Quick Actions Grid
                         _buildQuickActionsGrid(surfaceColor, textColor,
                             secondaryTextColor, isDark, bgColor),
-              const SizedBox(height: 24),
+                        const SizedBox(height: 24),
                         // Divider
                         Divider(
                             color: isDark
                                 ? Colors.white.withValues(alpha: 0.05)
                                 : Colors.grey[200]),
-              const SizedBox(height: 24),
+                        const SizedBox(height: 24),
                         // Notes Section
                         _buildNotesSection(surfaceColor, textColor,
                             secondaryTextColor, isDark),
-              const SizedBox(height: 24),
+                        const SizedBox(height: 24),
                         // Interactive Experience
                         if (lesson!.type == 'video')
                           _buildInteractiveExperience(
                               textColor, secondaryTextColor, isDark),
-              const SizedBox(height: 24),
+                        const SizedBox(height: 24),
                         // DIY Activity
                         if (lesson!.type == 'diy')
                           _buildDIYActivity(surfaceColor, textColor,
                               secondaryTextColor, isDark),
-            ],
-          ),
-        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 100), // Space for bottom nav
                 ],
               ),
@@ -856,6 +869,59 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
     );
   }
 
+  /// Build HTML content widget (renders HTML like Django/Laravel {!! !!})
+  Widget _buildHtmlContent(String? htmlString, Color textColor) {
+    if (htmlString == null || htmlString.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Html(
+      data: htmlString,
+      style: {
+        "body": Style(
+          margin: Margins.zero,
+          padding: HtmlPaddings.zero,
+          fontSize: FontSize(14),
+          color: textColor,
+          lineHeight: const LineHeight(1.5),
+        ),
+        "p": Style(
+          margin: Margins.only(bottom: 8),
+        ),
+        "h1": Style(
+          fontSize: FontSize(24),
+          fontWeight: FontWeight.bold,
+          margin: Margins.only(bottom: 12),
+        ),
+        "h2": Style(
+          fontSize: FontSize(20),
+          fontWeight: FontWeight.bold,
+          margin: Margins.only(bottom: 10),
+        ),
+        "h3": Style(
+          fontSize: FontSize(18),
+          fontWeight: FontWeight.bold,
+          margin: Margins.only(bottom: 8),
+        ),
+        "ul": Style(
+          margin: Margins.only(bottom: 8),
+        ),
+        "ol": Style(
+          margin: Margins.only(bottom: 8),
+        ),
+        "li": Style(
+          margin: Margins.only(bottom: 4),
+        ),
+        "strong": Style(
+          fontWeight: FontWeight.bold,
+        ),
+        "em": Style(
+          fontStyle: FontStyle.italic,
+        ),
+      },
+    );
+  }
+
   Widget _buildVideoPlayer(bool isDark, Color textColor) {
     // Always show YouTube player if controller is initialized
     if (_youtubeController != null) {
@@ -863,7 +929,17 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
         aspectRatio: 16 / 9,
         child: YoutubePlayerBuilder(
           onExitFullScreen: () {
-            // Handle exit fullscreen if needed
+            // Restore all orientations when exiting fullscreen
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.portraitUp,
+              DeviceOrientation.portraitDown,
+            ]);
+          },
+          onEnterFullScreen: () {
+            // Lock to portrait when entering fullscreen
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.portraitUp,
+            ]);
           },
           player: YoutubePlayer(
             controller: _youtubeController!,
@@ -883,9 +959,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
             },
           ),
           builder: (context, player) {
-      return Container(
+            return Container(
               decoration: const BoxDecoration(
-        color: Colors.black,
+                color: Colors.black,
               ),
               child: player,
             );
@@ -902,7 +978,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
           color: Colors.black,
           image: course?.thumbnail != null
               ? DecorationImage(
-                  image: NetworkImage(course!.thumbnail!),
+                  image: NetworkImage(getImageUrl(course!.thumbnail!)),
                   fit: BoxFit.cover,
                 )
               : null,
@@ -919,16 +995,58 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
               ),
             ],
           ),
-          ),
         ),
-      );
-    }
+      ),
+    );
+  }
 
   Widget _buildDownloadButton(Color surfaceColor, Color textColor,
       Color secondaryTextColor, bool isDark) {
     return InkWell(
-      onTap: () {
-        // Handle download
+      onTap: () async {
+        if (lesson == null ||
+            lesson!.videoUrl == null ||
+            lesson!.videoUrl!.isEmpty ||
+            lesson!.id == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("No video available to download for this lesson."),
+            ),
+          );
+          return;
+        }
+
+        final downloadService = VideoDownloadService();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Starting download..."),
+          ),
+        );
+
+        await downloadService.downloadVideo(
+          videoUrl: lesson!.videoUrl!,
+          lessonId: lesson!.id!,
+          onProgress: (progress) {
+            // Optionally you can update state to show progress in UI
+            if (progress >= 1.0) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Video downloaded for offline viewing."),
+                ),
+              );
+            }
+          },
+          onError: (error) {
+            if (error != null && error.isNotEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(error),
+                  backgroundColor: Colors.redAccent,
+                ),
+              );
+            }
+          },
+        );
       },
       borderRadius: BorderRadius.circular(16),
       child: Container(
@@ -937,7 +1055,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
           color: surfaceColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.grey[200]!,
           ),
         ),
         child: Row(
@@ -975,7 +1095,8 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: accent.withValues(alpha: 0.6), size: 20),
+            Icon(Icons.chevron_right,
+                color: accent.withValues(alpha: 0.6), size: 20),
           ],
         ),
       ),
@@ -990,7 +1111,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
     return Column(
       children: [
         Row(
-            children: [
+          children: [
             Expanded(
               child: _buildQuickActionButton(
                 Icons.description,
@@ -1087,7 +1208,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
           (a) => a.id == lesson!.assignmentId,
           orElse: () => _createDummyAssignment(),
         );
-                    } else {
+      } else {
         assignment = _createDummyAssignment();
       }
 
@@ -1163,7 +1284,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
           color: surfaceColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[200]!,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.grey[200]!,
           ),
         ),
         child: Column(
@@ -1177,10 +1300,10 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                 fontWeight: FontWeight.w600,
                 color: textColor,
               ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
     );
   }
 
@@ -1188,11 +1311,11 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
       Color textColor, Color secondaryTextColor, bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+      children: [
         Row(
-                      children: [
+          children: [
             Icon(Icons.view_in_ar, size: 18, color: accent),
-                        const SizedBox(width: 8),
+            const SizedBox(width: 8),
             Text(
               "INTERACTIVE EXPERIENCE",
               style: TextStyle(
@@ -1200,10 +1323,10 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                 fontWeight: FontWeight.w900,
                 letterSpacing: 2,
                 color: accent,
-                          ),
-                        ),
-                      ],
-                    ),
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(20),
@@ -1217,8 +1340,8 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
             border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
@@ -1236,7 +1359,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                 ),
               ),
               const SizedBox(height: 12),
-                              Text(
+              Text(
                 "Step into the Greenhouse",
                 style: TextStyle(
                   fontSize: 18,
@@ -1267,11 +1390,11 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                          ),
-                  ),
-              ],
-            ),
+                ),
+              ),
+            ],
           ),
+        ),
       ],
     );
   }
@@ -1324,35 +1447,33 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
         // DIY Description
         if (lesson?.description != null || lesson?.content != null)
           Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
               color: surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color:
-                    isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[200]!,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.grey[200]!,
               ),
-      ),
-      child: Text(
+            ),
+            child: _buildHtmlContent(
               lesson?.description ??
                   lesson?.content ??
                   "Follow the step-by-step instructions to complete this DIY activity.",
-              style: TextStyle(
-                fontSize: 14,
-                color: textColor,
-                height: 1.5,
-              ),
+              textColor,
             ),
           ),
         const SizedBox(height: 16),
         // DIY Video (if available)
         if (lesson?.videoUrl != null && lesson!.videoUrl!.isNotEmpty)
           Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color:
-                    isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.grey[200]!,
               ),
             ),
             child: ClipRRect(
@@ -1367,11 +1488,12 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
             color: surfaceColor,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color:
-                  isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[200]!,
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.grey[200]!,
             ),
-      ),
-      child: Column(
+          ),
+          child: Column(
             children: _diyActivities.entries.map((entry) {
               return CheckboxListTile(
                 title: Text(
@@ -1421,19 +1543,19 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
   Widget _buildNotesSection(Color surfaceColor, Color textColor,
       Color secondaryTextColor, bool isDark) {
     return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+          children: [
             Row(
               children: [
                 Icon(Icons.note, size: 20, color: accent),
-              const SizedBox(width: 8),
-              Text(
+                const SizedBox(width: 8),
+                Text(
                   "My Notes",
                   style: TextStyle(
-                  fontSize: 18,
+                    fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: textColor,
                   ),
@@ -1454,16 +1576,18 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                 foregroundColor: accent,
               ),
             ),
-            ],
-          ),
-          const SizedBox(height: 12),
+          ],
+        ),
+        const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: surfaceColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.grey[200]!,
             ),
           ),
           child: Column(
@@ -1485,13 +1609,62 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
               ),
               const SizedBox(height: 12),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-          Text(
+                  Text(
                     "${_lessonNotes.length} note${_lessonNotes.length != 1 ? 's' : ''}",
                     style: TextStyle(
                       fontSize: 12,
                       color: secondaryTextColor,
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final content = _noteController?.text.trim() ?? "";
+                      if (content.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content:
+                                Text("Type something before saving your note."),
+                          ),
+                        );
+                        return;
+                      }
+                      await _saveNote(content);
+                      FocusScope.of(context).unfocus();
+                      final isDarkTheme =
+                          Theme.of(context).brightness == Brightness.dark;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor:
+                              isDarkTheme ? Colors.white : Colors.black87,
+                          content: Text(
+                            "Note saved.",
+                            style: TextStyle(
+                              color: isDarkTheme ? Colors.black : Colors.white,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: accent,
+                      foregroundColor: Colors.black87,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Save",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
@@ -1539,6 +1712,20 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
           _lessonNotes[index] = note;
         }
       });
+
+      // Also sync note to backend if course and lesson IDs are available
+      if (course?.id != null && lesson?.id != null) {
+        try {
+          final api = ApiService();
+          await api.createNote({
+            "course_id": course!.id,
+            "topic_id": lesson!.id,
+            "notes": content,
+          });
+        } catch (e) {
+          print("Warning: Failed to sync note to API: $e");
+        }
+      }
     } catch (e) {
       print("Error saving note: $e");
     }
@@ -1546,9 +1733,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
 
   void _showTranscript(BuildContext context, Color textColor,
       Color secondaryTextColor, bool isDark, Color bgColor) {
-    final transcript = lesson?.transcript ??
+    final transcript = stripHtmlTags(lesson?.transcript ??
         lesson?.content ??
-        "No transcript available for this lesson.";
+        "No transcript available for this lesson.");
 
     showModalBottomSheet(
       context: context,
@@ -1556,12 +1743,12 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.85,
-      decoration: BoxDecoration(
+        decoration: BoxDecoration(
           color: bgColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
+        ),
+        child: Column(
+          children: [
             // Handle bar
             Container(
               margin: const EdgeInsets.only(top: 12),
@@ -1582,8 +1769,8 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                      "Transcript",
-                      style: TextStyle(
+                          "Transcript",
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
                             color: textColor,
@@ -1596,10 +1783,10 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                             fontSize: 14,
                             color: secondaryTextColor,
                           ),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
                   IconButton(
                     icon: const Icon(Icons.close),
                     color: textColor,
@@ -1612,12 +1799,12 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
+                child: Text(
                   transcript,
                   style: TextStyle(
                     fontSize: 15,
                     color: textColor,
-                  height: 1.6,
+                    height: 1.6,
                   ),
                 ),
               ),
@@ -1650,7 +1837,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                 ),
               ),
             ),
-        ],
+          ],
         ),
       ),
     );
@@ -1672,8 +1859,11 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
             color: bgColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: Column(
-      children: [
+            children: [
               Container(
                 margin: const EdgeInsets.only(top: 12),
                 width: 40,
@@ -1761,9 +1951,9 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                         },
                       ),
               ),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
                   color: surfaceColor,
                   border: Border(
                     top: BorderSide(
@@ -1772,12 +1962,20 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                           : Colors.grey[200]!,
                     ),
                   ),
-            ),
-            child: Row(
-              children: [
+                ),
+                child: Row(
+                  children: [
                     Expanded(
                       child: TextField(
                         controller: _commentController,
+                        textInputAction: TextInputAction.send,
+                        onSubmitted: (value) async {
+                          if (value.trim().isNotEmpty) {
+                            await _postComment(value);
+                            setModalState(() {});
+                            FocusScope.of(context).unfocus();
+                          }
+                        },
                         style: TextStyle(color: textColor),
                         decoration: InputDecoration(
                           hintText: "Add a comment...",
@@ -1818,6 +2016,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                             true) {
                           await _postComment(_commentController!.text);
                           setModalState(() {});
+                          FocusScope.of(context).unfocus();
                         }
                       },
                     ),
@@ -1855,7 +2054,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                 backgroundColor: accent.withValues(alpha: 0.2),
                 backgroundImage:
                     comment.userAvatar != null && comment.userAvatar!.isNotEmpty
-                        ? NetworkImage(comment.userAvatar!)
+                        ? NetworkImage(getImageUrl(comment.userAvatar!))
                         : null,
                 child: comment.userAvatar == null || comment.userAvatar!.isEmpty
                     ? Text(
@@ -1867,11 +2066,11 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                       )
                     : null,
               ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -1890,32 +2089,32 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                             children: [
                               Text(
                                 comment.userName ?? 'Anonymous',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
                                   color: textColor,
-                        ),
-                      ),
+                                ),
+                              ),
                               const SizedBox(width: 8),
-                      Text(
+                              Text(
                                 _formatTime(comment.createdAt),
                                 style: TextStyle(
-                          fontSize: 12,
+                                  fontSize: 12,
                                   color: secondaryTextColor,
-                        ),
+                                ),
                               ),
                             ],
-                      ),
-                      const SizedBox(height: 8),
+                          ),
+                          const SizedBox(height: 8),
                           Text(
-                            comment.content ?? '',
+                            stripHtmlTags(comment.content ?? ''),
                             style: TextStyle(
                               fontSize: 14,
                               color: textColor,
                               height: 1.4,
-                        ),
-                      ),
-                    ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -1943,11 +2142,11 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: secondaryTextColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                         const SizedBox(width: 16),
                         InkWell(
                           onTap: () {
@@ -2014,10 +2213,10 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                     ),
                     if (_replyingToCommentId == comment.id) ...[
                       const SizedBox(height: 12),
-        Row(
-          children: [
+                      Row(
+                        children: [
                           const SizedBox(width: 32),
-            Expanded(
+                          Expanded(
                             child: TextField(
                               controller: _replyController,
                               style: TextStyle(color: textColor),
@@ -2115,7 +2314,7 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
             backgroundColor: accent.withValues(alpha: 0.2),
             backgroundImage:
                 reply.userAvatar != null && reply.userAvatar!.isNotEmpty
-                    ? NetworkImage(reply.userAvatar!)
+                    ? NetworkImage(getImageUrl(reply.userAvatar!))
                     : null,
             child: reply.userAvatar == null || reply.userAvatar!.isEmpty
                 ? Text(
@@ -2163,13 +2362,13 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                             style: TextStyle(
                               fontSize: 11,
                               color: secondaryTextColor,
-              ),
-            ),
-          ],
-        ),
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 6),
                       Text(
-                        reply.content ?? '',
+                        stripHtmlTags(reply.content ?? ''),
                         style: TextStyle(
                           fontSize: 13,
                           color: textColor,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '/app/models/course.dart';
@@ -11,6 +12,10 @@ import '/resources/pages/modules_overview_page.dart';
 import '/resources/pages/assignment_page.dart';
 import '/app/models/assignment.dart';
 import '/app/models/review.dart';
+import '/app/helpers/text_helper.dart';
+import '/app/helpers/storage_helper.dart';
+import '/app/helpers/image_helper.dart';
+import '/app/networking/api_service.dart';
 import '/config/keys.dart';
 
 class CourseDetailPage extends NyStatefulWidget<CourseDetailController> {
@@ -24,6 +29,11 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
   String _selectedTab = "Overview";
   Map<String, bool> _expandedModules = {}; // Track which modules are expanded
   YoutubePlayerController? _previewVideoController;
+  final TextEditingController _enrollmentCodeController =
+      TextEditingController();
+
+  // Enrollment state from /my-courses
+  Set<String> _enrolledCourseIds = {};
 
   // Reviews
   List<Review> _reviews = [];
@@ -38,15 +48,154 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
   static const Color backgroundDark = Color(0xFF121212);
   static const Color surfaceDark = Color(0xFF1E1E1E);
 
-  // Check if course is enrolled - uses real API data
+  // Check if course is enrolled - primarily via /my-courses
   bool _isEnrolled(Course course) {
-    // Use real enrollment status from API
-    // Fallback to checking if user has progress (for offline scenarios)
-    if (course.isEnrolled == true) {
+    final courseId = course.id?.toString();
+
+    if (courseId != null && _enrolledCourseIds.contains(courseId)) {
       return true;
     }
-    // If API data not available, check if there's progress (offline fallback)
-    return course.completedLessons != null && course.completedLessons! > 0;
+
+    // Fallback to flag on course details if needed
+    return course.isEnrolled == true;
+  }
+
+  Future<void> _showEnrollDialog(Course course) async {
+    _enrollmentCodeController.clear();
+
+    await showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final bgColor = isDark ? backgroundDark : Colors.white;
+        final textColor = isDark ? Colors.white : const Color(0xFF131515);
+        final secondaryTextColor = isDark
+            ? (Colors.grey[400] ?? Colors.grey)
+            : (Colors.grey[600] ?? Colors.grey);
+
+        return AlertDialog(
+          backgroundColor: bgColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text(
+            "Enter Enrollment Code",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: textColor,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "To enroll in this course, please enter the enrollment code provided to you.\n\n"
+                "If you don't have an enrollment code, please contact the Agrisiti team at "
+                "info@agrisiti.com to request access.",
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.4,
+                  color: secondaryTextColor,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _enrollmentCodeController,
+                decoration: InputDecoration(
+                  labelText: "Enrollment Code",
+                  hintText: "e.g. 20252025",
+                  labelStyle: TextStyle(color: secondaryTextColor),
+                  hintStyle: TextStyle(color: secondaryTextColor),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: accent, width: 1.5),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                "Cancel",
+                style: TextStyle(color: secondaryTextColor),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final code = _enrollmentCodeController.text.trim();
+                if (code.isEmpty || course.id == null) {
+                  return;
+                }
+                Navigator.of(context).pop(); // Close dialog before API call
+                await _enrollInCourse(course, code);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: accent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+              child: const Text("Enroll"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _enrollInCourse(Course course, String code) async {
+    try {
+      final response = await api<ApiService>(
+        (request) => request.enrollInCourse(
+          courseId: course.id!,
+          enrollmentCode: code,
+        ),
+      );
+
+      if (response is Map && response['success'] == true) {
+        // Refresh course details to get updated is_enrolled status
+        await widget.controller.loadCourseDetails(course.id!);
+        setState(() {
+          this.course = widget.controller.course;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text("Successfully enrolled in course"),
+            backgroundColor: accent,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      } else {
+        final message = response is Map && response['message'] != null
+            ? response['message'].toString()
+            : "Failed to enroll in course. Please check your code.";
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: Colors.redAccent,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error enrolling in course: $e"),
+          backgroundColor: Colors.redAccent,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
   // Get button text based on enrollment status
@@ -64,12 +213,22 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
 
   @override
   get init => () async {
+        // Lock orientation to portrait on page load
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+
         final data = widget.data<Map<String, dynamic>>();
         if (data != null) {
           course = data['course'] as Course?;
           if (course != null) {
             await widget.controller.loadCourseDetails(course!.id!);
             course = widget.controller.course;
+            // Load reviews from course details if available
+            if (course?.reviews != null) {
+              _reviews = course!.reviews!;
+            }
 
             // Handle selected tab from route data
             if (data['selectedTab'] != null) {
@@ -84,42 +243,57 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
               }
             }
 
-            // Initialize preview video controller
-            try {
-              _previewVideoController = YoutubePlayerController(
-                initialVideoId: "aoweVTb5lXQ", // Preview video ID
-                flags: const YoutubePlayerFlags(
-                  autoPlay: false,
-                  mute: false,
-                  enableCaption: true,
-                  showLiveFullscreenButton: true,
-                  controlsVisibleAtStart: true,
-                ),
-              );
-            } catch (e) {
-              print("Error initializing preview video: $e");
-            }
+            // Initialize preview video controller with course preview video
+            _initializePreviewVideo();
 
             setState(() {});
           }
         }
         await _loadReviews();
         await _loadCurrentUser();
+        await _loadEnrollmentStatus();
       };
 
   Future<void> _loadCurrentUser() async {
     try {
       _currentUser = await Keys.auth.read<Map<String, dynamic>>();
       if (_currentUser == null) {
-        _currentUser = backpackRead(Keys.auth);
+        _currentUser = safeReadAuthData();
       }
       setState(() {});
     } catch (e) {
       if (!e.toString().contains('-34018')) {
         print('Warning: Failed to load user data: $e');
       }
-      _currentUser = backpackRead(Keys.auth);
+      _currentUser = safeReadAuthData();
       setState(() {});
+    }
+  }
+
+  Future<void> _loadEnrollmentStatus() async {
+    if (course?.id == null) return;
+
+    try {
+      final api = ApiService();
+      final response = await api.fetchMyCourses();
+      final rawData = response['data'] ?? response;
+
+      if (rawData is List) {
+        final ids = <String>{};
+        for (final item in rawData) {
+          if (item is Map<String, dynamic>) {
+            final courseId = item['course_id']?.toString() ??
+                item['course']?['id']?.toString();
+            if (courseId != null && courseId.isNotEmpty) {
+              ids.add(courseId);
+            }
+          }
+        }
+        _enrolledCourseIds = ids;
+        setState(() {});
+      }
+    } catch (e) {
+      print('Warning: Failed to load enrollment status from /my-courses: $e');
     }
   }
 
@@ -127,40 +301,31 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
     if (course?.id == null) return;
 
     try {
-      final reviewsJson = await Keys.reviews.read<List>();
-      if (reviewsJson != null) {
-        _reviews = reviewsJson
-            .map((r) => Review.fromJson(r))
-            .where((r) => r.courseId == course!.id)
-            .toList();
+      // Prefer API reviews
+      Map<String, dynamic>? response = await api<ApiService>(
+        (request) =>
+            request.fetchCourseReviews(course!.id!, perPage: 20, page: 1),
+      );
 
-        // Sort by creation date (newest first)
+      if (response != null && response['data'] is List) {
+        final List<dynamic> data = response['data'];
+        _reviews = data.map((r) => Review.fromJson(r)).toList();
+      } else if (course?.reviews != null && course!.reviews!.isNotEmpty) {
+        _reviews = List.from(course!.reviews!);
+      }
+
+      // Sort by creation date (newest first)
+      if (_reviews.isNotEmpty) {
         _reviews.sort((a, b) {
           final aDate = a.createdAt ?? DateTime(2000);
           final bDate = b.createdAt ?? DateTime(2000);
           return bDate.compareTo(aDate);
         });
-
-        setState(() {});
       }
+
+      setState(() {});
     } catch (e) {
       print('Error loading reviews: $e');
-    }
-  }
-
-  Future<void> _saveReview(Review review) async {
-    try {
-      final reviewsJson = await Keys.reviews.read<List>() ?? [];
-      final allReviews = reviewsJson.map((r) => Review.fromJson(r)).toList();
-
-      // Remove existing review if updating
-      allReviews.removeWhere((r) => r.id == review.id);
-      allReviews.add(review);
-
-      await Keys.reviews.save(allReviews.map((r) => r.toJson()).toList());
-      await _loadReviews();
-    } catch (e) {
-      print('Error saving review: $e');
     }
   }
 
@@ -168,38 +333,171 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
     if (_reviewController?.text.trim().isEmpty == true || course?.id == null)
       return;
 
-    final review = Review()
-      ..id = DateTime.now().millisecondsSinceEpoch.toString()
-      ..userId = _currentUser?['id']?.toString() ??
-          _currentUser?['user_id']?.toString()
-      ..userName = _currentUser?['name'] ?? 'Anonymous User'
-      ..userAvatar = _currentUser?['avatar']
-      ..courseId = course!.id
-      ..rating = _selectedRating
-      ..comment = _reviewController!.text.trim()
-      ..isVerified = true // Assume verified if user is enrolled
-      ..createdAt = DateTime.now()
-      ..updatedAt = DateTime.now();
+    try {
+      await api<ApiService>(
+        (request) => request.addCourseReview(
+          course!.id!,
+          rating: _selectedRating,
+          review: _reviewController!.text.trim(),
+        ),
+      );
 
-    await _saveReview(review);
+      _reviewController?.clear();
+      _selectedRating = 5;
 
-    _reviewController?.clear();
-    _selectedRating = 5;
-    setState(() {});
+      // Reload reviews from API
+      await _loadReviews();
 
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Review submitted successfully!'),
-        backgroundColor: accent,
-        duration: Duration(seconds: 2),
-      ),
-    );
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Review submitted successfully!'),
+          backgroundColor: accent,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to submit review: $e'),
+          backgroundColor: Colors.redAccent,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  /// Extract YouTube video ID from URL
+  String? _extractYouTubeId(String? url) {
+    if (url == null || url.isEmpty) return null;
+
+    // If it's already just a video ID (11 characters)
+    if (!url.contains('://') && !url.contains('/') && url.length == 11) {
+      if (RegExp(r'^[a-zA-Z0-9_-]{11}$').hasMatch(url)) {
+        return url;
+      }
+    }
+
+    // Try to parse as URI first
+    final uri = Uri.tryParse(url);
+    if (uri != null) {
+      // Handle youtu.be URLs
+      if (uri.host.contains('youtu.be')) {
+        final pathSegments = uri.pathSegments;
+        if (pathSegments.isNotEmpty) {
+          String id = pathSegments.last;
+          id = id.split('?').first.split('&').first;
+          if (id.length == 11 && RegExp(r'^[a-zA-Z0-9_-]{11}$').hasMatch(id)) {
+            return id;
+          }
+        }
+      }
+
+      // Handle youtube.com URLs
+      if (uri.host.contains('youtube.com')) {
+        // Try query parameter first (most common: ?v=VIDEO_ID)
+        final videoId = uri.queryParameters['v'];
+        if (videoId != null && videoId.isNotEmpty) {
+          String cleanId = videoId.split('&').first.split('?').first.trim();
+          if (cleanId.length == 11 &&
+              RegExp(r'^[a-zA-Z0-9_-]{11}$').hasMatch(cleanId)) {
+            return cleanId;
+          }
+        }
+
+        // Try embed URLs: youtube.com/embed/VIDEO_ID
+        final pathSegments = uri.pathSegments;
+        if (pathSegments.isNotEmpty && pathSegments[0] == 'embed') {
+          if (pathSegments.length > 1) {
+            String id = pathSegments[1].split('?').first.split('&').first;
+            if (id.length == 11 &&
+                RegExp(r'^[a-zA-Z0-9_-]{11}$').hasMatch(id)) {
+              return id;
+            }
+          }
+        }
+
+        // Try watch URLs: youtube.com/watch?v=VIDEO_ID
+        if (pathSegments.isNotEmpty && pathSegments[0] == 'watch') {
+          final videoId = uri.queryParameters['v'];
+          if (videoId != null && videoId.isNotEmpty) {
+            String cleanId = videoId.split('&').first.split('?').first.trim();
+            if (cleanId.length == 11 &&
+                RegExp(r'^[a-zA-Z0-9_-]{11}$').hasMatch(cleanId)) {
+              return cleanId;
+            }
+          }
+        }
+      }
+    }
+
+    // Fallback: try to extract from any URL format
+    String tempId = url.trim();
+    tempId = tempId.replaceAll(RegExp(r'^https?://'), '');
+    tempId = tempId.replaceAll(RegExp(r'^www\.'), '');
+    tempId = tempId.replaceAll(RegExp(r'^youtube\.com/'), '');
+    tempId = tempId.replaceAll(RegExp(r'^youtu\.be/'), '');
+    tempId = tempId.replaceAll(RegExp(r'^embed/'), '');
+    tempId = tempId.replaceAll(RegExp(r'^watch\?v='), '');
+    if (tempId.contains('&')) {
+      tempId = tempId.split('&').first;
+    }
+    if (tempId.contains('?')) {
+      tempId = tempId.split('?').first;
+    }
+    if (tempId.length == 11 &&
+        RegExp(r'^[a-zA-Z0-9_-]{11}$').hasMatch(tempId)) {
+      return tempId;
+    }
+
+    return null;
+  }
+
+  /// Initialize preview video controller with course preview video URL
+  void _initializePreviewVideo() {
+    try {
+      String? videoId;
+
+      // Extract video ID from course preview video URL
+      if (course?.previewVideoUrl != null &&
+          course!.previewVideoUrl!.isNotEmpty) {
+        videoId = _extractYouTubeId(course!.previewVideoUrl!);
+        print("Extracted preview video ID from course: $videoId");
+      }
+
+      // Use default video if no valid video ID found
+      if (videoId == null || videoId.isEmpty || videoId.length != 11) {
+        videoId = "aoweVTb5lXQ"; // Fallback to default preview video
+        print("Using default preview video ID: $videoId");
+      }
+
+      _previewVideoController = YoutubePlayerController(
+        initialVideoId: videoId,
+        flags: const YoutubePlayerFlags(
+          autoPlay: false,
+          mute: false,
+          enableCaption: true,
+          showLiveFullscreenButton: true,
+          controlsVisibleAtStart: true,
+        ),
+      );
+      print("✅ Preview video controller initialized with video ID: $videoId");
+    } catch (e) {
+      print("Error initializing preview video: $e");
+    }
   }
 
   @override
   void dispose() {
+    // Restore all orientations when leaving the page
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     _previewVideoController?.dispose();
+    _enrollmentCodeController.dispose();
     super.dispose();
   }
 
@@ -290,8 +588,9 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                         // Background Image
                         Positioned.fill(
                           child: Image.network(
-                            displayCourse.thumbnail ??
-                                "https://via.placeholder.com/640x360",
+                            getImageUrl(displayCourse.thumbnail) != ''
+                                ? getImageUrl(displayCourse.thumbnail!)
+                                : "https://via.placeholder.com/640x360",
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
                                 Container(
@@ -579,20 +878,16 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                           Row(
                             children: [
                               Text(
-                                "\$49.99",
+                                displayCourse.isFree == true ||
+                                        displayCourse.price == null ||
+                                        displayCourse.price == "0" ||
+                                        displayCourse.price == "0.00"
+                                    ? "Free"
+                                    : "\$${displayCourse.price}",
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w700,
                                   color: textColor,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                "\$89.99",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: secondaryTextColor,
-                                  decoration: TextDecoration.lineThrough,
                                 ),
                               ),
                             ],
@@ -606,9 +901,13 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        // Navigate to modules overview for enrolled courses
-                        routeTo(ModulesOverviewPage.path,
-                            data: {"course": displayCourse});
+                        if (_isEnrolled(displayCourse)) {
+                          // Navigate to modules overview for enrolled courses
+                          routeTo(ModulesOverviewPage.path,
+                              data: {"course": displayCourse});
+                        } else {
+                          _showEnrollDialog(displayCourse);
+                        }
                       },
                       icon: Icon(
                           _isEnrolled(displayCourse)
@@ -673,6 +972,17 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
     Color secondaryTextColor,
     bool isDark,
   ) {
+    // Derive dynamic values from API data with sensible fallbacks
+    final durationLabel =
+        course.durationMinutes != null && course.durationMinutes! > 0
+            ? _formatDuration(course.durationMinutes!)
+            : "Self-paced";
+    final levelLabel = (course.level != null && course.level!.isNotEmpty)
+        ? course.level!
+        : "All levels";
+    final certificateLabel =
+        course.certificateIncluded == false ? "Not included" : "Included";
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -683,7 +993,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
               child: _buildStatCard(
                 icon: Icons.schedule,
                 label: "Duration",
-                value: "6 Weeks",
+                value: durationLabel,
                 surfaceColor: surfaceColor,
                 textColor: textColor,
                 secondaryTextColor: secondaryTextColor,
@@ -695,7 +1005,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
               child: _buildStatCard(
                 icon: Icons.signal_cellular_alt,
                 label: "Level",
-                value: "Medium",
+                value: levelLabel,
                 surfaceColor: surfaceColor,
                 textColor: textColor,
                 secondaryTextColor: secondaryTextColor,
@@ -707,7 +1017,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
               child: _buildStatCard(
                 icon: Icons.verified,
                 label: "Certificate",
-                value: "Included",
+                value: certificateLabel,
                 surfaceColor: surfaceColor,
                 textColor: textColor,
                 secondaryTextColor: secondaryTextColor,
@@ -731,8 +1041,9 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
             ),
             const SizedBox(height: 12),
             Text(
-              course.description ??
-                  "Learn how to grow your own food in small spaces using sustainable methods. This comprehensive guide covers everything from soil health to hydroponics, perfect for urban dwellers looking to reconnect with nature and produce fresh, organic vegetables.",
+              stripHtmlTags(course.about ??
+                  course.description ??
+                  "Learn how to grow your own food in small spaces using sustainable methods. This comprehensive guide covers everything from soil health to hydroponics, perfect for urban dwellers looking to reconnect with nature and produce fresh, organic vegetables."),
               style: TextStyle(
                 fontSize: 14,
                 color: secondaryTextColor,
@@ -756,6 +1067,117 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
           ],
         ),
         const SizedBox(height: 24),
+        // What you'll learn
+        if (course.whatYouWillLearn != null &&
+            course.whatYouWillLearn!.isNotEmpty) ...[
+          Text(
+            "What you'll learn",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...course.whatYouWillLearn!.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.check_circle,
+                      size: 18, color: accent.withValues(alpha: 0.9)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      stripHtmlTags(item),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: secondaryTextColor,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+        // What you'll get
+        if (course.whatYouWillGet != null &&
+            course.whatYouWillGet!.isNotEmpty) ...[
+          Text(
+            "What you'll get",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...course.whatYouWillGet!.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.workspace_premium,
+                      size: 18, color: accent.withValues(alpha: 0.9)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      stripHtmlTags(item),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: secondaryTextColor,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+        // Course information
+        if (course.courseInformation != null &&
+            course.courseInformation!.isNotEmpty) ...[
+          Text(
+            "Course information",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...course.courseInformation!.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.info_outline,
+                      size: 18, color: accent.withValues(alpha: 0.9)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      stripHtmlTags(item),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: secondaryTextColor,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
         // Instructor Card
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -795,15 +1217,40 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                     height: 56,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border:
-                          Border.all(color: primary.withValues(alpha: 0.2), width: 2),
-                      image: const DecorationImage(
-                        image: NetworkImage(
-                          "https://lh3.googleusercontent.com/aida-public/AB6AXuAhD1RwfKRpUV04ISP13wL1krvVmkyGLSw5zrZQpXAUMjapggW1ifrtuSTHeIHB7OYMVjJ-gtWZRGJMn3wHRkebJZIBLMYWSdhbFQGwe2jiyhidev_GJg9nT6tbJSGBA9jW4YPZHcSP3S2-kGc7I-wJKLBv5UcIwb-6zBjzhAhFZ-QmxY7mqqPMjG_qjUcPs2F3qmrn5Bah2UwWp81npnW3Pyhebyi0pWx18lQAJKzcyqyFc65OjIzWNLRmTgXaNlPOzBIFAnhOrSY",
-                        ),
-                        fit: BoxFit.cover,
-                      ),
+                      border: Border.all(
+                          color: primary.withValues(alpha: 0.2), width: 2),
+                      image: course.tutor?.avatar != null &&
+                              course.tutor!.avatar!.isNotEmpty
+                          ? DecorationImage(
+                              image: NetworkImage(
+                                  getImageUrl(course.tutor!.avatar!)),
+                              fit: BoxFit.cover,
+                              onError: (_, __) {},
+                            )
+                          : null,
                     ),
+                    child: (course.tutor?.avatar == null ||
+                            course.tutor!.avatar!.isEmpty)
+                        ? Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: primary.withValues(alpha: 0.15),
+                            ),
+                            child: Center(
+                              child: Text(
+                                (course.tutor?.name?.isNotEmpty == true
+                                        ? course.tutor!.name![0].toUpperCase()
+                                        : "I")
+                                    .toString(),
+                                style: TextStyle(
+                                  color: primary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          )
+                        : null,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -811,7 +1258,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Dr. Adewale",
+                          course.tutor?.name ?? "Instructor",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -820,7 +1267,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          "Senior Agronomist",
+                          course.category?.name ?? "Course Tutor",
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -829,7 +1276,8 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "Over 15 years of experience in sustainable agriculture and soil science across West Africa.",
+                          stripHtmlTags(course.tutor?.bio ??
+                              "Instructor for this course."),
                           style: TextStyle(
                             fontSize: 12,
                             color: secondaryTextColor,
@@ -1158,6 +1606,19 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
     );
   }
 
+  String _formatDuration(int minutes) {
+    if (minutes <= 0) return "Self-paced";
+    final hours = minutes ~/ 60;
+    final mins = minutes % 60;
+    if (hours > 0 && mins > 0) {
+      return "${hours}h ${mins}m";
+    } else if (hours > 0) {
+      return "${hours}h";
+    } else {
+      return "${mins}m";
+    }
+  }
+
   Widget _buildTab(String label, bool isSelected, VoidCallback onTap,
       Color textColor, Color secondaryTextColor) {
     return GestureDetector(
@@ -1199,7 +1660,8 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         color: surfaceColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
+          color:
+              isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
           width: 1,
         ),
         boxShadow: [
@@ -1256,7 +1718,9 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
           child: Container(
             height: 6,
             decoration: BoxDecoration(
-              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[100],
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.grey[100],
               borderRadius: BorderRadius.circular(999),
             ),
             child: FractionallySizedBox(
@@ -1264,7 +1728,8 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
               widthFactor: percentage,
               child: Container(
                 decoration: BoxDecoration(
-                  color: percentage > 0.5 ? accent : accent.withValues(alpha: 0.4),
+                  color:
+                      percentage > 0.5 ? accent : accent.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
@@ -1282,9 +1747,9 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
     Color secondaryTextColor,
     bool isDark,
   ) {
-    // Calculate total duration (placeholder)
-    final totalDuration =
-        course.totalLessons != null ? course.totalLessons! * 20 : 0;
+    // Calculate total duration (approximate based on lessons count)
+    final totalLessons = course.totalLessons ?? course.lessonsCount ?? 0;
+    final totalDuration = totalLessons * 20; // ~20 mins per lesson
     final hours = totalDuration ~/ 60;
     final minutes = totalDuration % 60;
     final durationText = hours > 0 ? "${hours}h ${minutes}m" : "${minutes}m";
@@ -1333,21 +1798,16 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
           ...course.modules!.asMap().entries.map((entry) {
             final index = entry.key;
             final module = entry.value;
-            // Determine if module is locked (previous module must be completed AND test passed with 80%)
-            // For now, make all modules accessible - can be changed back by uncommenting the locking logic
+            // Lock logic:
+            // - If user is NOT enrolled, only first 2 modules are accessible
+            // - If enrolled, all modules use normal completion logic
             bool isLocked = false;
-            // Uncomment below to enable sequential module locking:
-            // if (index > 0 && course.modules != null) {
-            //   final previousModule = course.modules![index - 1];
-            //   // Module is locked if previous module is not completed OR test not passed (80% threshold)
-            //   final previousTestPassed = previousModule.testPassed == true ||
-            //       (previousModule.testScore != null &&
-            //           previousModule.testScore! >= 80);
-            //   isLocked =
-            //       previousModule.isCompleted != true || !previousTestPassed;
-            // }
-            // Override with module's own isLocked property if set
-            if (module.isLocked == true) {
+            if (!_isEnrolled(course) && index > 1) {
+              isLocked = true;
+            }
+            // Override with module's own isLocked property if set,
+            // but only when the user is NOT enrolled.
+            if (!_isEnrolled(course) && module.isLocked == true) {
               isLocked = true;
             }
 
@@ -1435,7 +1895,9 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         color: isLocked
             ? (isDark ? Colors.white.withValues(alpha: 0.02) : Colors.grey[50])
             : (isModuleActive
-                ? (isDark ? accent.withValues(alpha: 0.05) : accent.withValues(alpha: 0.05))
+                ? (isDark
+                    ? accent.withValues(alpha: 0.05)
+                    : accent.withValues(alpha: 0.05))
                 : surfaceColor),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
@@ -1563,15 +2025,21 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                       ...lessons.asMap().entries.map((lessonEntry) {
                         final lessonIndex = lessonEntry.key;
                         final lesson = lessonEntry.value;
-                        final isLessonLocked = lesson.isLocked == true;
 
-                        // Lock lesson if previous lesson is not completed (except first lesson)
-                        bool shouldLock = false;
-                        if (lessonIndex > 0) {
-                          final previousLesson = lessons[lessonIndex - 1];
-                          shouldLock = previousLesson.isCompleted != true;
+                        // If user is enrolled, all lessons are open.
+                        // If not enrolled, respect existing lesson locking flags.
+                        bool finalLocked = false;
+                        if (!_isEnrolled(course)) {
+                          final isLessonLocked = lesson.isLocked == true;
+
+                          // Lock lesson if previous lesson is not completed (except first lesson)
+                          bool shouldLock = false;
+                          if (lessonIndex > 0) {
+                            final previousLesson = lessons[lessonIndex - 1];
+                            shouldLock = previousLesson.isCompleted != true;
+                          }
+                          finalLocked = isLessonLocked || shouldLock;
                         }
-                        final finalLocked = isLessonLocked || shouldLock;
 
                         return _buildLessonItem(
                           lesson,
@@ -1655,7 +2123,8 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[100],
+          color:
+              isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[100],
           shape: BoxShape.circle,
         ),
         child: Icon(Icons.lock, size: 18, color: secondaryTextColor),
@@ -1689,8 +2158,9 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
               child: CircularProgressIndicator(
                 value: progressPercent / 100,
                 strokeWidth: 3,
-                backgroundColor:
-                    isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200],
+                backgroundColor: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.grey[200],
                 valueColor: AlwaysStoppedAnimation<Color>(accent),
               ),
             ),
@@ -1763,10 +2233,13 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         margin: const EdgeInsets.only(left: 44, right: 16, top: 8, bottom: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[50],
+          color:
+              isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[50],
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey[300]!,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.2)
+                : Colors.grey[300]!,
             width: 1,
             style: BorderStyle.solid,
           ),
@@ -1896,6 +2369,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                   "lesson": lesson,
                   "course": course,
                   "module": module,
+                  "isEnrolled": _isEnrolled(course),
                 });
               },
         borderRadius: BorderRadius.circular(12),
@@ -1943,8 +2417,9 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color:
-                            isLocked ? textColor.withValues(alpha: 0.6) : textColor,
+                        color: isLocked
+                            ? textColor.withValues(alpha: 0.6)
+                            : textColor,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -1999,7 +2474,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
     Color secondaryTextColor,
     bool isDark,
   ) {
-    // Calculate average rating and rating distribution
+    // Calculate average rating and rating distribution from real data
     double averageRating = 0.0;
     int totalReviews = _reviews.length;
     Map<int, int> ratingCounts = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0};
@@ -2012,25 +2487,13 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         ratingCounts[rating] = (ratingCounts[rating] ?? 0) + 1;
       }
       averageRating = totalRating / totalReviews;
-    } else {
-      averageRating = 4.8; // Default if no reviews
-      ratingCounts = {5: 80, 4: 12, 3: 5, 2: 1, 1: 2}; // Default distribution
     }
 
     // Calculate percentages
     Map<int, double> ratingPercentages = {};
     for (int i = 5; i >= 1; i--) {
-      ratingPercentages[i] = totalReviews > 0
-          ? (ratingCounts[i] ?? 0) / totalReviews
-          : (i == 5
-              ? 0.80
-              : i == 4
-                  ? 0.12
-                  : i == 3
-                      ? 0.05
-                      : i == 2
-                          ? 0.01
-                          : 0.02);
+      ratingPercentages[i] =
+          totalReviews > 0 ? (ratingCounts[i] ?? 0) / totalReviews : 0.0;
     }
 
     return StatefulBuilder(
@@ -2135,8 +2598,9 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
             const SizedBox(height: 16),
             Divider(
                 height: 1,
-                color:
-                    isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.grey[200]),
             const SizedBox(height: 12),
             // Filter Chips
             SingleChildScrollView(
@@ -2332,7 +2796,8 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         color: surfaceColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+          color:
+              isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
         ),
       ),
       child: Column(
@@ -2345,7 +2810,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                 backgroundColor: accent.withValues(alpha: 0.2),
                 backgroundImage:
                     review.userAvatar != null && review.userAvatar!.isNotEmpty
-                        ? NetworkImage(review.userAvatar!)
+                        ? NetworkImage(getImageUrl(review.userAvatar!))
                         : null,
                 child: review.userAvatar == null || review.userAvatar!.isEmpty
                     ? Text(
@@ -2459,7 +2924,9 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
           border: Border.all(
             color: isSelected
                 ? accent
-                : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!),
+                : (isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.grey[200]!),
             width: 1,
           ),
           boxShadow: isSelected
@@ -2498,6 +2965,8 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
     Color secondaryTextColor,
     bool isDark,
   ) {
+    final mainTutor = course?.tutor;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2527,14 +2996,38 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                 height: 56,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: primary.withValues(alpha: 0.2), width: 2),
-                  image: const DecorationImage(
-                    image: NetworkImage(
-                      "https://lh3.googleusercontent.com/aida-public/AB6AXuAhD1RwfKRpUV04ISP13wL1krvVmkyGLSw5zrZQpXAUMjapggW1ifrtuSTHeIHB7OYMVjJ-gtWZRGJMn3wHRkebJZIBLMYWSdhbFQGwe2jiyhidev_GJg9nT6tbJSGBA9jW4YPZHcSP3S2-kGc7I-wJKLBv5UcIwb-6zBjzhAhFZ-QmxY7mqqPMjG_qjUcPs2F3qmrn5Bah2UwWp81npnW3Pyhebyi0pWx18lQAJKzcyqyFc65OjIzWNLRmTgXaNlPOzBIFAnhOrSY",
-                    ),
-                    fit: BoxFit.cover,
-                  ),
+                  border: Border.all(
+                      color: primary.withValues(alpha: 0.2), width: 2),
+                  image: mainTutor?.avatar != null &&
+                          mainTutor!.avatar!.isNotEmpty
+                      ? DecorationImage(
+                          image: NetworkImage(getImageUrl(mainTutor.avatar!)),
+                          fit: BoxFit.cover,
+                          onError: (_, __) {},
+                        )
+                      : null,
                 ),
+                child: (mainTutor?.avatar == null || mainTutor!.avatar!.isEmpty)
+                    ? Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: primary.withValues(alpha: 0.15),
+                        ),
+                        child: Center(
+                          child: Text(
+                            (mainTutor?.name?.isNotEmpty == true
+                                    ? mainTutor!.name![0].toUpperCase()
+                                    : "I")
+                                .toString(),
+                            style: TextStyle(
+                              color: primary,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      )
+                    : null,
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -2542,7 +3035,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Dr. Adewale",
+                      mainTutor?.name ?? "Instructor",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -2551,7 +3044,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      "Senior Agronomist",
+                      course?.category?.name ?? "Course Tutor",
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -2560,7 +3053,8 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "Over 15 years of experience in sustainable agriculture and soil science across West Africa.",
+                      stripHtmlTags(
+                          mainTutor?.bio ?? "Instructor for this course."),
                       style: TextStyle(
                         fontSize: 12,
                         color: secondaryTextColor,
@@ -2639,10 +3133,13 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         margin: const EdgeInsets.only(left: 44, right: 16, top: 8, bottom: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[50],
+          color:
+              isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[50],
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey[300]!,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.2)
+                : Colors.grey[300]!,
             width: 1,
           ),
         ),
@@ -2794,7 +3291,8 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
         color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[50],
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey[300]!,
+          color:
+              isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey[300]!,
           width: 1,
         ),
       ),
@@ -2946,7 +3444,9 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
           color: surfaceColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.grey[200]!,
           ),
           boxShadow: [
             BoxShadow(
@@ -3002,9 +3502,17 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
       Color textColor, Color secondaryTextColor) {
     if (_previewVideoController == null) {
       // Initialize if not already done
+      _initializePreviewVideo();
+      if (_previewVideoController == null) {
+        print("Failed to initialize preview video");
+        return;
+      }
+      // Reinitialize with autoplay for fullscreen preview
       try {
+        final currentVideoId = _previewVideoController!.metadata.videoId;
+        _previewVideoController!.dispose();
         _previewVideoController = YoutubePlayerController(
-          initialVideoId: "aoweVTb5lXQ", // Preview video ID
+          initialVideoId: currentVideoId,
           flags: const YoutubePlayerFlags(
             autoPlay: true,
             mute: false,
@@ -3014,8 +3522,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
           ),
         );
       } catch (e) {
-        print("Error initializing preview video: $e");
-        return;
+        print("Error updating preview video flags: $e");
       }
     }
 
@@ -3082,6 +3589,19 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
               child: AspectRatio(
                 aspectRatio: 16 / 9,
                 child: YoutubePlayerBuilder(
+                  onExitFullScreen: () {
+                    // Restore all orientations when exiting fullscreen
+                    SystemChrome.setPreferredOrientations([
+                      DeviceOrientation.portraitUp,
+                      DeviceOrientation.portraitDown,
+                    ]);
+                  },
+                  onEnterFullScreen: () {
+                    // Lock to portrait when entering fullscreen
+                    SystemChrome.setPreferredOrientations([
+                      DeviceOrientation.portraitUp,
+                    ]);
+                  },
                   player: YoutubePlayer(
                     controller: _previewVideoController!,
                     showVideoProgressIndicator: true,

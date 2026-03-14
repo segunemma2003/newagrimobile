@@ -6,6 +6,7 @@ import '/app/models/quiz.dart';
 import '/app/models/course.dart';
 import '/app/models/module.dart';
 import '/app/controllers/lesson_controller.dart';
+import '/app/networking/api_service.dart';
 import '/resources/pages/course_detail_page.dart';
 
 class QuizPage extends NyStatefulWidget<LessonController> {
@@ -39,6 +40,9 @@ class _QuizPageState extends NyPage<QuizPage> {
   static const Color backgroundDark = Color(0xFF121212);
   static const Color surfaceDark = Color(0xFF1E1E1E);
 
+  bool _isLoading = false;
+  String? _errorMessage;
+
   @override
   get init => () {
         final data = widget.data<Map<String, dynamic>>();
@@ -47,48 +51,100 @@ class _QuizPageState extends NyPage<QuizPage> {
           course = data['course'] as Course?;
           module = data['module'] as Module?;
           isModuleQuiz = data['isModuleQuiz'] as bool? ?? false;
-
-          // Get quizzes from lesson or create dummy quizzes for module test
-          if (lesson != null &&
-              lesson!.quizzes != null &&
-              lesson!.quizzes!.isNotEmpty) {
-            _quizzes = lesson!.quizzes!;
-          } else if (isModuleQuiz == true && module != null) {
-            // Create dummy module test questions
-            _quizzes = _createModuleTestQuestions();
-          }
-
-          _startTimer();
+          _loadQuizzes();
         }
       };
+  Future<void> _loadQuizzes() async {
+    if (course == null || module == null) return;
 
-  List<Quiz> _createModuleTestQuestions() {
-    // Create 10 dummy questions for module test
-    return List.generate(10, (index) {
-      final quiz = Quiz();
-      quiz.id = "module_quiz_${module?.id}_$index";
-      quiz.question = "Module Test Question ${index + 1}?";
-      quiz.options = [
-        QuizOption()
-          ..id = "opt_a"
-          ..text = "Option A"
-          ..isCorrect = index % 4 == 0,
-        QuizOption()
-          ..id = "opt_b"
-          ..text = "Option B"
-          ..isCorrect = index % 4 == 1,
-        QuizOption()
-          ..id = "opt_c"
-          ..text = "Option C"
-          ..isCorrect = index % 4 == 2,
-        QuizOption()
-          ..id = "opt_d"
-          ..text = "Option D"
-          ..isCorrect = index % 4 == 3,
-      ];
-      quiz.explanation = "This is the explanation for question ${index + 1}.";
-      return quiz;
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
     });
+
+    try {
+      final api = ApiService();
+
+      if (isModuleQuiz == true) {
+        // Module-level test
+        final response =
+            await api.fetchModuleTest(course!.id!, module!.id!.toString());
+        final data = response['data'] ?? response;
+        final test = data['test'];
+        final questions = test['questions'] as List<dynamic>? ?? [];
+
+        _quizzes = questions.map((q) {
+          final quiz = Quiz();
+          quiz.id = q['id']?.toString();
+          quiz.question = q['question']?.toString();
+
+          final options = <QuizOption>[];
+          final optionsMap = q['options'] as Map<String, dynamic>? ?? {};
+
+          optionsMap.forEach((key, value) {
+            if (value != null && value.toString().isNotEmpty) {
+              final option = QuizOption();
+              option.id = key; // e.g. option_a
+              option.text = value.toString();
+              option.isCorrect =
+                  (q['correct_answer']?.toString() ?? '') == key; // e.g. option_a
+              options.add(option);
+            }
+          });
+
+          quiz.options = options;
+          quiz.explanation = q['explanation']?.toString();
+          return quiz;
+        }).toList();
+      } else if (lesson != null && lesson!.id != null) {
+        // Topic/lesson-level quiz
+        final response = await api.fetchLessonTest(
+          course!.id!,
+          module!.id!.toString(),
+          lesson!.id!.toString(),
+        );
+        final data = response['data'] ?? response;
+        final test = data['test'];
+        final questions = test['questions'] as List<dynamic>? ?? [];
+
+        _quizzes = questions.map((q) {
+          final quiz = Quiz();
+          quiz.id = q['id']?.toString();
+          quiz.question = q['question']?.toString();
+
+          final options = <QuizOption>[];
+          final optionsMap = q['options'] as Map<String, dynamic>? ?? {};
+
+          optionsMap.forEach((key, value) {
+            if (value != null && value.toString().isNotEmpty) {
+              final option = QuizOption();
+              option.id = key;
+              option.text = value.toString();
+              option.isCorrect =
+                  (q['correct_answer']?.toString() ?? '') == key;
+              options.add(option);
+            }
+          });
+
+          quiz.options = options;
+          quiz.explanation = q['explanation']?.toString();
+          return quiz;
+        }).toList();
+      }
+
+      if (_quizzes.isNotEmpty) {
+        _startTimer();
+      } else {
+        _errorMessage = "No questions available for this test.";
+      }
+    } catch (e) {
+      print('Error loading quizzes: $e');
+      _errorMessage = "Failed to load test questions. Please try again.";
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _startTimer() {
@@ -125,6 +181,15 @@ class _QuizPageState extends NyPage<QuizPage> {
         ? (Colors.grey[400] ?? Colors.grey)
         : (Colors.grey[600] ?? Colors.grey);
 
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: bgColor,
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     if (_quizzes.isEmpty) {
       return Scaffold(
         backgroundColor: bgColor,
@@ -144,7 +209,7 @@ class _QuizPageState extends NyPage<QuizPage> {
         ),
         body: Center(
           child: Text(
-            "No quiz available",
+            _errorMessage ?? "No quiz available",
             style: TextStyle(color: secondaryTextColor),
           ),
         ),

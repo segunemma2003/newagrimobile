@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '/resources/widgets/safearea_widget.dart';
+import '/app/networking/api_service.dart';
 
 class ContactAdminPage extends NyStatefulWidget {
   static RouteView path = ("/contact-admin", (_) => ContactAdminPage());
@@ -156,17 +157,41 @@ class _ContactAdminPageState extends NyPage<ContactAdminPage> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // In a real app, you would send this to an API
+                    onPressed: () async {
+                      if (!_formKey.currentState!.validate()) return;
+
+                      final subject = _subjectController.text.trim();
+                      final body = _messageController.text.trim();
+
+                      try {
+                        // Use messages API to send a message to admin/tutor
+                        await api<ApiService>(
+                          (request) => request.sendMessage({
+                            // No specific course context here, so use 0 or a special support course id if defined
+                            "course_id": 0,
+                            // Assume recipient_id 1 is admin in backend (can be adjusted if you have a specific admin user id)
+                            "recipient_id": 1,
+                            "subject": subject.isNotEmpty ? subject : "Support Request",
+                            "message": body,
+                          }),
+                        );
+
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("An aika sakonku zuwa ga admin. Zamu amsa muku nan ba da jimawa ba."),
+                            content: Text(
+                                "An aika sakonku zuwa ga admin. Zamu amsa muku nan ba da jimawa ba."),
                             backgroundColor: Color(0xFF2D8659),
                           ),
                         );
                         _subjectController.clear();
                         _messageController.clear();
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("An kasa aika sakon: $e"),
+                            backgroundColor: Colors.redAccent,
+                          ),
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(

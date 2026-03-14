@@ -3,6 +3,7 @@ import 'dart:async';
 import '/resources/widgets/splash_screen.dart';
 import '/bootstrap/app.dart';
 import '/config/providers.dart';
+import '/app/services/data_sync_service.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 /* Boot
@@ -47,6 +48,12 @@ class Boot {
     try {
       await bootFinished(nylo, providers);
       print('Boot nylo: finished');
+
+      // Initialize offline sync service (non-blocking)
+      DataSyncService().initializeSync().catchError((e) {
+        print('Error initializing sync service: $e');
+      });
+
       runApp(Main(nylo));
     } catch (e, stackTrace) {
       print('FATAL ERROR in Boot.finished: $e');

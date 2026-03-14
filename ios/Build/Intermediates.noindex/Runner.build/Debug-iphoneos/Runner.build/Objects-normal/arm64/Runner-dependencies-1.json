@@ -15,6 +15,11 @@
     "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/iphoneos\/prebuilt-modules\/26.2\/CoreAudio.swiftmodule\/arm64e-apple-ios.swiftmodule"
   },
   {
+    "isFramework" : true,
+    "moduleName" : "CoreData",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/iphoneos\/prebuilt-modules\/26.2\/CoreData.swiftmodule\/arm64e-apple-ios.swiftmodule"
+  },
+  {
     "isFramework" : false,
     "moduleName" : "CoreFoundation",
     "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/iphoneos\/prebuilt-modules\/26.2\/CoreFoundation.swiftmodule\/arm64e-apple-ios.swiftmodule"
@@ -106,6 +111,11 @@
   },
   {
     "isFramework" : false,
+    "moduleName" : "Spatial",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/iphoneos\/prebuilt-modules\/26.2\/Spatial.swiftmodule\/arm64e-apple-ios.swiftmodule"
+  },
+  {
+    "isFramework" : false,
     "moduleName" : "Swift",
     "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/iphoneos\/prebuilt-modules\/26.2\/Swift.swiftmodule\/arm64e-apple-ios.swiftmodule"
   },
@@ -113,6 +123,11 @@
     "isFramework" : false,
     "moduleName" : "SwiftOnoneSupport",
     "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/iphoneos\/prebuilt-modules\/26.2\/SwiftOnoneSupport.swiftmodule\/arm64e-apple-ios.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "SwiftUI",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/iphoneos\/prebuilt-modules\/26.2\/SwiftUI.swiftmodule\/arm64e-apple-ios.swiftmodule"
   },
   {
     "isFramework" : true,
@@ -186,406 +201,420 @@
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/Accessibility.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/Accessibility-POA4O97K5N8K2W6EMA1LSBKR.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/Accessibility-5FKN4VP27AZASSPZDJ2A38H5F.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Accessibility"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CFNetwork.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/CFNetwork-D7VPL5ORXVFHAI61HR064AX8D.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/CFNetwork-C2T4PKK27KP6650HKJVZDEGNN.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CFNetwork"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreAudio.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/CoreAudio-CGT1ATOF4FA5O1EHQDOZPUX3G.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/CoreAudio-1EDK38GS3OHTEZC9MHQ17TVWU.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreAudio"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreAudioTypes.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/CoreAudioTypes-7M57WC5DENN89EAK8BQGILPQ0.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/CoreAudioTypes-DRQURIG16JZCWHCI53ZUWDJK6.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreAudioTypes"
   },
   {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreData.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/CoreData-BRPCDB6U3BH8F1DZGFV19T2E2.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreData"
+  },
+  {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreFoundation.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/CoreFoundation-9BMDSIIS13I9IIGBFV1XL6N5O.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/CoreFoundation-CL33G608VVUME5ONFKBMVE39B.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreFoundation"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreGraphics.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/CoreGraphics-45C39TBCQF3ZB4DXHEBEZDCJU.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/CoreGraphics-1922M77OYQJULDZE1JEYX850Y.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreGraphics"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreImage.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/CoreImage-5HE9J0ZWI1HCS3AQA9BO71GSD.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/CoreImage-6WFE7LUUDHWV24VD8GGHNEVBR.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreImage"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreMedia.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/CoreMedia-AKC6CWJ9ON4OJ17MLEDQBJYAO.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/CoreMedia-7SOFX9XUJU2HEMY1GW6IAD2SM.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreMedia"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreText.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/CoreText-CMRIMY5OKQ71V319EQYN146B9.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/CoreText-93W9EC199SAW3VRJ0L8XO4AG9.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreText"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreTransferable.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/CoreTransferable-APD35GROW7XBV06L8XUSNTFI5.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/CoreTransferable-3JCTH1VRZVRM9EMH2TLIZO1TY.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreTransferable"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreVideo.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/CoreVideo-AUU4B5Q7Z0N5OR8FZET0AP71Z.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/CoreVideo-5PV7R0G3PY58ID5L8UDV72DLU.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreVideo"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/Darwin.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/Darwin-BCAYXJCD3GPJ9OC9QDUY9O2Z0.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/Darwin-AK7M4D1XXYE8DL7QAU0HGH4R8.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Darwin"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/DataDetection.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/DataDetection-DWI0IM1IJOPOTRWSR76GY3RK4.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/DataDetection-DYNGWU7TN5I7XQT5YYV52T7Z0.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "DataDetection"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/DeveloperToolsSupport.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/DeveloperToolsSupport-90ZFPJ7OLOABJ0YENSI66PAJW.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/DeveloperToolsSupport-417JW3TCWENCJPVTL6AU4POHG.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "DeveloperToolsSupport"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/dispatch.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/Dispatch-2UK7S2M8AEJAK7MTC4Q7PH7AF.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/Dispatch-CHU52VVRLM633Q0V3IL3WW210.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Dispatch"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/FileProvider.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/FileProvider-1XO9T638J7LNY3S4AS3DD6SH2.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/FileProvider-9BVR6484HU6Y1RWAUGGUETRI9.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "FileProvider"
   },
   {
     "clangModuleMapPath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/build\/ios\/Debug-iphoneos\/Flutter.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/Build\/Intermediates.noindex\/SwiftExplicitPrecompiledModules\/Flutter-EOD0JK8MYP9QSXUOUYUDQL280.pcm",
+    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/Build\/Intermediates.noindex\/SwiftExplicitPrecompiledModules\/Flutter-70EG8OGAEKZDZGWXJSFWD9ZNY.pcm",
     "isBridgingHeaderDependency" : true,
     "isFramework" : false,
     "moduleName" : "Flutter"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/Foundation.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/Foundation-6L1SJCPIN4ZT9XZRF3DOW9DCD.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/Foundation-34G3317UOFXCIA4G4WGSPJ2J8.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Foundation"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/IOSurface.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/IOSurface-BXZY1RFLU9DY7UOWLVS4LXQRD.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/IOSurface-AKQ09P8EHRPNJGVPMXWUNR6F0.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "IOSurface"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/ImageIO.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/ImageIO-2XHPRJI6JGXLYAUDPU23UP8JU.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/ImageIO-5X7IYCB4JUQOFI5RD38EHNOWB.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "ImageIO"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/DarwinBasic.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/MachO-3489GKBL3YGKP0H6P8IF17B0K.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/MachO-62X1IPE5OF9C9K93MGOA3QHEL.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "MachO"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/Metal.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/Metal-D8DSBINE4ZFANDVIZX7NUDCHO.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/Metal-A6Y0BKHC3C2KV0UHL8UTMF3J5.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Metal"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/OSLog.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/OSLog-34TUWG06S7DLNJDGJFIPO86JY.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/OSLog-9258C1LBF64TOKLYIDWF8C8MO.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "OSLog"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/ObjectiveC.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/ObjectiveC-ACT7SJR01240SEWY6K1H75KWN.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/ObjectiveC-3MLKK83JVESSSA878I5RUBR47.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "ObjectiveC"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/OpenGLES.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/OpenGLES-AV9SA0JJCDDQNQQHQO8WQHRQI.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/OpenGLES-DISUGU9MN9JNI88XQHXH9ZBSJ.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "OpenGLES"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/QuartzCore.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/QuartzCore-2HZS6X54ACRBN9BTS66SHBR2M.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/QuartzCore-8IU8R7GCDEZI7XNU7C7CYV02Y.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "QuartzCore"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/Security.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/Security-E4FUSNDDRIPSQRZ9RA0HPNMVT.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/Security-9WJTE069PA2DEOFI7EV27F3CV.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Security"
   },
   {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/Spatial\/module.modulemap",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/Spatial-CWBW2VMU71TJB0NB6OJIR5Q1W.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Spatial"
+  },
+  {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/lib\/swift\/shims\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/SwiftShims-EKZCY1CKQGWNI17MNQ7TLBYV5.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/SwiftShims-BTLKG6HEQE5PBI0MCBN70JTFP.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "SwiftShims"
   },
   {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/SwiftUI.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/SwiftUI-1XRYU7MZA9OKAAUTBLIT94JD3.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "SwiftUI"
+  },
+  {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/SwiftUICore.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/SwiftUICore-4K2XKWJ3B1DQQPXT7DH88AAOA.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/SwiftUICore-EI76QCXR5BRAPJVCSMB6LCB9D.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "SwiftUICore"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/Symbols.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/Symbols-1OTQRI1WC58GSUKR7KBJ90LF7.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/Symbols-ANFVE7S6O69MIG4TIXIOLFETZ.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Symbols"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/UIKit.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/UIKit-8C7EYKBVRYQQ8GVZK3STU8CXP.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/UIKit-24PN7OWPTTWZAB804QOHPLQ1J.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "UIKit"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/SubFrameworks\/UIUtilities.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/UIUtilities-2P5NDSJQWTBBK4KOJRZ3JUY6O.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/UIUtilities-DWYDIN0HC64Z50OFUNCU0VLPN.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "UIUtilities"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/UniformTypeIdentifiers.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/UniformTypeIdentifiers-C78H65EXA6ZH8T74J9MTWBGEX.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/UniformTypeIdentifiers-BRR3RV2B3ZBMTKCY9BQWW6UM7.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "UniformTypeIdentifiers"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/UserNotifications.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/UserNotifications-99RCW6835OJPWQPLLD74TY4SG.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/UserNotifications-9P7G67A3MAQ82GUWWMT45JXYB.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "UserNotifications"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/xpc.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/XPC-1FD35PT5CU8VAAXHGSTFFFP6N.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/XPC-3TVX4FSKVSV9LWHLP4RN7B8HB.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "XPC"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/DarwinFoundation1.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_AvailabilityInternal-97OX9RWYRE5BHG5LLDUSST9PN.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_AvailabilityInternal-DCNJWNPJ2BGF3UR1FOIPH7893.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_AvailabilityInternal"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_Builtin_float-CUWZLAN2K67U2BLCE4O9TKJD2.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_Builtin_float-6GLNDBH4CJSRHPBH8LVM2OP7Y.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_float"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_Builtin_intrinsics-2UBDYRQ77G3NUKO0Y5MOZKRGW.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_Builtin_intrinsics-DUIBGBA2EPQ0MYBLS0VCQED1U.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_intrinsics"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_Builtin_inttypes-BUI48MXGCH57POJQVSVXWAPYS.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_Builtin_inttypes-N54JNNY7BJ2EDJ5RKH9SCZIT.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_inttypes"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_Builtin_limits-8YR6WB77ETV35HPNILBE2N401.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_Builtin_limits-BSH9UMEFYS7BC1LRI6WKLDK0P.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_limits"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_Builtin_stdarg-9DQ8DGHSVRVZLOBREOALU2U4T.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_Builtin_stdarg-2NE14EI9PQRK7CRTTJ5YLNDXN.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stdarg"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_Builtin_stdatomic-9LSBAUAQ0ZGGT09P611JHDGM5.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_Builtin_stdatomic-5EJ1735W5HH8UZ4HYGB7SJVHT.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stdatomic"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_Builtin_stdbool-56EFKI78MRLAJD58GGOYN9DNT.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_Builtin_stdbool-3ZLC4Z9EX2F6955TEN13N4ILD.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stdbool"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_Builtin_stddef-1QQ5XZTKOFAQY3H62C9DVB3L8.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_Builtin_stddef-20P3GTI4RZ1S3SHFM6Q0U3KIT.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stddef"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_Builtin_stdint-ATR3BNJ9W6W5LF0F728SRANV1.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_Builtin_stdint-6SYH5MRY1W6TMHRSKW0T47B5O.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stdint"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_Builtin_tgmath-DXCXV3YGMGWIHSO4B8EUA65A6.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_Builtin_tgmath-DYSSAJCCE6MOP9O22GYLNAZ3Y.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_tgmath"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/DarwinFoundation1.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_DarwinFoundation1-59KN3TDTE5SUCO8OU0SJWEX85.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_DarwinFoundation1-2HZ32K9BV4EC3DTSSY8HAYCF1.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_DarwinFoundation1"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/DarwinFoundation2.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_DarwinFoundation2-3RMMO441P4WQCEXY6FD5H1AFL.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_DarwinFoundation2-8RKGM9I6M6VYAGWWTWL2Y9PEZ.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_DarwinFoundation2"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/DarwinFoundation3.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_DarwinFoundation3-ILWDAE9CW4LZHV3G315T6E2M.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_DarwinFoundation3-5S37I13C5M5ELHFWNU7ZQGHF0.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_DarwinFoundation3"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/lib\/swift\/shims\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/_SwiftConcurrencyShims-COF1MJAIZ9JS2S7BI2T3K58I1.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/_SwiftConcurrencyShims-299L9MHD0D3W8LHL6YXIQQ84W.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_SwiftConcurrencyShims"
   },
   {
-    "clangModuleMapPath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/build\/ios\/Debug-iphoneos\/flutter_local_notifications\/flutter_local_notifications.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/Build\/Intermediates.noindex\/SwiftExplicitPrecompiledModules\/flutter_local_notifications-B7VSGTJ2ZLEPFKUFE44PNUWT9.pcm",
-    "isBridgingHeaderDependency" : false,
-    "isFramework" : false,
-    "moduleName" : "flutter_local_notifications"
-  },
-  {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/os.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/os-EF5M73VZ9Y2NZ85R3QWTQGFPV.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/os-3N2DUIBD4OIACEM24US8XZGJT.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "os"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/os.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/os_object-16BW2HTD5JUF8JENJ4XK2E6PK.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/os_object-6X64TJPO85ABYBV96PF7VPCQ9.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "os_object"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/os.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/os_workgroup-EYW3XKDFYMTBS1ABCC6S01EIO.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/os_workgroup-EXBCHCEBUY1LI8UVUNLFQ0EEO.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "os_workgroup"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/ptrauth-81YKNEOEB90GM9QSI1MB6XUO2.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/ptrauth-B0X8GDQWUZUDXI48HIW4Q6ZCG.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "ptrauth"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/ptrcheck-5PBLBJ2J75EGCPCVCRCW48B2P.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/ptrcheck-3W3QLUFNG1QZVKCI1UQN14FA2.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "ptrcheck"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/simd\/module.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/simd-BLMT9WRMUW2K7GF9SPJCR3WQD.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/simd-5CTUYLJXBZAYWVDP1B7SY2TLF.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "simd"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/DarwinFoundation2.modulemap",
-    "clangModulePath" : "\/Users\/mac\/Projects\/agrisiti_mobile\/ios\/DerivedData\/ModuleCache.noindex\/sys_types-9EN1DMSD6FYVYX5TWRE1AE8KW.pcm",
+    "clangModulePath" : "\/Users\/mac\/Library\/Developer\/Xcode\/DerivedData\/ModuleCache.noindex\/sys_types-59WWNMKENNKQBFRYG0V928VHQ.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "sys_types"

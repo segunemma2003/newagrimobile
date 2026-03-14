@@ -9,6 +9,7 @@ import '/resources/pages/terms_conditions_page.dart';
 import '/resources/pages/notification_settings_page.dart';
 import '/app/providers/language_provider.dart';
 import '/app/helpers/language_helper.dart';
+import '/app/helpers/storage_helper.dart';
 
 class SettingsPage extends NyStatefulWidget {
   static RouteView path = ("/settings", (_) => SettingsPage());
@@ -52,14 +53,14 @@ class _SettingsPageState extends NyPage<SettingsPage> {
     try {
       _userData = await Keys.auth.read<Map<String, dynamic>>();
       if (_userData == null) {
-        _userData = backpackRead(Keys.auth);
+        _userData = safeReadAuthData();
       }
       setState(() {});
     } catch (e) {
       if (!e.toString().contains('-34018')) {
         print('Warning: Failed to load user data: $e');
       }
-      _userData = backpackRead(Keys.auth);
+      _userData = safeReadAuthData();
       setState(() {});
     }
   }

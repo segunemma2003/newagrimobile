@@ -3,16 +3,10 @@
 <plist version="1.0">
 <dict>
 	<key>application-identifier</key>
-	<string>43KNA93B67.com.agrisityacademy.com</string>
-	<key>aps-environment</key>
-	<string>development</string>
+	<string>43KNA93B67.com.agrisiti.flutterApps</string>
 	<key>com.apple.developer.team-identifier</key>
 	<string>43KNA93B67</string>
 	<key>get-task-allow</key>
 	<true/>
-	<key>keychain-access-groups</key>
-	<array>
-		<string>43KNA93B67.com.agrisityacademy.com</string>
-	</array>
 </dict>
 </plist>

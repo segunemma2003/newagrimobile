@@ -1,0 +1,37 @@
+{
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/PusherSwift/Sources/Extensions/PusherChannel+EncryptionHelpers.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannel+EncryptionHelpers.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannel+EncryptionHelpers.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannel+EncryptionHelpers.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannel+EncryptionHelpers.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannel+EncryptionHelpers.swiftdeps"
+  },
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/PusherSwift/Sources/Models/PusherChannelType.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannelType.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannelType.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannelType.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannelType.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannelType.swiftdeps"
+  },
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/PusherSwift/Sources/Models/PusherChannels.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannels.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannels.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannels.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannels.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannels.swiftdeps"
+  },
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/PusherSwift/Sources/Models/PusherClientOptions.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions.swiftdeps"
+  },
+  "/Users/mac/Projects/agrisiti_mobile/ios/Pods/PusherSwift/Sources/ObjC/PusherClientOptions+ObjectiveC.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions+ObjectiveC.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions+ObjectiveC.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions+ObjectiveC.dia",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions+ObjectiveC.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions+ObjectiveC.swiftdeps"
+  }
+}

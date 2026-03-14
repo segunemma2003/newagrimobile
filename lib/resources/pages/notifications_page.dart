@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
+import '/app/controllers/notifications_controller.dart';
+import '/app/models/notification.dart' as NotificationModel;
+import '/app/helpers/image_helper.dart';
+import '/app/helpers/text_helper.dart';
 
-class NotificationsPage extends NyStatefulWidget {
+class NotificationsPage extends NyStatefulWidget<NotificationsController> {
   static RouteView path = ("/notifications", (_) => NotificationsPage());
 
   NotificationsPage({super.key}) : super(child: () => _NotificationsPageState());
@@ -11,102 +15,87 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
   String _selectedFilter = "All";
   final List<String> _filters = ["All", "Mentions", "Announcements", "System"];
 
-  // Sample notification data - in real app, this would come from API/storage
-  final List<Map<String, dynamic>> _notifications = [
-    {
-      "id": "1",
-      "title": "New Module Unlocked",
-      "message": "Sustainable Farming 101: Module 4 'Water Conservation' is now available for you.",
-      "time": "2h ago",
-      "isRead": false,
-      "type": "course",
-      "dateGroup": "Today",
-      "icon": Icons.menu_book,
-      "iconColor": Color(0xFF0fbd38),
-    },
-    {
-      "id": "2",
-      "title": "Jane Doe replied",
-      "message": "@You Regarding 'Soil Health Analysis', have you checked the pH levels in the north sector?",
-      "time": "4h ago",
-      "isRead": false,
-      "type": "mention",
-      "dateGroup": "Today",
-      "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuAZv0E3v_bpXmjEagveKH4FR93IWhrjLvjT6L9usv9FPZkls46wW8OJ6BQV-IPhPg2l8hgM-iSd3QmoaKdd-4PC4bytQwiXujHMlh_QZYfdSHcMI41l0ZFRAWNZvOJ5SFDZLhAYV6Rf3wRzMtsmrhTTSf8orQtLSRxZ52kT0cEuPh8SkKRyeJ2t0mP6nxDjQASk3sB6yceC3WXIEImFj17EEa_C-HABa0ETWSsM8eALn5cWZ28NZ3QCNbun8-cJhi8I0PX3gD30utE",
-      "iconColor": Color(0xFF2196F3),
-    },
-    {
-      "id": "3",
-      "title": "Quiz Deadline Approaching",
-      "message": "Don't forget to complete your quiz by 11:59 PM today.",
-      "time": "6h ago",
-      "isRead": true,
-      "type": "announcement",
-      "dateGroup": "Today",
-      "icon": Icons.alarm,
-      "iconColor": Color(0xFFFF9800),
-    },
-    {
-      "id": "4",
-      "title": "Certificate Ready",
-      "message": "Congratulations! Your certificate for 'Intro to Agri-Business' is ready for download.",
-      "time": "1d ago",
-      "isRead": true,
-      "type": "system",
-      "dateGroup": "Yesterday",
-      "icon": Icons.verified,
-      "iconColor": Color(0xFF2196F3),
-    },
-    {
-      "id": "5",
-      "title": "Mark Lee liked your post",
-      "message": "\"Great insights on crop rotation...\"",
-      "time": "1d ago",
-      "isRead": true,
-      "type": "mention",
-      "dateGroup": "Yesterday",
-      "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuDFRfK7Mu57sEQu0DsqkOb4VE_Suq6Ud5UKuXUBt1tjeLOLLIjg5e-Jb6TbM7mpO7Ethj3ODY8sWBo6DNGL7WGBg-uyQXqi_2ZVZqIiObUiN8klKqJLooRj2uoKHE7tRjXn8ujY24ac2Mqnp9hS2PcHc0aT5uI5RGvxznvmJnE_dyplFyZ2yTyJ1oZTWODZ7X2y04b4Gm9FPeaS1-HUBBHq49pCGB6q1c9R-fgdEvZCYUk3mHFEPrwe_7h5Ql63YWVX2d5T2MLEEFQ",
-      "iconColor": Color(0xFFE91E63),
-    },
-  ];
-
   // Color scheme - maintaining current background colors
   static const Color primary = Color(0xFF0fbd38);
-  static const Color backgroundLight = Color(0xFFF7F9F8); // Current background
-  static const Color backgroundDark = Color(0xFF102214); // Dark mode background
+  static const Color backgroundLight = Color(0xFFF7F9F8);
+  static const Color backgroundDark = Color(0xFF102214);
   static const Color surfaceDark = Color(0xFF162b1b);
 
-  List<Map<String, dynamic>> get _filteredNotifications {
-    if (_selectedFilter == "All") {
-      return _notifications;
+  @override
+  get init => () async {
+        // Load notifications from storage first (fast)
+        await widget.controller.loadNotificationsFromStorage();
+        setState(() {});
+        
+        // Sync notifications in background (non-blocking)
+        widget.controller.syncNotifications().then((_) {
+          if (mounted) {
+            setState(() {});
+          }
+        }).catchError((e) {
+          print("Error syncing notifications: $e");
+        });
+      };
+
+  List<NotificationModel.Notification> get _filteredNotifications {
+    List<NotificationModel.Notification> filtered = widget.controller.notifications;
+    
+    if (_selectedFilter != "All") {
+      filtered = filtered.where((n) {
+        final type = n.type;
+        if (type == null) return false;
+        switch (_selectedFilter) {
+          case "Mentions":
+            return type == 'message_sent';
+          case "Announcements":
+            return type == 'course_added' || type == 'course_published' || type == 'module_added';
+          case "System":
+            return type == 'enrollment_confirmed' || type == 'course_completed' || type == 'assignment_graded';
+          default:
+            return true;
+        }
+      }).toList();
     }
-    return _notifications.where((n) {
-      switch (_selectedFilter) {
-        case "Mentions":
-          return n['type'] == 'mention';
-        case "Announcements":
-          return n['type'] == 'announcement';
-        case "System":
-          return n['type'] == 'system';
-        default:
-          return true;
+    
+    // Sort by created_at (newest first)
+    filtered.sort((a, b) {
+      final aCreated = a.createdAt;
+      final bCreated = b.createdAt;
+      if (aCreated == null || bCreated == null) return 0;
+      try {
+        return DateTime.parse(bCreated).compareTo(DateTime.parse(aCreated));
+      } catch (e) {
+        return 0;
       }
-    }).toList();
+    });
+    
+    return filtered;
   }
 
-  void _markAllAsRead() {
-                setState(() {
-                  for (var notification in _notifications) {
-                    notification['isRead'] = true;
-                  }
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("All notifications marked as read"),
+  void _markAllAsRead() async {
+    await widget.controller.markAllAsRead();
+    setState(() {});
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("All notifications marked as read"),
         backgroundColor: primary,
-                    duration: Duration(seconds: 2),
-                  ),
-                );
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _markAsRead(NotificationModel.Notification notification) async {
+    if (notification.id != null) {
+      await widget.controller.markAsRead(notification.id!);
+      setState(() {});
+    }
+  }
+
+  void _deleteNotification(NotificationModel.Notification notification) async {
+    if (notification.id != null) {
+      await widget.controller.deleteNotification(notification.id!);
+      setState(() {});
+    }
   }
 
   @override
@@ -119,12 +108,17 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
         : (Colors.grey[600] ?? Colors.grey);
     final surfaceColor = isDark ? surfaceDark : Colors.white;
 
+    final filteredNotifications = _filteredNotifications;
+
     // Group notifications by date
-    final todayNotifications = _filteredNotifications
-        .where((n) => n['dateGroup'] == 'Today')
+    final todayNotifications = filteredNotifications
+        .where((n) => n.getDateGroup() == 'Today')
         .toList();
-    final yesterdayNotifications = _filteredNotifications
-        .where((n) => n['dateGroup'] == 'Yesterday')
+    final yesterdayNotifications = filteredNotifications
+        .where((n) => n.getDateGroup() == 'Yesterday')
+        .toList();
+    final olderNotifications = filteredNotifications
+        .where((n) => n.getDateGroup() != 'Today' && n.getDateGroup() != 'Yesterday')
         .toList();
 
     return Scaffold(
@@ -244,19 +238,19 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                         ),
                       );
                     }).toList(),
-              ),
+                  ),
+                ),
+              ],
             ),
-        ],
-      ),
           ),
           // Main Content
           Expanded(
-            child: _filteredNotifications.isEmpty
+            child: filteredNotifications.isEmpty
                 ? _buildEmptyState(textColor, secondaryTextColor, isDark)
-          : RefreshIndicator(
-              onRefresh: () async {
-                await Future.delayed(const Duration(seconds: 1));
-                setState(() {});
+                : RefreshIndicator(
+                    onRefresh: () async {
+                      await widget.controller.syncNotifications();
+                      setState(() {});
                     },
                     child: SingleChildScrollView(
                       child: Column(
@@ -271,7 +265,7 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                if (_notifications.any((n) => !n['isRead']))
+                                if (filteredNotifications.any((n) => n.isRead != true))
                                   TextButton.icon(
                                     onPressed: _markAllAsRead,
                                     icon: const Icon(Icons.done_all, size: 18),
@@ -343,6 +337,35 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                                   isDark,
                                 )),
                           ],
+                          // Older Section
+                          if (olderNotifications.isNotEmpty) ...[
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 16,
+                                right: 16,
+                                top: 16,
+                                bottom: 8,
+                              ),
+                              child: Text(
+                                "OLDER",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: secondaryTextColor,
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                            ),
+                            ...olderNotifications.map((notification) =>
+                                _buildNotificationItem(
+                                  notification,
+                                  bgColor,
+                                  surfaceColor,
+                                  textColor,
+                                  secondaryTextColor,
+                                  isDark,
+                                )),
+                          ],
                           const SizedBox(height: 20),
                         ],
                       ),
@@ -350,7 +373,7 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                   ),
           ),
         ],
-            ),
+      ),
     );
   }
 
@@ -400,20 +423,25 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
   }
 
   Widget _buildNotificationItem(
-    Map<String, dynamic> notification,
+    NotificationModel.Notification notification,
     Color bgColor,
     Color surfaceColor,
     Color textColor,
     Color secondaryTextColor,
     bool isDark,
   ) {
-    final isRead = notification['isRead'] as bool;
-    final hasAvatar = notification['avatar'] != null;
-    final icon = notification['icon'] as IconData?;
-    final iconColor = notification['iconColor'] as Color?;
+    final isRead = notification.isRead ?? false;
+    final icon = notification.getIcon();
+    final iconColor = notification.getIconColor();
+    
+    // Check if notification has avatar data (for message_sent type)
+    String? avatarUrl;
+    if (notification.type == 'message_sent' && notification.data != null) {
+      avatarUrl = notification.data!['sender_avatar'] ?? notification.data!['senderAvatar'];
+    }
 
     return Dismissible(
-      key: Key(notification['id']),
+      key: Key(notification.id ?? DateTime.now().toString()),
       direction: DismissDirection.endToStart,
       background: Container(
         alignment: Alignment.centerRight,
@@ -422,15 +450,11 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (direction) {
-        setState(() {
-          _notifications.removeWhere((n) => n['id'] == notification['id']);
-        });
+        _deleteNotification(notification);
       },
       child: InkWell(
         onTap: () {
-          setState(() {
-            notification['isRead'] = true;
-          });
+          _markAsRead(notification);
         },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -446,7 +470,7 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Icon/Avatar
-              if (hasAvatar)
+              if (avatarUrl != null && avatarUrl.isNotEmpty)
                 Stack(
                   children: [
                     Container(
@@ -455,7 +479,7 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         image: DecorationImage(
-                          image: NetworkImage(notification['avatar']),
+                          image: NetworkImage(getImageUrl(avatarUrl)),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -473,15 +497,11 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                           width: 16,
                           height: 16,
                           decoration: BoxDecoration(
-                            color: notification['type'] == 'mention'
-                                ? const Color(0xFF2196F3)
-                                : const Color(0xFFE91E63),
+                            color: iconColor,
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            notification['type'] == 'mention'
-                                ? Icons.chat_bubble
-                                : Icons.favorite,
+                            Icons.message,
                             size: 10,
                             color: Colors.white,
                           ),
@@ -491,19 +511,19 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                   ],
                 )
               else if (icon != null)
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                    color: iconColor!.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: iconColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
                     icon,
-                  color: iconColor,
-                  size: 24,
+                    color: iconColor,
+                    size: 24,
+                  ),
                 ),
-              ),
               const SizedBox(width: 16),
               // Content
               Expanded(
@@ -515,7 +535,7 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                       children: [
                         Expanded(
                           child: Text(
-                            notification['title'],
+                            stripHtmlTags(notification.title ?? ''),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: isRead
@@ -530,18 +550,18 @@ class _NotificationsPageState extends NyPage<NotificationsPage> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          notification['time'],
+                          notification.getFormattedTime(),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: isRead ? secondaryTextColor : primary,
                           ),
-                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      notification['message'],
+                      stripHtmlTags(notification.message ?? ''),
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,

@@ -64,97 +64,32 @@ class _IntroPageState extends NyPage<IntroPage> {
 
   @override
   Widget view(BuildContext context) {
-    print('INTRO: view() called - building IntroPage');
-    print('INTRO: context = $context');
-    print('INTRO: mounted = $mounted');
-
-    try {
-      // Return widget that prints when built
-      return Builder(
-        builder: (BuildContext ctx) {
-          print('INTRO: Builder.build() called - widget is being built!');
-          print('INTRO: Builder context = $ctx');
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            print('INTRO: PostFrameCallback - widget should be visible now');
+    return Scaffold(
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _currentPage = index;
           });
-
-          return Scaffold(
-            backgroundColor: Colors.green, // Bright color to verify visibility
-            body: SafeArea(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 300,
-                      height: 300,
-                      color: Colors.red,
-                      child: Center(
-                        child: Text(
-                          'INTRO PAGE\nTEST\nSUCCESS!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 32,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 40),
-                    Container(
-                      padding: EdgeInsets.all(20),
-                      color: Colors.blue,
-                      child: Text(
-                        'If you see this green/red/blue,\nthe page IS rendering!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
         },
-      );
-    } catch (e, st) {
-      print('INTRO: ERROR in view(): $e');
-      print(st);
-      return Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Error loading IntroPage: $e',
-                  style: TextStyle(color: Colors.red)),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => setState(() {}),
-                child: Text('Retry'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+        children: [
+          _buildScreen1(context),
+          _buildScreen2(context),
+          _buildScreen3(context),
+        ],
+      ),
+    );
   }
 
   // Screen 1: Light background - Empowering Agriculture
   Widget _buildScreen1(BuildContext context) {
-    print('INTRO: _buildScreen1 called');
     const primary = Color(0xFF3E6866);
     const secondary = Color(0xFF50C1AE);
 
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: Colors.white,
+      color: secondary.withValues(alpha: 0.1),
       child: SafeArea(
         child: Column(
           children: [
@@ -175,17 +110,13 @@ class _IntroPageState extends NyPage<IntroPage> {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(6.0),
-                          child: Image.asset(
-                            "logo-without.png",
+                          // FIX 1: Image() with AssetImage instead of Image.asset()
+                          child: Image(
+                            image: const AssetImage("logo-without.png"),
                             width: 28,
                             height: 28,
                             fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) {
-                              print('ERROR loading logo: $error');
-                              return Icon(Icons.image,
-                                  size: 28, color: primary);
-                            },
-                          ),
+                          ).localAsset(),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -402,7 +333,7 @@ class _IntroPageState extends NyPage<IntroPage> {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: Colors.white,
+      color: secondary.withValues(alpha: 0.1),
       child: SafeArea(
         child: Column(
           children: [
@@ -432,16 +363,13 @@ class _IntroPageState extends NyPage<IntroPage> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Image.asset(
-                        "logo-without.png",
+                      // FIX 2: Image() with AssetImage instead of Image.asset()
+                      Image(
+                        image: const AssetImage("logo-without.png"),
                         width: 24,
                         height: 24,
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          print('ERROR loading logo: $error');
-                          return Icon(Icons.image, size: 24, color: primary);
-                        },
-                      ),
+                      ).localAsset(),
                       const SizedBox(width: 4),
                       Text(
                         "Agrisiti",
@@ -1018,7 +946,7 @@ class _IntroPageState extends NyPage<IntroPage> {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: Colors.white,
+      color: secondary.withValues(alpha: 0.1),
       child: SafeArea(
         child: Column(
           children: [
@@ -1035,16 +963,13 @@ class _IntroPageState extends NyPage<IntroPage> {
                       color: primary.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
-                    child: Image.asset(
-                      "logo-without.png",
+                    // FIX 3: Image() with AssetImage instead of Image.asset()
+                    child: Image(
+                      image: const AssetImage("logo-without.png"),
                       width: 28,
                       height: 28,
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        print('ERROR loading logo: $error');
-                        return Icon(Icons.image, size: 28, color: primary);
-                      },
-                    ),
+                    ).localAsset(),
                   ),
                   TextButton(
                     onPressed: _skipIntro,
@@ -1107,21 +1032,15 @@ class _IntroPageState extends NyPage<IntroPage> {
                                     color:
                                         backgroundDark.withValues(alpha: 0.6),
                                     child: Center(
-                                      child: Image.asset(
-                                        "logo-without.png",
+                                      // FIX 4: Image() with AssetImage instead of Image.asset()
+                                      child: Image(
+                                        image: const AssetImage(
+                                            "logo-without.png"),
                                         height: 200,
                                         width: 200,
                                         color:
                                             Colors.white.withValues(alpha: 0.2),
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          print('ERROR loading logo: $error');
-                                          return Icon(Icons.image,
-                                              size: 200,
-                                              color: Colors.white
-                                                  .withValues(alpha: 0.2));
-                                        },
-                                      ),
+                                      ).localAsset(),
                                     ),
                                   ),
                                 ),

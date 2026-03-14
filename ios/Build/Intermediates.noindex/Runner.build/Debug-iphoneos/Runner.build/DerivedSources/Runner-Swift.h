@@ -307,28 +307,16 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 #if defined(__OBJC__)
 
 @class UIApplication;
-@class UISceneSession;
-@class UISceneConnectionOptions;
-@class UISceneConfiguration;
+@protocol FlutterImplicitEngineBridge;
 SWIFT_CLASS("_TtC6Runner11AppDelegate")
-@interface AppDelegate : FlutterAppDelegate
+@interface AppDelegate : FlutterAppDelegate <FlutterImplicitEngineDelegate>
 - (BOOL)application:(UIApplication * _Nonnull)application didFinishLaunchingWithOptions:(NSDictionary<UIApplicationLaunchOptionsKey, id> * _Nullable)launchOptions SWIFT_WARN_UNUSED_RESULT;
-- (UISceneConfiguration * _Nonnull)application:(UIApplication * _Nonnull)application configurationForConnectingSceneSession:(UISceneSession * _Nonnull)connectingSceneSession options:(UISceneConnectionOptions * _Nonnull)options SWIFT_WARN_UNUSED_RESULT SWIFT_AVAILABILITY(ios,introduced=13.0);
-- (void)application:(UIApplication * _Nonnull)application didDiscardSceneSessions:(NSSet<UISceneSession *> * _Nonnull)sceneSessions SWIFT_AVAILABILITY(ios,introduced=13.0);
+- (void)didInitializeImplicitFlutterEngine:(id <FlutterImplicitEngineBridge> _Nonnull)engineBridge;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
-@class UIWindow;
-@class UIScene;
-SWIFT_CLASS("_TtC6Runner13SceneDelegate") SWIFT_AVAILABILITY(ios,introduced=13.0)
-@interface SceneDelegate : UIResponder <UIWindowSceneDelegate>
-@property (nonatomic, strong) UIWindow * _Nullable window;
-- (void)scene:(UIScene * _Nonnull)scene willConnectToSession:(UISceneSession * _Nonnull)session options:(UISceneConnectionOptions * _Nonnull)connectionOptions;
-- (void)sceneDidDisconnect:(UIScene * _Nonnull)scene;
-- (void)sceneDidBecomeActive:(UIScene * _Nonnull)scene;
-- (void)sceneWillResignActive:(UIScene * _Nonnull)scene;
-- (void)sceneWillEnterForeground:(UIScene * _Nonnull)scene;
-- (void)sceneDidEnterBackground:(UIScene * _Nonnull)scene;
+SWIFT_CLASS("_TtC6Runner13SceneDelegate")
+@interface SceneDelegate : FlutterSceneDelegate
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 

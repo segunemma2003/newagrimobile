@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:nylo_framework/nylo_framework.dart';
 import '/app/forms/login_form.dart';
 import '/app/controllers/login_controller.dart';
-import '/config/keys.dart';
+import '/app/helpers/storage_helper.dart';
 import '/resources/pages/register_page.dart';
 
 class LoginPage extends NyStatefulWidget<LoginController> {
@@ -54,7 +54,7 @@ class _LoginPageState extends NyPage<LoginPage> {
           }
         }
         // Also check Backpack (session storage) as fallback
-        var backpackAuth = backpackRead(Keys.auth);
+        var backpackAuth = safeReadAuthData();
         if (backpackAuth != null) {
           routeTo("/main");
         }

@@ -26,6 +26,9 @@ import '/resources/pages/notification_settings_page.dart';
 import '/resources/pages/notifications_page.dart';
 import '/resources/pages/language_settings_page.dart';
 import '/resources/pages/contact_admin_page.dart';
+import '/resources/pages/courses_page.dart';
+import '/resources/pages/explore_page.dart';
+import '/resources/pages/settings_page.dart';
 import '/routes/guards/auth_route_guard.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
@@ -47,12 +50,8 @@ import 'package:nylo_framework/nylo_framework.dart';
 |-------------------------------------------------------------------------- */
 
 appRouter() => nyRoutes((router) {
-      print('ROUTER: Setting WelcomePage as initial route');
-      router
-          .add(WelcomePage.path)
-          .initialRoute(); // TEMP: Test if WelcomePage works
-      print('ROUTER: WelcomePage path = ${WelcomePage.path}');
-      router.add(IntroPage.path);
+      router.add(IntroPage.path).initialRoute();
+      router.add(WelcomePage.path);
       router.add(LoginPage.path);
       router.add(RegisterPage.path);
       router.add(ForgotPasswordPage.path);
@@ -64,6 +63,10 @@ appRouter() => nyRoutes((router) {
                 "route_guards": [AuthRouteGuard()],
               }, (router) {
         router.add(MainNavigationPage.path);
+        // Main navigation pages
+        router.add(CoursesPage.path);
+        router.add(ExplorePage.path);
+        router.add(SettingsPage.path);
         // Detail pages that should be navigated to from main nav
         router.add(CourseDetailPage.path);
         router.add(LessonDetailPage.path);

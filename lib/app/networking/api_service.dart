@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:dio/dio.dart';
 import '/config/decoders.dart';
 import '/config/keys.dart';
+import '/app/services/offline_queue_service.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 /* ApiService
@@ -56,6 +59,7 @@ class ApiService extends NyApiService {
     required String password,
     required String passwordConfirmation,
     String? phone,
+    String? location,
   }) async {
     final data = {
       "name": name,
@@ -66,6 +70,10 @@ class ApiService extends NyApiService {
 
     if (phone != null && phone.isNotEmpty) {
       data["phone"] = phone;
+    }
+
+    if (location != null && location.isNotEmpty) {
+      data["location"] = location;
     }
 
     return await network(
@@ -87,9 +95,15 @@ class ApiService extends NyApiService {
   }
 
   /// Update profile - PUT /user/profile
+  /// Queues request when offline
   Future updateProfile(Map<String, dynamic> data) async {
-    return await network(
-      request: (request) => request.put("/user/profile", data: data),
+    return await _requestWithOfflineQueue(
+      method: 'PUT',
+      endpoint: '/user/profile',
+      data: data,
+      onlineRequest: () => network(
+        request: (request) => request.put("/user/profile", data: data),
+      ),
     );
   }
 
@@ -581,14 +595,21 @@ class ApiService extends NyApiService {
 
   /// Complete quiz - POST /courses/{course_id}/modules/{module_id}/tests/{test_id}/complete-quiz
   /// Authentication: Required
+  /// Queues request when offline
   Future completeQuiz({
     required String courseId,
     required String moduleId,
     required String testId,
   }) async {
-    return await network(
-      request: (request) => request.post(
-        "/courses/$courseId/modules/$moduleId/tests/$testId/complete-quiz",
+    return await _requestWithOfflineQueue(
+      method: 'POST',
+      endpoint:
+          '/courses/$courseId/modules/$moduleId/tests/$testId/complete-quiz',
+      data: null,
+      onlineRequest: () => network(
+        request: (request) => request.post(
+          "/courses/$courseId/modules/$moduleId/tests/$testId/complete-quiz",
+        ),
       ),
     );
   }
@@ -625,16 +646,23 @@ class ApiService extends NyApiService {
   /// Submit test - POST /courses/{course_id}/modules/{module_id}/tests/{test_id}/submit
   /// Authentication: Required
   /// Request body: {"answers": {"1": "B", "2": "A", "3": "true"}}
+  /// Queues request when offline
   Future submitTest({
     required String courseId,
     required String moduleId,
     required String testId,
     required Map<String, dynamic> answers,
   }) async {
-    return await network(
-      request: (request) => request.post(
-        "/courses/$courseId/modules/$moduleId/tests/$testId/submit",
-        data: {"answers": answers},
+    final submitData = {"answers": answers};
+    return await _requestWithOfflineQueue(
+      method: 'POST',
+      endpoint: '/courses/$courseId/modules/$moduleId/tests/$testId/submit',
+      data: submitData,
+      onlineRequest: () => network(
+        request: (request) => request.post(
+          "/courses/$courseId/modules/$moduleId/tests/$testId/submit",
+          data: submitData,
+        ),
       ),
     );
   }
@@ -642,6 +670,7 @@ class ApiService extends NyApiService {
   /// Submit topic test - POST /courses/{course_id}/modules/{module_id}/topics/{topic_id}/tests/{test_id}/submit
   /// Authentication: Required
   /// Request body: {"answers": {"1": "option_a", "2": "option_b"}}
+  /// Queues request when offline
   Future submitTopicTest({
     required String courseId,
     required String moduleId,
@@ -649,10 +678,17 @@ class ApiService extends NyApiService {
     required String testId,
     required Map<String, dynamic> answers,
   }) async {
-    return await network(
-      request: (request) => request.post(
-        "/courses/$courseId/modules/$moduleId/topics/$topicId/tests/$testId/submit",
-        data: {"answers": answers},
+    final submitData = {"answers": answers};
+    return await _requestWithOfflineQueue(
+      method: 'POST',
+      endpoint:
+          '/courses/$courseId/modules/$moduleId/topics/$topicId/tests/$testId/submit',
+      data: submitData,
+      onlineRequest: () => network(
+        request: (request) => request.post(
+          "/courses/$courseId/modules/$moduleId/topics/$topicId/tests/$testId/submit",
+          data: submitData,
+        ),
       ),
     );
   }
@@ -697,9 +733,15 @@ class ApiService extends NyApiService {
   }
 
   /// Create note - POST /notes
+  /// Queues request when offline
   Future createNote(Map<String, dynamic> data) async {
-    return await network(
-      request: (request) => request.post("/notes", data: data),
+    return await _requestWithOfflineQueue(
+      method: 'POST',
+      endpoint: '/notes',
+      data: data,
+      onlineRequest: () => network(
+        request: (request) => request.post("/notes", data: data),
+      ),
     );
   }
 
@@ -807,19 +849,27 @@ class ApiService extends NyApiService {
   /// Add lesson/topic comment - POST /courses/{course_id}/topics/{topic_id}/comments
   /// Authentication: Required
   /// Request body: {"comment": "Great lesson!", "parent_id": null}
+  /// Queues request when offline
   Future addLessonComment(
     String courseId,
     String topicId, {
     required String comment,
     int? parentId,
   }) async {
-    return await network(
-      request: (request) => request.post(
-        "/courses/$courseId/topics/$topicId/comments",
-        data: {
-          "comment": comment,
-          if (parentId != null) "parent_id": parentId,
-        },
+    final commentData = {
+      "comment": comment,
+      if (parentId != null) "parent_id": parentId,
+    };
+
+    return await _requestWithOfflineQueue(
+      method: 'POST',
+      endpoint: '/courses/$courseId/topics/$topicId/comments',
+      data: commentData,
+      onlineRequest: () => network(
+        request: (request) => request.post(
+          "/courses/$courseId/topics/$topicId/comments",
+          data: commentData,
+        ),
       ),
     );
   }
@@ -854,6 +904,46 @@ class ApiService extends NyApiService {
   }
 
   // ==================== Utility Methods ====================
+
+  /// Check if device is online
+  Future<bool> _isOnline() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    return connectivityResult != ConnectivityResult.none;
+  }
+
+  /// Make API request with offline queue support
+  /// If offline, queues the request and throws an exception with a user-friendly message
+  Future<T> _requestWithOfflineQueue<T>({
+    required String method,
+    required String endpoint,
+    Map<String, dynamic>? data,
+    required Future<T> Function() onlineRequest,
+    bool queueWhenOffline = true,
+  }) async {
+    final isOnline = await _isOnline();
+
+    if (!isOnline && queueWhenOffline) {
+      // Queue the request for later
+      final queueService = OfflineQueueService();
+      await queueService.queueRequest(
+        method: method,
+        endpoint: endpoint,
+        data: data,
+      );
+
+      // Throw exception with user-friendly message
+      throw Exception(
+          'No internet connection. Your request has been queued and will be sent when you\'re back online.');
+    }
+
+    if (!isOnline && !queueWhenOffline) {
+      throw Exception(
+          'No internet connection. Please check your network and try again.');
+    }
+
+    // Make the request
+    return await onlineRequest();
+  }
 
   /// Download course video with progress tracking
   Future downloadVideo(String videoUrl, String savePath,
@@ -915,4 +1005,165 @@ class ApiService extends NyApiService {
   //  // Save the new token
   //   await Keys.bearerToken.save(response['token']);
   // }
+
+  // ==================== Notifications Endpoints ====================
+
+  /// Get notifications - GET /notifications
+  /// Authentication: Required
+  /// Query Parameters: unread_only (boolean), type (string), per_page (integer), page (integer)
+  Future fetchNotifications({
+    bool? unreadOnly,
+    String? type,
+    int? perPage,
+    int? page,
+  }) async {
+    final queryParams = <String, dynamic>{};
+    if (unreadOnly != null) queryParams['unread_only'] = unreadOnly;
+    if (type != null) queryParams['type'] = type;
+    if (perPage != null) queryParams['per_page'] = perPage;
+    if (page != null) queryParams['page'] = page;
+
+    return await network(
+      request: (request) => request.get(
+        "/notifications",
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+      ),
+      cacheKey: "notifications_${unreadOnly}_${type}_${page}",
+      cacheDuration: const Duration(minutes: 2),
+    );
+  }
+
+  /// Get unread count - GET /notifications/unread-count
+  /// Authentication: Required
+  Future fetchUnreadCount() async {
+    return await network(
+      request: (request) => request.get("/notifications/unread-count"),
+      cacheKey: "notifications_unread_count",
+      cacheDuration: const Duration(minutes: 1),
+    );
+  }
+
+  /// Get single notification - GET /notifications/{notification}
+  /// Authentication: Required
+  /// Automatically marks the notification as read when viewed
+  Future fetchNotification(String notificationId) async {
+    return await network(
+      request: (request) => request.get("/notifications/$notificationId"),
+      cacheKey: "notification_$notificationId",
+      cacheDuration: const Duration(minutes: 5),
+    );
+  }
+
+  /// Mark notification as read - PUT /notifications/{notification}/read
+  /// Authentication: Required
+  Future markNotificationAsRead(String notificationId) async {
+    return await network(
+      request: (request) => request.put("/notifications/$notificationId/read"),
+    );
+  }
+
+  /// Mark all notifications as read - PUT /notifications/read-all
+  /// Authentication: Required
+  Future markAllNotificationsAsRead() async {
+    return await network(
+      request: (request) => request.put("/notifications/read-all"),
+    );
+  }
+
+  /// Delete notification - DELETE /notifications/{notification}
+  /// Authentication: Required
+  Future deleteNotification(String notificationId) async {
+    return await network(
+      request: (request) => request.delete("/notifications/$notificationId"),
+    );
+  }
+
+  /// Delete all read notifications - DELETE /notifications/read/all
+  /// Authentication: Required
+  Future deleteAllReadNotifications() async {
+    return await network(
+      request: (request) => request.delete("/notifications/read/all"),
+    );
+  }
+
+  // ==================== Community / Forum Endpoints ====================
+
+  /// List forum posts - GET /forum/posts
+  Future fetchForumPosts(
+      {String? search, String? category, String? sort}) async {
+    final query = <String, dynamic>{};
+    if (search != null && search.isNotEmpty) query['search'] = search;
+    if (category != null && category.isNotEmpty) query['category'] = category;
+    if (sort != null && sort.isNotEmpty) query['sort'] = sort;
+
+    return await network(
+      request: (request) => request.get(
+        "/forum/posts",
+        queryParameters: query.isNotEmpty ? query : null,
+      ),
+    );
+  }
+
+  /// Create forum post - POST /forum/posts
+  /// Supports optional image upload via multipart/form-data.
+  Future createForumPost({
+    String? category,
+    required String content,
+    String? imagePath,
+  }) async {
+    final formData = FormData.fromMap({
+      "category": category,
+      "content": content,
+      if (imagePath != null)
+        "image": await MultipartFile.fromFile(imagePath, filename: "post.jpg"),
+    });
+
+    return await network(
+      request: (request) => request.post(
+        "/forum/posts",
+        data: formData,
+        options: Options(
+          contentType: 'multipart/form-data',
+        ),
+      ),
+    );
+  }
+
+  /// Get comments for a post - GET /forum/posts/{post}/comments
+  Future fetchForumComments(String postId) async {
+    return await network(
+      request: (request) => request.get("/forum/posts/$postId/comments"),
+    );
+  }
+
+  /// Add comment to post - POST /forum/posts/{post}/comments
+  Future addForumComment(String postId, String content,
+      {String? parentId}) async {
+    final data = {
+      "content": content,
+      if (parentId != null) "parent_id": parentId,
+    };
+    return await network(
+      request: (request) =>
+          request.post("/forum/posts/$postId/comments", data: data),
+    );
+  }
+
+  /// Toggle like on a post - POST /forum/posts/{post}/like
+  Future toggleForumPostLike(String postId, bool like) async {
+    return await network(
+      request: (request) =>
+          request.post("/forum/posts/$postId/like", data: {"like": like}),
+    );
+  }
+
+  /// Toggle like on a comment - POST /forum/comments/{comment}/like
+  Future toggleForumCommentLike(String commentId, bool like) async {
+    return await network(
+      request: (request) => request.post(
+        "/forum/comments/$commentId/like",
+        data: {"like": like},
+      ),
+    );
+  }
 }

@@ -1,8 +1,13 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
+import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 import '/app/models/message.dart';
 import '/app/models/chat_message.dart';
 import '/app/networking/api_service.dart';
+import '/app/services/pusher_service.dart';
+import '/app/helpers/text_helper.dart';
+import '/app/helpers/image_helper.dart';
 import '/config/keys.dart';
 
 class ChatDetailPage extends NyStatefulWidget {
@@ -47,14 +52,150 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
             }
           }
           // Also check if course_id and recipient_id are passed directly
-          if (data['course_id'] != null) _courseId = data['course_id']?.toString();
-          if (data['recipient_id'] != null) _recipientId = data['recipient_id']?.toString();
+          if (data['course_id'] != null)
+            _courseId = data['course_id']?.toString();
+          if (data['recipient_id'] != null)
+            _recipientId = data['recipient_id']?.toString();
         }
         _messageController = TextEditingController();
         await _loadCurrentUser();
         await _loadMessages();
         _scrollToBottom();
+
+        // Initialize Pusher for real-time messaging
+        await _initializePusher();
       };
+
+  Future<void> _initializePusher() async {
+    if (_courseId == null || _currentUserId == null) {
+      return;
+    }
+
+    try {
+      final pusherService = PusherService.getInstance();
+
+      // Initialize and connect to Pusher
+      await pusherService.initialize();
+      await pusherService.connect();
+
+      // Subscribe to private channel for this conversation
+      // Channel name format: private-course.{courseId}.user.{userId}
+      final channelName = 'private-course.$_courseId.user.$_currentUserId';
+      await pusherService.subscribePrivate(channelName);
+
+      // Listen for new messages
+      pusherService.bind(channelName, 'message-sent', (event) {
+        _handleNewMessage(event);
+      });
+
+      // Listen for message read receipts
+      pusherService.bind(channelName, 'message-read', (event) {
+        _handleMessageRead(event);
+      });
+
+      print('Pusher initialized for channel: $channelName');
+    } catch (e) {
+      print('Error initializing Pusher: $e');
+      // Continue without real-time updates if Pusher fails
+    }
+  }
+
+  void _handleNewMessage(PusherEvent event) {
+    try {
+      // Parse event data - could be JSON string or Map
+      dynamic messageData;
+      if (event.data is String) {
+        try {
+          messageData = jsonDecode(event.data);
+        } catch (e) {
+          print('Error parsing Pusher event data: $e');
+          return;
+        }
+      } else {
+        messageData = event.data;
+      }
+
+      if (messageData == null) return;
+
+      // Check if this message is for this conversation
+      final senderId = messageData['sender_id']?.toString();
+      final recipientId = messageData['recipient_id']?.toString();
+
+      if ((senderId == _recipientId && recipientId == _currentUserId) ||
+          (senderId == _currentUserId && recipientId == _recipientId)) {
+        // This message belongs to this conversation
+        final chatMsg = ChatMessage()
+          ..id = messageData['id']?.toString() ??
+              DateTime.now().millisecondsSinceEpoch.toString()
+          ..conversationId = _conversation?.id ?? '${_courseId}-$_recipientId'
+          ..senderId = senderId
+          ..senderName = messageData['sender']?['name'] ??
+              messageData['sender_name'] ??
+              'Unknown'
+          ..senderAvatar =
+              messageData['sender']?['avatar'] ?? messageData['sender_avatar']
+          ..content = messageData['message'] ?? messageData['subject'] ?? ''
+          ..timestamp = messageData['created_at'] != null
+              ? DateTime.tryParse(messageData['created_at'].toString())
+              : DateTime.now()
+          ..isSent = senderId == _currentUserId
+          ..isRead = messageData['is_read'] ?? false
+          ..type = 'text';
+
+        // Check if message already exists
+        final exists = _messages.any((m) => m.id == chatMsg.id);
+        if (!exists) {
+          setState(() {
+            _messages.add(chatMsg);
+            // Sort by timestamp
+            _messages.sort((a, b) {
+              final aTime = a.timestamp ?? DateTime(2000);
+              final bTime = b.timestamp ?? DateTime(2000);
+              return aTime.compareTo(bTime);
+            });
+          });
+          _scrollToBottom();
+        }
+      }
+    } catch (e) {
+      print('Error handling new message from Pusher: $e');
+    }
+  }
+
+  void _handleMessageRead(PusherEvent event) {
+    try {
+      // Parse event data
+      dynamic data;
+      if (event.data is String) {
+        try {
+          data = jsonDecode(event.data);
+        } catch (e) {
+          print('Error parsing Pusher read event data: $e');
+          return;
+        }
+      } else {
+        data = event.data;
+      }
+
+      if (data == null) return;
+
+      final messageId =
+          data['message_id']?.toString() ?? data['id']?.toString();
+      if (messageId != null) {
+        setState(() {
+          final message = _messages.firstWhere(
+            (m) => m.id == messageId,
+            orElse: () => ChatMessage(),
+          );
+          if (message.id != null) {
+            message.isRead = true;
+          }
+        });
+      }
+    } catch (e) {
+      print('Error handling message read from Pusher: $e');
+    }
+  }
 
   Future<void> _loadCurrentUser() async {
     try {
@@ -86,7 +227,8 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
       );
 
       if (response != null) {
-        final messagesData = response is List ? response : (response['data'] ?? []);
+        final messagesData =
+            response is List ? response : (response['data'] ?? []);
         _messages = [];
 
         for (var msgData in messagesData) {
@@ -103,9 +245,11 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
 
             final chatMsg = ChatMessage()
               ..id = msgData['id']?.toString()
-              ..conversationId = _conversation?.id ?? '${_courseId}-$_recipientId'
+              ..conversationId =
+                  _conversation?.id ?? '${_courseId}-$_recipientId'
               ..senderId = senderId
-              ..senderName = otherUser?['name'] ?? (isSent ? _currentUserName : 'Unknown')
+              ..senderName =
+                  otherUser?['name'] ?? (isSent ? _currentUserName : 'Unknown')
               ..senderAvatar = otherUser?['avatar']
               ..content = msgData['message'] ?? msgData['subject'] ?? ''
               ..timestamp = msgData['created_at'] != null
@@ -121,7 +265,8 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
             if (!isSent && msgData['is_read'] == false) {
               try {
                 await api<ApiService>(
-                  (request) => request.markMessageAsRead(msgData['id']?.toString() ?? ''),
+                  (request) => request
+                      .markMessageAsRead(msgData['id']?.toString() ?? ''),
                 );
               } catch (e) {
                 print('Error marking message as read: $e');
@@ -154,8 +299,11 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
   }
 
   Future<void> _sendMessage() async {
-    if (_courseId == null || _recipientId == null || _messageController == null || 
-        _messageController!.text.trim().isEmpty || _currentUserId == null) {
+    if (_courseId == null ||
+        _recipientId == null ||
+        _messageController == null ||
+        _messageController!.text.trim().isEmpty ||
+        _currentUserId == null) {
       return;
     }
 
@@ -272,13 +420,39 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
     } else if (messageDate == today.subtract(const Duration(days: 1))) {
       return 'Yesterday';
     } else {
-      final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      final months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+      ];
       return '${months[dateTime.month - 1]} ${dateTime.day}, ${dateTime.year}';
     }
   }
 
   @override
   void dispose() {
+    // Cleanup Pusher subscriptions
+    if (_courseId != null && _currentUserId != null) {
+      try {
+        final pusherService = PusherService.getInstance();
+        final channelName = 'private-course.$_courseId.user.$_currentUserId';
+        pusherService.unbind(channelName, 'message-sent');
+        pusherService.unbind(channelName, 'message-read');
+        pusherService.unsubscribe(channelName);
+      } catch (e) {
+        print('Error cleaning up Pusher: $e');
+      }
+    }
+
     _messageController?.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -313,7 +487,8 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
-                    image: NetworkImage(_conversation!.senderAvatar!),
+                    image:
+                        NetworkImage(getImageUrl(_conversation!.senderAvatar!)),
                     fit: BoxFit.cover,
                     onError: (_, __) {},
                   ),
@@ -359,7 +534,8 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                 // Messages List
                 Expanded(
                   child: _isLoading
-                      ? Center(child: CircularProgressIndicator(color: secondary))
+                      ? Center(
+                          child: CircularProgressIndicator(color: secondary))
                       : ListView.builder(
                           controller: _scrollController,
                           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -384,7 +560,8 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                               children: [
                                 if (showDateDivider)
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 8),
                                     child: Text(
                                       _formatDate(message.timestamp),
                                       style: TextStyle(
@@ -428,7 +605,9 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200],
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.1)
+                                : Colors.grey[200],
                             borderRadius: BorderRadius.circular(24),
                           ),
                           child: TextField(
@@ -438,7 +617,8 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                               hintText: "Type a message",
                               hintStyle: TextStyle(color: secondaryTextColor),
                               border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 10),
                             ),
                             maxLines: null,
                             textCapitalization: TextCapitalization.sentences,
@@ -455,7 +635,8 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                           child: Container(
                             width: 48,
                             height: 48,
-                            child: const Icon(Icons.send, color: Colors.white, size: 20),
+                            child: const Icon(Icons.send,
+                                color: Colors.white, size: 20),
                           ),
                         ),
                       ),
@@ -491,7 +672,7 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                   shape: BoxShape.circle,
                   image: _conversation!.senderAvatar != null && _conversation!.senderAvatar!.isNotEmpty
                       ? DecorationImage(
-                          image: NetworkImage(_conversation!.senderAvatar!),
+                          image: NetworkImage(getImageUrl(_conversation!.senderAvatar!)),
                           fit: BoxFit.cover,
                           onError: (_, __) {},
                         )
@@ -707,7 +888,8 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       child: Row(
-        mainAxisAlignment: isSent ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isSent ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isSent) ...[
@@ -716,18 +898,21 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
               height: 32,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                image: message.senderAvatar != null && message.senderAvatar!.isNotEmpty
+                image: message.senderAvatar != null &&
+                        message.senderAvatar!.isNotEmpty
                     ? DecorationImage(
-                        image: NetworkImage(message.senderAvatar!),
+                        image: NetworkImage(getImageUrl(message.senderAvatar!)),
                         fit: BoxFit.cover,
                         onError: (_, __) {},
                       )
                     : null,
-                color: message.senderAvatar == null || message.senderAvatar!.isEmpty
+                color: message.senderAvatar == null ||
+                        message.senderAvatar!.isEmpty
                     ? primary.withValues(alpha: 0.2)
                     : null,
               ),
-              child: message.senderAvatar == null || message.senderAvatar!.isEmpty
+              child:
+                  message.senderAvatar == null || message.senderAvatar!.isEmpty
                   ? Center(
                       child: Text(
                         (message.senderName ?? 'U')[0].toUpperCase(),
@@ -747,8 +932,12 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: isSent
-                    ? (isDark ? secondary.withValues(alpha: 0.3) : sentMessageColor)
-                    : (isDark ? Colors.white.withValues(alpha: 0.1) : receivedMessageColor),
+                    ? (isDark
+                        ? secondary.withValues(alpha: 0.3)
+                        : sentMessageColor)
+                    : (isDark
+                        ? Colors.white.withValues(alpha: 0.1)
+                        : receivedMessageColor),
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(8),
                   topRight: const Radius.circular(8),
@@ -770,7 +959,7 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                     ),
                   if (!isSent) const SizedBox(height: 2),
                   Text(
-                    message.content ?? '',
+                    stripHtmlTags(message.content ?? ''),
                     style: TextStyle(
                       fontSize: 14,
                       color: isSent

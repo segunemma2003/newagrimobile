@@ -8,11 +8,7 @@ import '/resources/pages/main_navigation_page.dart';
 class WelcomePage extends NyStatefulWidget {
   static RouteView path = ("/welcome", (_) => WelcomePage());
 
-  WelcomePage({super.key})
-      : super(child: () {
-          print('WELCOME: WelcomePage constructor called');
-          return _WelcomePageState();
-        });
+  WelcomePage({super.key}) : super(child: () => _WelcomePageState());
 }
 
 class _WelcomePageState extends NyPage<WelcomePage> {
@@ -26,21 +22,6 @@ class _WelcomePageState extends NyPage<WelcomePage> {
 
   @override
   Widget view(BuildContext context) {
-    print('WELCOME: view() called');
-    // TEMP: Simple test
-    return Scaffold(
-      backgroundColor: Colors.purple,
-      body: Center(
-        child: Text(
-          'WELCOME PAGE TEST\nIf you see this, routing works!',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 32, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-
-    /* ORIGINAL CODE (commented for testing):
     // Color scheme
     const primary = Color(0xFF3E6866);
     const secondary = Color(0xFF50C1AE);
@@ -315,6 +296,5 @@ class _WelcomePageState extends NyPage<WelcomePage> {
         ),
       ),
     );
-    */
   }
 }

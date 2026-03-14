@@ -1,0 +1,10 @@
+framework module pusher_channels_flutter {
+  umbrella header "pusher_channels_flutter-umbrella.h"
+
+  export *
+  module * { export * }
+}
+
+module pusher_channels_flutter.__Swift {
+  exclude header "pusher_channels_flutter-Swift.h"
+}

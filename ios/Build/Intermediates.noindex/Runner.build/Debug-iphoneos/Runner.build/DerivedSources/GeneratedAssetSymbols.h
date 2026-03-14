@@ -9,7 +9,4 @@
 /// The "LaunchImage" asset catalog image resource.
 static NSString * const ACImageNameLaunchImage AC_SWIFT_PRIVATE = @"LaunchImage";
 
-/// The "icon" asset catalog image resource.
-static NSString * const ACImageNameIcon AC_SWIFT_PRIVATE = @"icon";
-
 #undef AC_SWIFT_PRIVATE

@@ -18,6 +18,7 @@ class RegisterController extends NyController {
         form.data()['password_confirmation'] ??
         form.data()['passwordConfirmation'];
     final phoneRaw = form.data()['Phone'] ?? form.data()['phone'];
+    final locationRaw = form.data()['Location'] ?? form.data()['location'];
 
     if (nameRaw == null ||
         emailRaw == null ||
@@ -37,6 +38,7 @@ class RegisterController extends NyController {
     final password = passwordRaw.toString().trim();
     final passwordConfirmation = passwordConfirmationRaw.toString().trim();
     final phone = phoneRaw != null ? phoneRaw.toString().trim() : null;
+    final location = locationRaw != null ? locationRaw.toString().trim() : null;
 
     // Validate passwords match
     if (password != passwordConfirmation) {
@@ -59,6 +61,7 @@ class RegisterController extends NyController {
           password: password,
           passwordConfirmation: passwordConfirmation,
           phone: phone,
+          location: location,
         ),
       ) as Map<String, dynamic>?;
 

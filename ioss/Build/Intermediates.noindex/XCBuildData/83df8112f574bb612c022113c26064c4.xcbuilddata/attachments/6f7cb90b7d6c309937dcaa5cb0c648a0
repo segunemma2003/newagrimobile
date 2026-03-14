@@ -1,0 +1,19 @@
+{
+  "" : {
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/app_badge_plus.build/Objects-normal/arm64/app_badge_plus-primary.dia",
+    "emit-module-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/app_badge_plus.build/Objects-normal/arm64/app_badge_plus-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/app_badge_plus.build/Objects-normal/arm64/app_badge_plus-primary-emit-module.dia",
+    "pch" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/app_badge_plus.build/Objects-normal/arm64/app_badge_plus-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/app_badge_plus.build/Objects-normal/arm64/app_badge_plus-primary.swiftdeps"
+  },
+  "/Users/mac/.pub-cache/hosted/pub.dev/app_badge_plus-1.2.3/ios/app_badge_plus/Source/app_badge_plus/AppBadgePlusPlugin.swift" : {
+    "const-values" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/app_badge_plus.build/Objects-normal/arm64/AppBadgePlusPlugin.swiftconstvalues",
+    "dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/app_badge_plus.build/Objects-normal/arm64/AppBadgePlusPlugin.d",
+    "diagnostics" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/app_badge_plus.build/Objects-normal/arm64/AppBadgePlusPlugin.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphoneos/app_badge_plus.build/Objects-normal/arm64/AppBadgePlusPlugin.o",
+    "llvm-bc" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/app_badge_plus.build/Objects-normal/arm64/AppBadgePlusPlugin.bc",
+    "object" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/app_badge_plus.build/Objects-normal/arm64/AppBadgePlusPlugin.o",
+    "swift-dependencies" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/app_badge_plus.build/Objects-normal/arm64/AppBadgePlusPlugin.swiftdeps",
+    "swiftmodule" : "/Users/mac/Projects/agrisiti_mobile/ios/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/app_badge_plus.build/Objects-normal/arm64/AppBadgePlusPlugin~partial.swiftmodule"
+  }
+}
