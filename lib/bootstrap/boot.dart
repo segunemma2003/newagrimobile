@@ -4,6 +4,7 @@ import '/resources/widgets/splash_screen.dart';
 import '/bootstrap/app.dart';
 import '/config/providers.dart';
 import '/app/services/data_sync_service.dart';
+import '/app/services/message_notification_service.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 /* Boot
@@ -52,6 +53,11 @@ class Boot {
       // Initialize offline sync service (non-blocking)
       DataSyncService().initializeSync().catchError((e) {
         print('Error initializing sync service: $e');
+      });
+
+      // Initialize message notification service (non-blocking)
+      MessageNotificationService().initialize().catchError((e) {
+        print('Error initializing message notification service: $e');
       });
 
       runApp(Main(nylo));

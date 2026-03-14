@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
+import 'package:flutter_html/flutter_html.dart';
 import '/app/models/message.dart';
 import '/app/models/chat_message.dart';
 import '/app/networking/api_service.dart';
 import '/app/services/pusher_service.dart';
-import '/app/helpers/text_helper.dart';
 import '/app/helpers/image_helper.dart';
-import '/config/keys.dart';
+import '/app/helpers/storage_helper.dart';
 
 class ChatDetailPage extends NyStatefulWidget {
   static RouteView path = ("/chat-detail", (_) => ChatDetailPage());
@@ -25,6 +25,8 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
   String? _currentUserAvatar;
   String? _courseId;
   String? _recipientId;
+  String? _recipientName;
+  String? _recipientAvatar;
   final ScrollController _scrollController = ScrollController();
   bool _isLoading = true;
 
@@ -52,10 +54,18 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
             }
           }
           // Also check if course_id and recipient_id are passed directly
-          if (data['course_id'] != null)
+          if (data['courseId'] != null)
+            _courseId = data['courseId']?.toString();
+          else if (data['course_id'] != null)
             _courseId = data['course_id']?.toString();
-          if (data['recipient_id'] != null)
+          if (data['recipientId'] != null)
+            _recipientId = data['recipientId']?.toString();
+          else if (data['recipient_id'] != null)
             _recipientId = data['recipient_id']?.toString();
+          if (data['recipientName'] != null)
+            _recipientName = data['recipientName']?.toString();
+          if (data['recipientAvatar'] != null)
+            _recipientAvatar = data['recipientAvatar']?.toString();
         }
         _messageController = TextEditingController();
         await _loadCurrentUser();
@@ -155,6 +165,9 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
             });
           });
           _scrollToBottom();
+          
+          // Don't show notification if we're already in this chat
+          // (notification service will handle it for other cases)
         }
       }
     } catch (e) {
@@ -179,16 +192,16 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
 
       if (data == null) return;
 
-      final messageId =
-          data['message_id']?.toString() ?? data['id']?.toString();
+      // Handle both direct message object and message_id
+      final messageId = data['id']?.toString() ?? 
+                       data['message_id']?.toString() ?? 
+                       data['message']?['id']?.toString();
+      
       if (messageId != null) {
         setState(() {
-          final message = _messages.firstWhere(
-            (m) => m.id == messageId,
-            orElse: () => ChatMessage(),
-          );
-          if (message.id != null) {
-            message.isRead = true;
+          final messageIndex = _messages.indexWhere((m) => m.id == messageId);
+          if (messageIndex != -1) {
+            _messages[messageIndex].isRead = true;
           }
         });
       }
@@ -199,7 +212,7 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
 
   Future<void> _loadCurrentUser() async {
     try {
-      final userData = await Keys.auth.read<Map<String, dynamic>>();
+      final userData = safeReadAuthData();
       _currentUserId = userData?['id']?.toString();
       _currentUserName = userData?['name']?.toString() ?? 'You';
       _currentUserAvatar = userData?['avatar']?.toString();
@@ -221,7 +234,8 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
     });
 
     try {
-      // Fetch course messages from API
+      // For location-based messaging (course_id = 0), fetch messages differently
+      // For now, we'll use a generic endpoint or filter client-side
       final response = await api<ApiService>(
         (request) => request.fetchCourseMessages(_courseId!),
       );
@@ -242,6 +256,15 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
             final sender = msgData['sender'];
             final recipient = msgData['recipient'];
             final otherUser = isSent ? recipient : sender;
+
+            // Store recipient info for header
+            if (!isSent && sender != null) {
+              _recipientName = sender['name'] ?? _conversation?.senderName ?? 'Unknown';
+              _recipientAvatar = sender['avatar'] ?? _conversation?.senderAvatar;
+            } else if (isSent && recipient != null) {
+              _recipientName = recipient['name'] ?? _conversation?.senderName ?? 'Unknown';
+              _recipientAvatar = recipient['avatar'] ?? _conversation?.senderAvatar;
+            }
 
             final chatMsg = ChatMessage()
               ..id = msgData['id']?.toString()
@@ -274,6 +297,12 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
             }
           }
         }
+        
+        // If recipient info not found in messages, use conversation data
+        if (_recipientName == null && _conversation != null) {
+          _recipientName = _conversation!.senderName;
+          _recipientAvatar = _conversation!.senderAvatar;
+        }
 
         // Sort by timestamp
         _messages.sort((a, b) {
@@ -285,6 +314,9 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
         setState(() {
           _isLoading = false;
         });
+        
+        // Scroll to bottom after messages are loaded
+        _scrollToBottom();
       } else {
         setState(() {
           _isLoading = false;
@@ -309,6 +341,9 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
 
     final messageText = _messageController!.text.trim();
     _messageController!.clear();
+    
+    // Dismiss keyboard
+    FocusScope.of(context).unfocus();
 
     // Optimistically add message to UI
     final tempMessage = ChatMessage()
@@ -341,13 +376,17 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
       );
 
       if (response != null) {
-        // Update message with real ID from server
+        // Update message with real ID and read status from server
         final msgData = response is Map ? response : response['data'];
         if (msgData != null && msgData['id'] != null) {
-          tempMessage.id = msgData['id']?.toString();
-          tempMessage.timestamp = msgData['created_at'] != null
+          final messageIndex = _messages.indexWhere((m) => m.id == tempMessage.id);
+          if (messageIndex != -1) {
+            _messages[messageIndex].id = msgData['id']?.toString();
+            _messages[messageIndex].timestamp = msgData['created_at'] != null
               ? DateTime.tryParse(msgData['created_at'].toString())
               : DateTime.now();
+            _messages[messageIndex].isRead = msgData['is_read'] ?? false;
+          }
         }
         setState(() {});
       }
@@ -479,29 +518,58 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
         ),
         title: Row(
           children: [
-            if (_conversation?.senderAvatar != null)
               Container(
                 width: 40,
                 height: 40,
                 margin: const EdgeInsets.only(right: 12),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image:
-                        NetworkImage(getImageUrl(_conversation!.senderAvatar!)),
+                image: (_recipientAvatar != null && _recipientAvatar!.isNotEmpty)
+                    ? DecorationImage(
+                        image: NetworkImage(getImageUrl(_recipientAvatar!)),
                     fit: BoxFit.cover,
                     onError: (_, __) {},
-                  ),
-                ),
+                      )
+                    : null,
+                color: (_recipientAvatar == null || _recipientAvatar!.isEmpty)
+                    ? Colors.white.withValues(alpha: 0.2)
+                    : null,
+              ),
+              child: (_recipientAvatar == null || _recipientAvatar!.isEmpty)
+                  ? Center(
+                      child: Text(
+                        (_recipientName ?? 'U')[0].toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    )
+                  : null,
               ),
             Expanded(
-              child: Text(
-                _conversation?.senderName ?? "Chat",
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _recipientName ?? _conversation?.senderName ?? "Chat",
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
+                  ),
+                  if (_conversation?.senderType != null)
+                    Text(
+                      _conversation!.senderType == 'instructor' ? 'Instructor' : 'Student',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                ],
               ),
             ),
           ],
@@ -536,6 +604,36 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                   child: _isLoading
                       ? Center(
                           child: CircularProgressIndicator(color: secondary))
+                      : _messages.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.chat_bubble_outline,
+                                    size: 64,
+                                    color: secondaryTextColor.withValues(alpha: 0.5),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    "No messages yet",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: secondaryTextColor,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    "Start the conversation!",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: secondaryTextColor.withValues(alpha: 0.7),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
                       : ListView.builder(
                           controller: _scrollController,
                           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -613,6 +711,13 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                           child: TextField(
                             controller: _messageController,
                             style: TextStyle(color: textColor),
+                            textInputAction: TextInputAction.send,
+                            onSubmitted: (value) async {
+                              if (value.trim().isNotEmpty) {
+                                await _sendMessage();
+                                FocusScope.of(context).unfocus();
+                              }
+                            },
                             decoration: InputDecoration(
                               hintText: "Type a message",
                               hintStyle: TextStyle(color: secondaryTextColor),
@@ -958,14 +1063,11 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                       ),
                     ),
                   if (!isSent) const SizedBox(height: 2),
-                  Text(
-                    stripHtmlTags(message.content ?? ''),
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: isSent
-                          ? (isDark ? Colors.white : const Color(0xFF111B21))
-                          : textColor,
-                    ),
+                  _buildMessageContent(
+                    message.content ?? '',
+                    isSent,
+                    isDark,
+                    textColor,
                   ),
                   const SizedBox(height: 4),
                   Row(
@@ -981,7 +1083,9 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                       if (isSent) ...[
                         const SizedBox(width: 4),
                         Icon(
-                          message.isRead == true ? Icons.done_all : Icons.done,
+                          message.isRead == true 
+                              ? Icons.done_all 
+                              : Icons.done,
                           size: 14,
                           color: message.isRead == true
                               ? (isDark ? secondary : Colors.blue)
@@ -994,9 +1098,49 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
               ),
             ),
           ),
-          if (isSent) const SizedBox(width: 36),
+          if (isSent) const SizedBox(width: 8),
+          if (!isSent) const SizedBox(width: 36),
         ],
       ),
     );
+  }
+
+  Widget _buildMessageContent(String content, bool isSent, bool isDark, Color textColor) {
+    // Check if content contains HTML tags
+    final hasHtml = content.contains('<') && 
+                    (content.contains('</') || content.contains('/>'));
+    
+    if (hasHtml) {
+      return Html(
+        data: content,
+        style: {
+          "body": Style(
+            fontSize: FontSize(14),
+            color: isSent
+                ? (isDark ? Colors.white : const Color(0xFF111B21))
+                : textColor,
+            margin: Margins.zero,
+            padding: HtmlPaddings.zero,
+          ),
+          "p": Style(
+            margin: Margins.only(bottom: 4),
+            padding: HtmlPaddings.zero,
+          ),
+          "br": Style(
+            height: Height(4),
+          ),
+        },
+      );
+    } else {
+      return Text(
+        content,
+        style: TextStyle(
+          fontSize: 14,
+          color: isSent
+              ? (isDark ? Colors.white : const Color(0xFF111B21))
+              : textColor,
+        ),
+      );
+    }
   }
 }

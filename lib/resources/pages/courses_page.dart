@@ -96,8 +96,11 @@ class _CoursesPageState extends NyPage<CoursesPage> {
     final textColor = isDark ? Colors.white : Colors.grey[900];
     final secondaryTextColor = isDark ? Colors.grey[400] : Colors.grey[500];
 
-    final userName = _userData?['name']?.toString() ?? "Alex Rivers";
-    final firstName = userName.split(' ').first;
+    final userName = _userData?['name']?.toString();
+    final displayName = (userName != null && userName.trim().isNotEmpty) 
+        ? userName.trim() 
+        : "User";
+    final firstName = displayName.split(' ').first;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -176,7 +179,7 @@ class _CoursesPageState extends NyPage<CoursesPage> {
                             ),
                           ),
                           Text(
-                            userName,
+                            displayName,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,

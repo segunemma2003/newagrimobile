@@ -1,4 +1,0 @@
-
-module flutter_inappwebview_ios.__Swift {
-  exclude header "flutter_inappwebview_ios-Swift.h"
-}

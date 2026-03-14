@@ -59,7 +59,7 @@ class _TermsConditionsPageState extends NyPage<TermsConditionsPage> {
                   ),
                   const SizedBox(height: 4),
                   const Text(
-                    "October 2024",
+                    "January 2026",
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,

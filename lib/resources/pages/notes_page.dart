@@ -76,14 +76,43 @@ class _NotesPageState extends NyPage<NotesPage> {
       Map<String, dynamic> response;
 
       // Prefer the most specific scope available
-      if (lesson != null && module != null) {
-        // Lesson/topic-level notes
-        response = await api.fetchLessonNotes(
-          course!.id!,
-          module!.id!.toString(),
-          lesson!.id!.toString(),
-        );
-      } else if (module != null) {
+      if (lesson != null && lesson!.id != null) {
+        // Lesson/topic-level notes - need module ID
+        if (module != null && module!.id != null) {
+          response = await api.fetchLessonNotes(
+            course!.id!,
+            module!.id!.toString(),
+            lesson!.id!.toString(),
+          );
+        } else {
+          // If module is not provided, try to find it from course
+          if (course!.modules != null) {
+            Module? foundModule;
+            for (var mod in course!.modules!) {
+              if (mod.lessons != null) {
+                final hasLesson = mod.lessons!.any((l) => l.id == lesson!.id);
+                if (hasLesson) {
+                  foundModule = mod;
+                  break;
+                }
+              }
+            }
+            if (foundModule != null && foundModule.id != null) {
+              response = await api.fetchLessonNotes(
+                course!.id!,
+                foundModule.id!.toString(),
+                lesson!.id!.toString(),
+              );
+            } else {
+              // Fallback to course notes if module not found
+              response = await api.fetchCourseNotes(course!.id!);
+            }
+          } else {
+            // Fallback to course notes
+            response = await api.fetchCourseNotes(course!.id!);
+          }
+        }
+      } else if (module != null && module!.id != null) {
         // Module-level notes
         response = await api.fetchModuleNotes(
           course!.id!,
@@ -118,7 +147,7 @@ class _NotesPageState extends NyPage<NotesPage> {
       // Merge API notes into local list (avoid duplicates by id)
       final existingIds =
           _allNotes.map((n) => n.id).whereType<String>().toSet();
-      final merged = List<Note>.from(_allNotes);
+      var merged = List<Note>.from(_allNotes);
       for (final note in apiNotes) {
         if (note.id != null && existingIds.contains(note.id)) {
           // Replace existing note with API version
@@ -127,6 +156,15 @@ class _NotesPageState extends NyPage<NotesPage> {
         } else {
           merged.add(note);
         }
+      }
+
+      // Filter by lesson if provided (after merging API notes)
+      if (lesson != null && lesson!.id != null) {
+        merged = merged.where((n) => n.lessonId == lesson!.id).toList();
+      }
+      // Filter by course if provided
+      if (course != null && course!.id != null) {
+        merged = merged.where((n) => n.courseId == course!.id).toList();
       }
 
       // Sort merged notes by updated/created date

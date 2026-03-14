@@ -307,11 +307,45 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
             request.fetchCourseReviews(course!.id!, perPage: 20, page: 1),
       );
 
-      if (response != null && response['data'] is List) {
-        final List<dynamic> data = response['data'];
-        _reviews = data.map((r) => Review.fromJson(r)).toList();
+      // Handle different response formats
+      List<dynamic>? reviewsData;
+      if (response != null) {
+        // Check if response has 'data' key (could be List or Map with pagination)
+        if (response['data'] != null) {
+          if (response['data'] is List) {
+            reviewsData = response['data'] as List<dynamic>;
+          } else if (response['data'] is Map &&
+              response['data']['data'] is List) {
+            // Paginated response
+            reviewsData = response['data']['data'] as List<dynamic>;
+          }
+        } else if (response is List) {
+          // Direct list response
+          reviewsData = response as List<dynamic>;
+        }
+
+        print('Reviews API response format: ${response.runtimeType}');
+        print('Reviews data found: ${reviewsData?.length ?? 0} reviews');
+      }
+
+      if (reviewsData != null && reviewsData.isNotEmpty) {
+        _reviews = reviewsData
+            .map((r) {
+              try {
+                return Review.fromJson(r);
+              } catch (e) {
+                print('Error parsing review: $e, data: $r');
+                return null;
+              }
+            })
+            .whereType<Review>()
+            .toList();
+        print('Successfully parsed ${_reviews.length} reviews');
       } else if (course?.reviews != null && course!.reviews!.isNotEmpty) {
         _reviews = List.from(course!.reviews!);
+        print('Using reviews from course object: ${_reviews.length} reviews');
+      } else {
+        print('No reviews found in API response or course object');
       }
 
       // Sort by creation date (newest first)

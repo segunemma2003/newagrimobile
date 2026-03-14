@@ -107,6 +107,25 @@ class ApiService extends NyApiService {
     );
   }
 
+  /// Upload avatar - POST /user/profile/avatar
+  /// Uploads profile picture image file
+  Future uploadAvatar(String imagePath) async {
+    final file = await MultipartFile.fromFile(
+      imagePath,
+      filename: imagePath.split('/').last,
+    );
+
+    return await network(
+      request: (request) => request.post(
+        "/user/profile/avatar",
+        data: FormData.fromMap({'avatar': file}),
+        options: Options(
+          contentType: 'multipart/form-data',
+        ),
+      ),
+    );
+  }
+
   /// Change password - PUT /user/password
   Future changePassword({
     required String currentPassword,
@@ -802,7 +821,17 @@ class ApiService extends NyApiService {
   // ==================== Messages Endpoints ====================
 
   /// Get course messages - GET /courses/{course_id}/messages
+  /// For location-based messaging (course_id = 0), use GET /messages?course_id=0
   Future fetchCourseMessages(String courseId) async {
+    if (courseId == "0") {
+      // Location-based messaging
+      return await network(
+        request: (request) =>
+            request.get("/messages", queryParameters: {"course_id": "0"}),
+        cacheKey: "location_messages",
+        cacheDuration: const Duration(minutes: 5),
+      );
+    }
     return await network(
       request: (request) => request.get("/courses/$courseId/messages"),
       cacheKey: "course_messages_$courseId",
@@ -830,6 +859,26 @@ class ApiService extends NyApiService {
   Future markMessageAsRead(String messageId) async {
     return await network(
       request: (request) => request.put("/messages/$messageId/read"),
+    );
+  }
+
+  /// Get facilitators by location - GET /facilitators
+  /// Returns facilitators in the user's location
+  Future fetchFacilitators() async {
+    return await network(
+      request: (request) => request.get("/facilitators"),
+      cacheKey: "facilitators",
+      cacheDuration: const Duration(minutes: 10),
+    );
+  }
+
+  /// Get all instructors - GET /instructors
+  /// Returns all tutors and facilitators
+  Future fetchInstructors() async {
+    return await network(
+      request: (request) => request.get("/instructors"),
+      cacheKey: "instructors",
+      cacheDuration: const Duration(minutes: 10),
     );
   }
 
@@ -1164,6 +1213,13 @@ class ApiService extends NyApiService {
         "/forum/comments/$commentId/like",
         data: {"like": like},
       ),
+    );
+  }
+
+  /// Share a post - POST /forum/posts/{post}/share
+  Future shareForumPost(String postId) async {
+    return await network(
+      request: (request) => request.post("/forum/posts/$postId/share"),
     );
   }
 }

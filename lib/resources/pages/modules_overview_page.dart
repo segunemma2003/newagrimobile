@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
+import 'package:flutter_html/flutter_html.dart';
 import '/app/models/course.dart';
 import '/app/models/module.dart';
 import '/app/models/lesson.dart';
@@ -235,8 +236,8 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
               final isCompleted = module.isCompleted == true;
               final testPassed = module.testPassed == true ||
                   (testScore != null && testScore >= 80);
-              final isLocked =
-                  (course?.isEnrolled == true) ? false : (module.isLocked == true);
+              // No locking - all modules are accessible
+              final isLocked = false;
 
               return _buildModuleCard(
                 module,
@@ -290,7 +291,9 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
           color: isDark ? surfaceDark : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.grey[200]!,
             width: 1,
           ),
           boxShadow: [
@@ -312,25 +315,21 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
                   height: 48,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isLocked
-                        ? Colors.grey.withValues(alpha: 0.1)
-                        : (isCompleted
-                            ? accent.withValues(alpha: 0.2)
-                            : accent.withValues(alpha: 0.1)),
+                    color: isCompleted
+                        ? accent.withValues(alpha: 0.2)
+                        : accent.withValues(alpha: 0.1),
                   ),
                   child: Center(
-                    child: isLocked
-                        ? Icon(Icons.lock, color: Colors.grey, size: 24)
-                        : (isCompleted
-                            ? Icon(Icons.check, color: accent, size: 24)
-                            : Text(
-                                moduleNumber.toString().padLeft(2, '0'),
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: accent,
-                                ),
-                              )),
+                    child: isCompleted
+                        ? Icon(Icons.check, color: accent, size: 24)
+                        : Text(
+                            moduleNumber.toString().padLeft(2, '0'),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: accent,
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -346,38 +345,18 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
-                                color: isLocked ? Colors.grey : textColor,
+                                color: textColor,
                               ),
                             ),
                           ),
-                          if (isLocked)
-                            Container(
-                              margin: const EdgeInsets.only(left: 8),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.orange.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                "Locked",
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.orange,
-                                ),
-                              ),
-                            ),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        isLocked
-                            ? "Complete previous module with 80% to unlock"
-                            : "${module.totalLessons ?? module.lessons?.length ?? 0} Lessons",
+                        "${module.totalLessons ?? module.lessons?.length ?? 0} Lessons",
                         style: TextStyle(
                           fontSize: 14,
-                          color: isLocked ? Colors.orange : secondaryTextColor,
+                          color: secondaryTextColor,
                         ),
                       ),
                     ],
@@ -423,8 +402,9 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
             // Progress Bar
             LinearProgressIndicator(
               value: isLocked ? 0 : (progress / 100),
-              backgroundColor:
-                  isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200],
+              backgroundColor: isDark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.grey[200],
               valueColor: AlwaysStoppedAnimation<Color>(
                 isLocked ? Colors.grey : accent,
               ),
@@ -436,8 +416,9 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color:
-                      isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[50],
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : Colors.grey[50],
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isDark
@@ -570,9 +551,13 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
                       () {
                         // Launch VR experience
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("VR Experience launching..."),
+                          SnackBar(
+                            content: const Text(
+                              "VR Experience launching...",
+                              style: TextStyle(color: Colors.white),
+                            ),
                             backgroundColor: accent,
+                            duration: const Duration(seconds: 2),
                           ),
                         );
                       },
@@ -789,24 +774,19 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       itemCount: lessons.length,
                       itemBuilder: (context, index) {
-                      final lesson = lessons[index];
-                      final isLocked = (course.isEnrolled == true)
-                          ? false
-                          : (lesson.isLocked == true);
+                        final lesson = lessons[index];
                         final isCompleted = lesson.isCompleted == true;
 
                         return InkWell(
-                          onTap: isLocked
-                              ? null
-                              : () {
-                                  Navigator.pop(context);
-                                  routeTo(LessonDetailPage.path, data: {
-                                    "lesson": lesson,
-                                    "course": course,
-                                    "module": module,
-                                    "isEnrolled": course.isEnrolled == true,
-                                  });
-                                },
+                          onTap: () {
+                            Navigator.pop(context);
+                            routeTo(LessonDetailPage.path, data: {
+                              "lesson": lesson,
+                              "course": course,
+                              "module": module,
+                              "isEnrolled": course.isEnrolled == true,
+                            });
+                          },
                           borderRadius: BorderRadius.circular(12),
                           child: Container(
                             margin: const EdgeInsets.only(bottom: 12),
@@ -828,29 +808,22 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
                                   height: 40,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: isLocked
-                                        ? (isDark
-                                            ? Colors.white.withValues(alpha: 0.05)
-                                            : Colors.grey[200])
-                                        : (isCompleted
-                                            ? accent.withValues(alpha: 0.2)
-                                            : accent.withValues(alpha: 0.1)),
+                                    color: isCompleted
+                                        ? accent.withValues(alpha: 0.2)
+                                        : accent.withValues(alpha: 0.1),
                                   ),
                                   child: Center(
-                                    child: isLocked
-                                        ? Icon(Icons.lock,
-                                            size: 18, color: secondaryTextColor)
-                                        : isCompleted
-                                            ? Icon(Icons.check_circle,
-                                                size: 20, color: accent)
-                                            : Text(
-                                                "${index + 1}",
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: accent,
-                                                ),
-                                              ),
+                                    child: isCompleted
+                                        ? Icon(Icons.check_circle,
+                                            size: 20, color: accent)
+                                        : Text(
+                                            "${index + 1}",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w700,
+                                              color: accent,
+                                            ),
+                                          ),
                                   ),
                                 ),
                                 const SizedBox(width: 16),
@@ -865,21 +838,16 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,
-                                          color: isLocked
-                                              ? secondaryTextColor
-                                              : textColor,
+                                          color: textColor,
                                         ),
                                       ),
-                                      if (lesson.description != null) ...[
+                                      if (lesson.description != null &&
+                                          lesson.description!.isNotEmpty) ...[
                                         const SizedBox(height: 4),
-                                        Text(
+                                        _buildHtmlDescription(
                                           lesson.description!,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: secondaryTextColor,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
+                                          secondaryTextColor,
+                                          isDark,
                                         ),
                                       ],
                                     ],
@@ -887,8 +855,7 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
                                 ),
                                 Icon(
                                   Icons.chevron_right,
-                                  color:
-                                      isLocked ? secondaryTextColor : textColor,
+                                  color: textColor,
                                 ),
                               ],
                             ),
@@ -930,5 +897,78 @@ class _ModulesOverviewPageState extends NyPage<ModulesOverviewPage> {
         ),
       ),
     );
+  }
+
+  Widget _buildHtmlDescription(
+      String htmlString, Color textColor, bool isDark) {
+    // Check if content contains HTML tags
+    final hasHtml = htmlString.contains('<') &&
+        (htmlString.contains('</') || htmlString.contains('/>'));
+
+    if (hasHtml) {
+      return Html(
+        data: htmlString,
+        style: {
+          "body": Style(
+            fontSize: FontSize(12),
+            color: textColor,
+            lineHeight: LineHeight(1.4),
+            margin: Margins.zero,
+            padding: HtmlPaddings.zero,
+          ),
+          "p": Style(
+            margin: Margins.only(bottom: 4),
+            padding: HtmlPaddings.zero,
+          ),
+          "h1": Style(
+            fontSize: FontSize(14),
+            fontWeight: FontWeight.bold,
+            margin: Margins.only(bottom: 4),
+          ),
+          "h2": Style(
+            fontSize: FontSize(13),
+            fontWeight: FontWeight.bold,
+            margin: Margins.only(bottom: 4),
+          ),
+          "h3": Style(
+            fontSize: FontSize(12),
+            fontWeight: FontWeight.bold,
+            margin: Margins.only(bottom: 4),
+          ),
+          "ul": Style(
+            padding: HtmlPaddings.only(left: 16),
+            margin: Margins.only(bottom: 4),
+          ),
+          "ol": Style(
+            padding: HtmlPaddings.only(left: 16),
+            margin: Margins.only(bottom: 4),
+          ),
+          "li": Style(
+            margin: Margins.only(bottom: 2),
+          ),
+          "strong": Style(
+            fontWeight: FontWeight.bold,
+          ),
+          "em": Style(
+            fontStyle: FontStyle.italic,
+          ),
+          "br": Style(
+            height: Height(4),
+          ),
+        },
+      );
+    } else {
+      // If no HTML tags, just display as plain text
+      return Text(
+        htmlString,
+        style: TextStyle(
+          fontSize: 12,
+          color: textColor,
+          height: 1.4,
+        ),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
   }
 }

@@ -1,0 +1,4 @@
+
+module NWWebSocket.__Swift {
+  exclude header "NWWebSocket-Swift.h"
+}

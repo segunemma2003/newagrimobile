@@ -131,36 +131,87 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
   }
 
   Future<void> _toggleLike(ForumPost post) async {
-    setState(() {
-      post.isLiked = !(post.isLiked ?? false);
-      if (post.isLiked == true) {
-        post.likes = (post.likes ?? 0) + 1;
-      } else {
-        post.likes = (post.likes ?? 0) - 1;
-        if (post.likes! < 0) post.likes = 0;
-      }
-    });
+    if (post.id == null) return;
 
-    // Save to storage
+    final originalLikeState = post.isLiked ?? false;
+    final like = !originalLikeState;
+
     try {
-      final postsJson = _posts.map((p) => p.toJson()).toList();
-      await Keys.forumPosts.save(postsJson);
+      final api = ApiService();
+      final response = await api.toggleForumPostLike(post.id!, like);
+      final updatedPost = ForumPost.fromJson(response['data'] ?? response);
+
+      setState(() {
+        final index = _posts.indexWhere((p) => p.id == post.id);
+        if (index != -1) {
+          _posts[index] = updatedPost;
+        }
+      });
+
+      // Save to storage
+      try {
+        final postsJson = _posts.map((p) => p.toJson()).toList();
+        await Keys.forumPosts.save(postsJson);
+      } catch (e) {
+        print('Error saving posts: $e');
+      }
     } catch (e) {
-      print('Error saving posts: $e');
+      print('Error toggling post like: $e');
+      // Revert UI change on error
+      setState(() {
+        post.isLiked = originalLikeState;
+        if (post.isLiked == true) {
+          post.likes = (post.likes ?? 0) + 1;
+        } else {
+          post.likes = (post.likes ?? 0) - 1;
+          if (post.likes! < 0) post.likes = 0;
+        }
+      });
     }
   }
 
   Future<void> _sharePost(ForumPost post) async {
-    try {
-      await Share.share(
-        '${post.content}\n\nShared from Agrisiti Community Forum',
-        subject: 'Post by ${post.userName}',
-      );
-      setState(() {
-        post.shares = (post.shares ?? 0) + 1;
-      });
+    if (post.id == null) return;
 
-      // Optionally sync shares count with backend in future
+    try {
+      // Share using native share dialog
+      try {
+        await Share.share(
+          stripHtmlTags(post.content ?? ''),
+          subject: 'Post by ${post.userName}',
+        );
+      } catch (e) {
+        // Handle iOS sharePositionOrigin error gracefully
+        print('Share dialog error (non-critical): $e');
+      }
+
+      // Call API to increment share count
+      try {
+        final api = ApiService();
+        final response = await api.shareForumPost(post.id!);
+        final updatedPost = ForumPost.fromJson(response['data'] ?? response);
+
+        setState(() {
+          final index = _posts.indexWhere((p) => p.id == post.id);
+          if (index != -1) {
+            _posts[index].shares = updatedPost.shares ?? post.shares;
+          }
+        });
+
+        // Save to storage
+        try {
+          final postsJson = _posts.map((p) => p.toJson()).toList();
+          await Keys.forumPosts.save(postsJson);
+        } catch (e) {
+          print('Error saving posts: $e');
+        }
+      } catch (e) {
+        print('Error updating share count: $e');
+        // Still update UI locally if API fails
+        setState(() {
+          post.shares = (post.shares ?? 0) + 1;
+        });
+      }
     } catch (e) {
       print('Error sharing post: $e');
     }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '/resources/widgets/safearea_widget.dart';
-import '/app/networking/api_service.dart';
 
 class ContactAdminPage extends NyStatefulWidget {
   static RouteView path = ("/contact-admin", (_) => ContactAdminPage());
@@ -10,10 +10,6 @@ class ContactAdminPage extends NyStatefulWidget {
 }
 
 class _ContactAdminPageState extends NyPage<ContactAdminPage> {
-  final TextEditingController _subjectController = TextEditingController();
-  final TextEditingController _messageController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-
   @override
   Widget view(BuildContext context) {
     return Scaffold(
@@ -38,222 +34,168 @@ class _ContactAdminPageState extends NyPage<ContactAdminPage> {
       body: SafeAreaWidget(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF0F7F3),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFF2D8659).withValues(alpha: 0.2)),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.info_outline, color: Color(0xFF2D8659), size: 20),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          "Kana da tambaya ko buƙatar taimako? Aiko mana sako kuma zamu amsa muku nan ba da jimawa ba.",
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF2D8659),
-                            height: 1.4,
-                          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0F7F3),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFF2D8659).withValues(alpha: 0.2)),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Color(0xFF2D8659), size: 20),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        "Kana da tambaya ko buƙatar taimako? Tuntuɓi mu ta WhatsApp kuma zamu amsa muku nan ba da jimawa ba.",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF2D8659),
+                          height: 1.4,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 24),
-                // Subject Field
-                Text(
-                  "Jigo",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A1A),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _subjectController,
-                  decoration: InputDecoration(
-                    hintText: "Shigar da jigo",
-                    hintStyle: TextStyle(color: Colors.grey[400]),
-                    prefixIcon: const Icon(Icons.subject, color: Color(0xFF2D8659)),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFE5E5E5)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFE5E5E5)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFF2D8659), width: 2),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Da fatan za a shigar da jigo';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20),
-                // Message Field
-                Text(
-                  "Sako",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A1A),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _messageController,
-                  maxLines: 8,
-                  decoration: InputDecoration(
-                    hintText: "Shigar da sakonku...",
-                    hintStyle: TextStyle(color: Colors.grey[400]),
-                    alignLabelWithHint: true,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFE5E5E5)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFE5E5E5)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFF2D8659), width: 2),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.all(16),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Da fatan za a shigar da sako';
-                    }
-                    if (value.trim().length < 10) {
-                      return 'Sako dole ne ya kasance aƙalla haruffa 10';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 32),
-                // Send Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (!_formKey.currentState!.validate()) return;
-
-                      final subject = _subjectController.text.trim();
-                      final body = _messageController.text.trim();
-
-                      try {
-                        // Use messages API to send a message to admin/tutor
-                        await api<ApiService>(
-                          (request) => request.sendMessage({
-                            // No specific course context here, so use 0 or a special support course id if defined
-                            "course_id": 0,
-                            // Assume recipient_id 1 is admin in backend (can be adjusted if you have a specific admin user id)
-                            "recipient_id": 1,
-                            "subject": subject.isNotEmpty ? subject : "Support Request",
-                            "message": body,
-                          }),
-                        );
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                                "An aika sakonku zuwa ga admin. Zamu amsa muku nan ba da jimawa ba."),
-                            backgroundColor: Color(0xFF2D8659),
-                          ),
-                        );
-                        _subjectController.clear();
-                        _messageController.clear();
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("An kasa aika sakon: $e"),
-                            backgroundColor: Colors.redAccent,
-                          ),
-                        );
+              ),
+              const SizedBox(height: 32),
+              // Contact via WhatsApp Button
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    // Open WhatsApp with the phone number
+                    final phoneNumber = '447907853788'; // Remove + for WhatsApp URL
+                    final Uri whatsappUri = Uri.parse('https://wa.me/$phoneNumber');
+                    
+                    try {
+                      if (await canLaunchUrl(whatsappUri)) {
+                        await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
+                      } else {
+                        // Fallback: try alternative WhatsApp URL format
+                        final Uri altWhatsappUri = Uri.parse('whatsapp://send?phone=$phoneNumber');
+                        if (await canLaunchUrl(altWhatsappUri)) {
+                          await launchUrl(altWhatsappUri, mode: LaunchMode.externalApplication);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "WhatsApp is not installed. Please install WhatsApp to contact admin.",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2D8659),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      elevation: 0,
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            "Could not open WhatsApp: $e",
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Colors.redAccent,
+                        ),
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.chat, color: Colors.white),
+                  label: const Text(
+                    "Tuntuɓi Admin ta WhatsApp",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
                     ),
-                    child: const Text(
-                      "Aika Sako",
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF25D366), // WhatsApp green
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Contact Information
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFFE5E5E5)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Wasu Hanyoyin Tuntuɓar Mu",
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1A1A1A),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 16),
+                    _buildContactItem(
+                      icon: Icons.email_outlined,
+                      title: "Imel",
+                      value: "info@agrisiti.com",
+                      onTap: () async {
+                        final Uri emailUri = Uri(
+                          scheme: 'mailto',
+                          path: 'info@agrisiti.com',
+                        );
+                        if (await canLaunchUrl(emailUri)) {
+                          await launchUrl(emailUri);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Could not open email client"),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    _buildContactItem(
+                      icon: Icons.phone_outlined,
+                      title: "Wayar",
+                      value: "+447907853788",
+                      onTap: () async {
+                        final Uri phoneUri = Uri(
+                          scheme: 'tel',
+                          path: '+447907853788',
+                        );
+                        if (await canLaunchUrl(phoneUri)) {
+                          await launchUrl(phoneUri);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Could not open phone dialer"),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    _buildContactItem(
+                      icon: Icons.access_time_outlined,
+                      title: "Lokacin Amsa",
+                      value: "Yawanci cikin sa'o'i 24",
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 24),
-                // Contact Information
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFE5E5E5)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Wasu Hanyoyin Tuntuɓar Mu",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF1A1A1A),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildContactItem(
-                        icon: Icons.email_outlined,
-                        title: "Imel",
-                        value: "tallafi@agrisiti.com",
-                      ),
-                      const SizedBox(height: 12),
-                      _buildContactItem(
-                        icon: Icons.phone_outlined,
-                        title: "Wayar",
-                        value: "+234 123 456 7890",
-                      ),
-                      const SizedBox(height: 12),
-                      _buildContactItem(
-                        icon: Icons.access_time_outlined,
-                        title: "Lokacin Amsa",
-                        value: "Yawanci cikin sa'o'i 24",
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -264,34 +206,51 @@ class _ContactAdminPageState extends NyPage<ContactAdminPage> {
     required IconData icon,
     required String title,
     required String value,
+    VoidCallback? onTap,
   }) {
-    return Row(
-      children: [
-        Icon(icon, color: const Color(0xFF2D8659), size: 20),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
           children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF999999),
-              ),
+            Icon(icon, color: const Color(0xFF2D8659), size: 20),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF999999),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: onTap != null 
+                        ? const Color(0xFF2D8659) 
+                        : const Color(0xFF1A1A1A),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 2),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF1A1A1A),
+            if (onTap != null) ...[
+              const Spacer(),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 14,
+                color: Colors.grey[400],
               ),
-            ),
+            ],
           ],
         ),
-      ],
+      ),
     );
   }
 }
-

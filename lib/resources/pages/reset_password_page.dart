@@ -616,9 +616,12 @@ class _ResetPasswordPageState extends NyPage<ResetPasswordPage> {
     });
 
     try {
+      // Convert token to uppercase to match backend expectation
+      final token = _codeController.text.trim().toUpperCase();
+      
       final response = await api<ApiService>(
         (request) => request.resetPassword(
-          token: _codeController.text.trim(),
+          token: token,
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
           passwordConfirmation: _confirmPasswordController.text.trim(),
@@ -667,12 +670,15 @@ class _ResetPasswordPageState extends NyPage<ResetPasswordPage> {
         String errorMessage = 'An error occurred. Please try again.';
         
         // Handle specific error cases
-        if (e.toString().contains('Invalid reset token') || e.toString().contains('expired') || e.toString().contains('Invalid reset code')) {
+        final errorString = e.toString().toLowerCase();
+        if (errorString.contains('invalid reset') || errorString.contains('expired') || errorString.contains('invalid reset code')) {
           errorMessage = 'Invalid or expired reset code. Please request a new password reset code.';
-        } else if (e.toString().contains('No user found')) {
+        } else if (errorString.contains('no user found') || errorString.contains('email')) {
           errorMessage = 'No user found with this email address.';
-        } else if (e.toString().contains('at least 8 characters')) {
+        } else if (errorString.contains('at least 8 characters') || errorString.contains('password')) {
           errorMessage = 'Password must be at least 8 characters long.';
+        } else if (errorString.contains('422') || errorString.contains('validation')) {
+          errorMessage = 'Please check your input and try again.';
         }
 
         ScaffoldMessenger.of(context).showSnackBar(

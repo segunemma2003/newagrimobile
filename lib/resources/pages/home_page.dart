@@ -85,7 +85,10 @@ class _HomePageState extends NyPage<HomePage> {
     final textColor = isDark ? Colors.white : const Color(0xFF131515);
     final secondaryTextColor = isDark ? Colors.grey[400]! : Colors.grey[500]!;
 
-    final userName = _userData?['name']?.toString() ?? "Alex Rivera";
+    final userName = _userData?['name']?.toString();
+    final displayName = (userName != null && userName.trim().isNotEmpty) 
+        ? userName.trim() 
+        : "User";
     final userAvatar = _userData?['avatar']?.toString();
 
     return Scaffold(
@@ -125,8 +128,8 @@ class _HomePageState extends NyPage<HomePage> {
                             ),
                             child: Center(
                               child: Text(
-                                userName.isNotEmpty
-                                    ? userName[0].toUpperCase()
+                                displayName.isNotEmpty
+                                    ? displayName[0].toUpperCase()
                                     : "A",
                                 style: TextStyle(
                                   color: primary,
@@ -153,7 +156,7 @@ class _HomePageState extends NyPage<HomePage> {
                           ),
                         ),
                         Text(
-                          userName,
+                          displayName,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,

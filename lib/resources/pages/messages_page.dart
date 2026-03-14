@@ -4,6 +4,7 @@ import '/app/models/message.dart';
 import '/app/networking/api_service.dart';
 import '/app/helpers/storage_helper.dart';
 import '/app/helpers/image_helper.dart';
+import '/app/helpers/text_helper.dart';
 import '/resources/pages/chat_detail_page.dart';
 
 class MessagesPage extends NyStatefulWidget {
@@ -134,8 +135,8 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                           otherUser?['role'] == 'facilitator'
                       ? 'instructor'
                       : 'student'
-                  ..lastMessagePreview =
-                      msgData['message'] ?? msgData['subject'] ?? ''
+                  ..lastMessagePreview = stripHtmlTags(
+                      msgData['message'] ?? msgData['subject'] ?? '')
                   ..lastMessageTime = msgData['created_at'] != null
                       ? DateTime.tryParse(msgData['created_at'].toString())
                       : null
@@ -152,8 +153,8 @@ class _MessagesPageState extends NyPage<MessagesPage> {
               if (msgTime != null &&
                   (conv.lastMessageTime == null ||
                       msgTime.isAfter(conv.lastMessageTime!))) {
-                conv.lastMessagePreview =
-                    msgData['message'] ?? msgData['subject'] ?? '';
+                conv.lastMessagePreview = stripHtmlTags(
+                    msgData['message'] ?? msgData['subject'] ?? '');
                 conv.lastMessageTime = msgTime;
                 conv.isRead = msgData['is_read'] ?? false;
               }
@@ -308,7 +309,7 @@ class _MessagesPageState extends NyPage<MessagesPage> {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
-                        // TODO: Open new message dialog
+                        routeTo("/instructors");
                       },
                       borderRadius: BorderRadius.circular(20),
                       child: Container(

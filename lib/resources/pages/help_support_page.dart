@@ -153,13 +153,13 @@ class _HelpSupportPageState extends NyPage<HelpSupportPage> {
                   _buildContactItem(
                     icon: Icons.email_outlined,
                     title: "Email",
-                    value: "support@agrisiti.com",
+                    value: "info@agrisiti.com",
                   ),
                   const SizedBox(height: 12),
                   _buildContactItem(
                     icon: Icons.phone_outlined,
                     title: "Phone",
-                    value: "+234 123 456 7890",
+                    value: "+447907853788",
                   ),
                   const SizedBox(height: 12),
                   _buildContactItem(

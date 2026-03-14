@@ -5,6 +5,7 @@ import 'package:nylo_framework/nylo_framework.dart';
 import '/app/forms/login_form.dart';
 import '/app/controllers/login_controller.dart';
 import '/app/helpers/storage_helper.dart';
+import '/config/keys.dart';
 import '/resources/pages/register_page.dart';
 
 class LoginPage extends NyStatefulWidget<LoginController> {
@@ -43,8 +44,22 @@ class _LoginPageState extends NyPage<LoginPage> {
         try {
           final isAuthenticated = await Auth.isAuthenticated();
           if (isAuthenticated) {
+          // Verify auth data is valid
+          final authData = safeReadAuthData();
+          if (authData != null && authData.isNotEmpty) {
             routeTo("/main");
             return;
+          } else {
+            // Auth flag says logged in but no valid data - clear it
+            try {
+              await Keys.auth.save(null);
+              await Keys.bearerToken.save(null);
+            } catch (e) {
+              // Suppress keychain errors
+            }
+            backpackDelete(Keys.auth);
+            backpackDelete(Keys.bearerToken);
+          }
           }
         } catch (e) {
           // Handle storage errors gracefully - check Backpack as fallback
@@ -55,7 +70,7 @@ class _LoginPageState extends NyPage<LoginPage> {
         }
         // Also check Backpack (session storage) as fallback
         var backpackAuth = safeReadAuthData();
-        if (backpackAuth != null) {
+        if (backpackAuth != null && backpackAuth.isNotEmpty) {
           routeTo("/main");
         }
       };

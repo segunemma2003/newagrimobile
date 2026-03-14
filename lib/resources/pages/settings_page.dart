@@ -10,6 +10,7 @@ import '/resources/pages/notification_settings_page.dart';
 import '/app/providers/language_provider.dart';
 import '/app/helpers/language_helper.dart';
 import '/app/helpers/storage_helper.dart';
+import '/resources/pages/login_page.dart';
 
 class SettingsPage extends NyStatefulWidget {
   static RouteView path = ("/settings", (_) => SettingsPage());
@@ -84,6 +85,12 @@ class _SettingsPageState extends NyPage<SettingsPage> {
               try {
                 await Keys.auth.save(null);
                 await Keys.bearerToken.save(null);
+                // Clear all cached data
+                await Keys.courses.save(null);
+                await Keys.certificates.save(null);
+                await Keys.forumPosts.save(null);
+                await Keys.notes.save(null);
+                await Keys.offlineQueue.save(null);
               } catch (e) {
                 if (!e.toString().contains('-34018')) {
                   print('Warning: Failed to clear auth data: $e');
@@ -91,7 +98,14 @@ class _SettingsPageState extends NyPage<SettingsPage> {
               }
               backpackDelete(Keys.auth);
               backpackDelete(Keys.bearerToken);
-              routeTo("/login");
+              
+              // Use pushAndRemoveUntil to prevent going back to dashboard
+              if (mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  (route) => false,
+                );
+              }
             },
             child: Text(
               LanguageHelper.logout,

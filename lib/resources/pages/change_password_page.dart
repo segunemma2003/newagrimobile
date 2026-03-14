@@ -576,14 +576,17 @@ class _ChangePasswordPageState extends NyPage<ChangePasswordPage> {
         String errorMessage = 'An error occurred. Please try again.';
         
         // Handle specific error cases
-        if (e.toString().contains('401') || e.toString().contains('Unauthenticated')) {
+        final errorString = e.toString().toLowerCase();
+        if (errorString.contains('401') || errorString.contains('unauthenticated')) {
           errorMessage = 'Your session has expired. Please login again.';
-        } else if (e.toString().contains('Current password is incorrect')) {
+        } else if (errorString.contains('current password is incorrect') || errorString.contains('incorrect')) {
           errorMessage = 'Current password is incorrect. Please try again.';
-        } else if (e.toString().contains('must be different')) {
+        } else if (errorString.contains('must be different') || errorString.contains('different')) {
           errorMessage = 'New password must be different from your current password.';
-        } else if (e.toString().contains('at least 8 characters')) {
+        } else if (errorString.contains('at least 8 characters') || errorString.contains('password')) {
           errorMessage = 'Password must be at least 8 characters long.';
+        } else if (errorString.contains('422') || errorString.contains('validation')) {
+          errorMessage = 'Please check your input and try again.';
         }
 
         ScaffoldMessenger.of(context).showSnackBar(

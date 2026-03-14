@@ -145,6 +145,17 @@ class CoursesController extends NyController {
       }
     } catch (e) {
       print("Sync Failed: $e");
+      // If sync fails due to FormatException or model decoder errors, clear corrupted cache
+      if (e.toString().contains('FormatException') || 
+          e.toString().contains('nyloModelDecoders') ||
+          e.toString().contains('Unexpected character')) {
+        try {
+          await Keys.courses.save(null);
+          print("Cleared corrupted courses cache");
+        } catch (clearError) {
+          print("Warning: Failed to clear corrupted cache: $clearError");
+        }
+      }
     }
   }
 
@@ -172,6 +183,12 @@ class CoursesController extends NyController {
     try {
       await Keys.auth.save(null);
       await Keys.bearerToken.save(null);
+      // Clear all cached data
+      await Keys.courses.save(null);
+      await Keys.certificates.save(null);
+      await Keys.forumPosts.save(null);
+      await Keys.notes.save(null);
+      await Keys.offlineQueue.save(null);
     } catch (e) {
       // Suppress error logging for Keychain issues on simulator
       if (!e.toString().contains('-34018')) {
@@ -181,6 +198,9 @@ class CoursesController extends NyController {
     // Clear from Backpack as well
     backpackDelete(Keys.auth);
     backpackDelete(Keys.bearerToken);
+    
+    // Use pushAndRemoveUntil to prevent going back to dashboard
+    // Note: This requires context, so this method should be called from a page
     routeTo("/login");
   }
 }

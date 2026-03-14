@@ -1,0 +1,4 @@
+
+module PusherTweetNacl.__Swift {
+  exclude header "PusherTweetNacl-Swift.h"
+}

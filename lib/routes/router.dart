@@ -17,6 +17,7 @@ import '/resources/pages/certificates_page.dart';
 import '/resources/pages/community_forum_page.dart';
 import '/resources/pages/forum_post_detail_page.dart';
 import '/resources/pages/chat_detail_page.dart';
+import '/resources/pages/instructors_page.dart';
 import '/resources/pages/change_password_page.dart';
 import '/resources/pages/forgot_password_page.dart';
 import '/resources/pages/reset_password_page.dart';
@@ -76,6 +77,7 @@ appRouter() => nyRoutes((router) {
         router.add(AssignmentPage.path);
         router.add(ProfilePage.path);
         router.add(MessagesPage.path);
+        router.add(InstructorsPage.path);
         router.add(EditProfilePage.path);
         router.add(CertificatesPage.path);
         router.add(CommunityForumPage.path);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:nylo_framework/nylo_framework.dart';
 import '/config/keys.dart';
+import '/app/helpers/storage_helper.dart';
 import 'dart:math' as math;
 
 class IntroPage extends NyStatefulWidget {
@@ -38,7 +39,18 @@ class _IntroPageState extends NyPage<IntroPage> {
 
       if (mounted) {
         if (isAuthenticated) {
-          routeTo("/main");
+          // Verify auth data is valid
+          final authData = safeReadAuthData();
+          if (authData != null && authData.isNotEmpty) {
+            routeTo("/main");
+          } else {
+            // Auth flag says logged in but no valid data - clear it
+            await Keys.auth.save(null);
+            await Keys.bearerToken.save(null);
+            backpackDelete(Keys.auth);
+            backpackDelete(Keys.bearerToken);
+            routeTo("/login");
+          }
         } else {
           routeTo("/login");
         }

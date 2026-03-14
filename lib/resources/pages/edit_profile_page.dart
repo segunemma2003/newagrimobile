@@ -69,12 +69,55 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
         setState(() {
           _selectedImagePath = image.path;
         });
+
+        // Upload image immediately
+        await _uploadAvatar(image.path);
       }
     } catch (e) {
       print('Error picking image: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error selecting image: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _uploadAvatar(String imagePath) async {
+    try {
+      final api = ApiService();
+      final response = await api.uploadAvatar(imagePath);
+
+      if (response['data'] != null && response['data']['user'] != null) {
+        final userData = response['data']['user'];
+        if (userData is Map<String, dynamic>) {
+          // Update local storage
+          await Keys.auth.save(userData);
+          backpackSave(Keys.auth, userData);
+
+          // Update local user data
+          _userData = userData;
+
+          // Clear selected image path since it's now uploaded
+          setState(() {
+            _selectedImagePath = null;
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Profile picture updated!'),
+              backgroundColor: accent,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error uploading avatar: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error uploading picture: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -174,6 +217,7 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
 
     return Scaffold(
       backgroundColor: bgColor,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Form(
           key: _formKey,
@@ -401,7 +445,7 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
                       _buildTextField(
                         label: "Location",
                         controller: _locationController,
-                        hintText: "City, Country",
+                        hintText: "City",
                         textColor: textColor,
                         secondaryTextColor: secondaryTextColor,
                         borderColor: borderColor,
@@ -409,7 +453,7 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
                         isDark: isDark,
                         validator: null, // Optional field
                       ),
-                      const SizedBox(height: 100), // Space for bottom button
+                      const SizedBox(height: 24), // Space for bottom button
                     ],
                   ),
                 ),
@@ -424,7 +468,9 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
           left: 16,
           right: 16,
           top: 16,
-          bottom: 16 + MediaQuery.of(context).padding.bottom,
+          bottom: 16 +
+              MediaQuery.of(context).viewInsets.bottom +
+              MediaQuery.of(context).padding.bottom,
         ),
         decoration: BoxDecoration(
           color: bgColor.withValues(alpha: 0.95),

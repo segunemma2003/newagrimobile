@@ -444,7 +444,7 @@ class _RegisterPageState extends NyPage<RegisterPage> {
                                 color: Colors.white,
                               ),
                               decoration: InputDecoration(
-                                hintText: "City, Country",
+                                hintText: "City",
                                 hintStyle: TextStyle(color: Colors.grey[500]),
                                 prefixIcon: Icon(
                                   Icons.location_on,

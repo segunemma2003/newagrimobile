@@ -9,6 +9,7 @@ import '/resources/pages/terms_conditions_page.dart';
 import '/resources/pages/edit_profile_page.dart';
 import '/resources/pages/certificates_page.dart';
 import '/resources/pages/change_password_page.dart';
+import '/resources/pages/login_page.dart';
 
 class ProfilePage extends NyStatefulWidget {
   static RouteView path = ("/profile", (_) => ProfilePage());
@@ -53,6 +54,12 @@ class _ProfilePageState extends NyPage<ProfilePage> {
       try {
         await Keys.auth.save(null);
         await Keys.bearerToken.save(null);
+        // Clear all cached data
+        await Keys.courses.save(null);
+        await Keys.certificates.save(null);
+        await Keys.forumPosts.save(null);
+        await Keys.notes.save(null);
+        await Keys.offlineQueue.save(null);
       } catch (e) {
         if (!e.toString().contains('-34018')) {
           print('Warning: Failed to clear auth data: $e');
@@ -61,10 +68,22 @@ class _ProfilePageState extends NyPage<ProfilePage> {
       // Clear from Backpack
       backpackDelete(Keys.auth);
       backpackDelete(Keys.bearerToken);
-      routeTo("/login");
+      
+      // Use pushAndRemoveUntil to prevent going back to dashboard
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => LoginPage()),
+          (route) => false,
+        );
+      }
     } catch (e) {
       print('Error during logout: $e');
-      routeTo("/login");
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => LoginPage()),
+          (route) => false,
+        );
+      }
     }
   }
 
