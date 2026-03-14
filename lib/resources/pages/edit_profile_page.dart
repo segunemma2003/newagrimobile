@@ -33,9 +33,12 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
   get init => () async {
         await _loadUserData();
         _nameController = TextEditingController(text: _userData?['name'] ?? '');
-        _emailController = TextEditingController(text: _userData?['email'] ?? '');
-        _phoneController = TextEditingController(text: _userData?['phone'] ?? '');
-        _locationController = TextEditingController(text: _userData?['location'] ?? '');
+        _emailController =
+            TextEditingController(text: _userData?['email'] ?? '');
+        _phoneController =
+            TextEditingController(text: _userData?['phone'] ?? '');
+        _locationController =
+            TextEditingController(text: _userData?['location'] ?? '');
       };
 
   Future<void> _loadUserData() async {
@@ -44,26 +47,12 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
       if (_userData == null) {
         _userData = safeReadAuthData();
       }
-      if (_userData == null) {
-        // Default dummy data
-        _userData = {
-          'name': 'Jane Doe',
-          'email': 'jane.doe@agrisiti.edu',
-          'phone': '+1 202 555 0124',
-          'avatar': 'https://lh3.googleusercontent.com/aida-public/AB6AXuDPB7fFIlsiilzBVXArm84X8tJvtf3upRxx8AkliGxEXbpmVCu9VQ58YxA1R_CDPx4amcSbOBSWx3M0E0_nhZpUJJHQtyT4vmw23RrKjb482WtS3q1XNkGwB0bqYth9z533x-1jTX-Z2stTtMZBMAzEwxMfhXY4lm2p8c-7G67TGWpE5iOJnql0qNfmmAjixHTRxwe2fpY8ELRiHY48ctQBn1QwxU2DK2G4mpvQhuyJhR2pGQrKLwR8Wl7jrmKjNJSojqesDWKUCZs',
-        };
-      }
       setState(() {});
     } catch (e) {
       if (!e.toString().contains('-34018')) {
         print('Warning: Failed to load user data: $e');
       }
-      _userData = safeReadAuthData() ?? {
-        'name': 'Jane Doe',
-        'email': 'jane.doe@agrisiti.edu',
-        'phone': '+1 202 555 0124',
-        'avatar': 'https://lh3.googleusercontent.com/aida-public/AB6AXuDPB7fFIlsiilzBVXArm84X8tJvtf3upRxx8AkliGxEXbpmVCu9VQ58YxA1R_CDPx4amcSbOBSWx3M0E0_nhZpUJJHQtyT4vmw23RrKjb482WtS3q1XNkGwB0bqYth9z533x-1jTX-Z2stTtMZBMAzEwxMfhXY4lm2p8c-7G67TGWpE5iOJnql0qNfmmAjixHTRxwe2fpY8ELRiHY48ctQBn1QwxU2DK2G4mpvQhuyJhR2pGQrKLwR8Wl7jrmKjNJSojqesDWKUCZs',
-      };
+      _userData = safeReadAuthData();
       setState(() {});
     }
   }
@@ -107,7 +96,12 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
       };
 
       // Remove null/empty values
-      updateData.removeWhere((key, value) => value == null || (value is String && value.isEmpty));
+      updateData.removeWhere((key, value) {
+        if (value == null) return true;
+        final strValue = value.toString();
+        if (strValue.isEmpty) return true;
+        return false;
+      });
 
       // Update via API
       final api = ApiService();
@@ -173,7 +167,8 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
 
     final currentAvatar = _selectedImagePath != null
         ? FileImage(File(_selectedImagePath!))
-        : (_userData?['avatar'] != null && _userData!['avatar'].toString().isNotEmpty
+        : (_userData?['avatar'] != null &&
+                _userData!['avatar'].toString().isNotEmpty
             ? NetworkImage(getImageUrl(_userData!['avatar']))
             : null);
 
@@ -186,12 +181,15 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
             children: [
               // Top Header
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 decoration: BoxDecoration(
                   color: bgColor.withValues(alpha: 0.8),
                   border: Border(
                     bottom: BorderSide(
-                      color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.05)
+                          : Colors.grey[100]!,
                     ),
                   ),
                 ),
@@ -247,10 +245,12 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
                             height: 128,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isDark ? (Colors.grey[800] ?? Colors.grey) : Colors.white,
-                              width: 4,
-                            ),
+                              border: Border.all(
+                                color: isDark
+                                    ? (Colors.grey[800] ?? Colors.grey)
+                                    : Colors.white,
+                                width: 4,
+                              ),
                               image: currentAvatar != null
                                   ? DecorationImage(
                                       image: currentAvatar as ImageProvider,
@@ -271,7 +271,8 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
                             child: currentAvatar == null
                                 ? Center(
                                     child: Text(
-                                      (_userData?['name'] ?? 'JD')[0].toUpperCase(),
+                                      (_userData?['name'] ?? 'JD')[0]
+                                          .toUpperCase(),
                                       style: TextStyle(
                                         fontSize: 48,
                                         fontWeight: FontWeight.w700,
@@ -297,12 +298,15 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
                                     color: primary,
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: isDark ? (Colors.grey[800] ?? Colors.grey) : Colors.white,
+                                      color: isDark
+                                          ? (Colors.grey[800] ?? Colors.grey)
+                                          : Colors.white,
                                       width: 2,
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.2),
+                                        color:
+                                            Colors.black.withValues(alpha: 0.2),
                                         blurRadius: 4,
                                         offset: const Offset(0, 2),
                                       ),
@@ -426,7 +430,9 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
           color: bgColor.withValues(alpha: 0.95),
           border: Border(
             top: BorderSide(
-              color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.grey[100]!,
             ),
           ),
         ),
@@ -499,7 +505,8 @@ class _EditProfilePageState extends NyPage<EditProfilePage> {
             ),
             filled: true,
             fillColor: inputBgColor,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: borderColor),

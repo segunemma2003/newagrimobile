@@ -22,6 +22,8 @@ dependencies: \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/image_picker_ios/image_picker_ios.framework/Headers/FLTImagePickerPlugin.h \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/package_info_plus/package_info_plus.framework/Modules/module.modulemap \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/package_info_plus/package_info_plus.framework/Headers/FPPPackageInfoPlusPlugin.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Modules/module.modulemap \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/PermissionHandlerPlugin.h \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/pusher_channels_flutter/pusher_channels_flutter.framework/Headers/PusherChannelsFlutterPlugin.h \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/share_plus/share_plus.framework/Modules/module.modulemap \
   /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/share_plus/share_plus.framework/Headers/FPPSharePlusPlugin.h \

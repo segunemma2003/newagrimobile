@@ -2210,7 +2210,7 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage> {
     bool isDark,
     Color accent,
   ) {
-    // Create a dummy lesson for the module quiz
+    // Create a lesson object for the module quiz
     final moduleQuizLesson = Lesson()
       ..id = module?.id ?? "module_quiz"
       ..title = "${module?.title ?? 'Module'} Assessment"

@@ -329,7 +329,6 @@ class VideoDownloadService {
       _downloadErrors[videoUrl] = error;
       _isDownloading[videoUrl] = false;
       _downloadProgress.remove(videoUrl);
-      _downloadTaskIds.remove(videoUrl);
       onError?.call(error);
       print(error);
       return null;
@@ -436,14 +435,6 @@ class VideoDownloadService {
       if (await file.exists()) {
         await file.delete();
 
-        // Cancel download task if exists
-        final taskId = _downloadTaskIds[videoUrl];
-        if (taskId != null) {
-          await FlutterDownloader.remove(
-              taskId: taskId, shouldDeleteContent: true);
-          _downloadTaskIds.remove(videoUrl);
-        }
-
         // Update lesson to remove video path
         await _updateLessonVideoPath(lessonId, '');
 
@@ -536,7 +527,6 @@ class VideoDownloadService {
 
         _downloadProgress.clear();
         _downloadErrors.clear();
-        _downloadTaskIds.clear();
       }
     } catch (e) {
       print("Error clearing downloads: $e");

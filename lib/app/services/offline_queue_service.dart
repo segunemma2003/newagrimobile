@@ -26,7 +26,7 @@ class OfflineQueueService {
   }) async {
     try {
       final queue = await getQueue();
-      
+
       final request = {
         'id': id ?? '${DateTime.now().millisecondsSinceEpoch}_${endpoint}',
         'method': method,
@@ -38,15 +38,14 @@ class OfflineQueueService {
       };
 
       // Check for duplicates (same endpoint and data)
-      queue.removeWhere((item) => 
-        item['endpoint'] == endpoint && 
-        item['method'] == method &&
-        _mapsEqual(item['data'], data)
-      );
+      queue.removeWhere((item) =>
+          item['endpoint'] == endpoint &&
+          item['method'] == method &&
+          _mapsEqual(item['data'], data));
 
       queue.add(request);
       await _saveQueue(queue);
-      
+
       print('Queued offline request: $method $endpoint');
     } catch (e) {
       print('Error queueing request: $e');
@@ -58,15 +57,18 @@ class OfflineQueueService {
     try {
       final queueJson = await Keys.offlineQueue.read<List>();
       if (queueJson == null) return [];
-      
-      return queueJson.map((item) {
-        if (item is Map<String, dynamic>) {
-          return item;
-        } else if (item is Map) {
-          return Map<String, dynamic>.from(item);
-        }
-        return <String, dynamic>{};
-      }).where((item) => item.isNotEmpty).toList();
+
+      return queueJson
+          .map((item) {
+            if (item is Map<String, dynamic>) {
+              return item;
+            } else if (item is Map) {
+              return Map<String, dynamic>.from(item);
+            }
+            return <String, dynamic>{};
+          })
+          .where((item) => item.isNotEmpty)
+          .toList();
     } catch (e) {
       print('Error reading queue: $e');
       return [];
@@ -124,7 +126,7 @@ class OfflineQueueService {
 
     // Save failed requests back to queue
     await _saveQueue(failedRequests);
-    
+
     // Update last sync timestamp
     await Keys.lastSyncTimestamp.save(DateTime.now().toIso8601String());
 
@@ -143,7 +145,7 @@ class OfflineQueueService {
       final data = request['data'] as Map<String, dynamic>?;
 
       final apiService = ApiService();
-      
+
       // Execute the request based on method using ApiService's network method
       try {
         switch (method.toUpperCase()) {
@@ -177,7 +179,9 @@ class OfflineQueueService {
       } catch (e) {
         // Check if it's a network error (should retry) or validation error (should not retry)
         final errorStr = e.toString().toLowerCase();
-        if (errorStr.contains('422') || errorStr.contains('validation') || errorStr.contains('400')) {
+        if (errorStr.contains('422') ||
+            errorStr.contains('validation') ||
+            errorStr.contains('400')) {
           // Validation errors - don't retry
           print('Validation error for request ${request['endpoint']}: $e');
           return false;
@@ -207,7 +211,7 @@ class OfflineQueueService {
     if (a == null && b == null) return true;
     if (a == null || b == null) return false;
     if (a.length != b.length) return false;
-    
+
     try {
       return jsonEncode(a) == jsonEncode(b);
     } catch (e) {

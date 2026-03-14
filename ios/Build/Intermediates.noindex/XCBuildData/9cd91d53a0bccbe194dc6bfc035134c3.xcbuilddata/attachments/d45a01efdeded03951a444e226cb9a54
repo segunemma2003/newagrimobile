@@ -1,0 +1,4 @@
+
+module pusher_channels_flutter.__Swift {
+  exclude header "pusher_channels_flutter-Swift.h"
+}

@@ -1,0 +1,28 @@
+moduledependenciestarget: \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Modules/module.modulemap \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/permission_handler_apple-umbrella.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk/System/Library/Frameworks/UIKit.framework/Modules/module.modulemap \
+  /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk/System/Library/Frameworks/Foundation.framework/Modules/module.modulemap \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/PermissionHandlerEnums.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/PermissionHandlerPlugin.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/Flutter.framework/Modules/module.modulemap \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/PermissionManager.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/AudioVideoPermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/PermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/UnknownPermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/AppTrackingTransparencyPermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/BackgroundRefreshStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/BluetoothPermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/ContactPermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/EventPermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/LocationPermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/MediaLibraryPermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/PhonePermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/PhotoPermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/SensorPermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/SpeechPermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/StoragePermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/NotificationPermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/CriticalAlertsPermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/AssistantPermissionStrategy.h \
+  /Users/mac/Projects/agrisiti_mobile/build/ios/Debug-iphoneos/permission_handler_apple/permission_handler_apple.framework/Headers/Codec.h

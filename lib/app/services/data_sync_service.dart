@@ -55,7 +55,7 @@ class DataSyncService {
     try {
       final response = await _apiService.fetchCourses();
       final data = response['data'] as List<dynamic>? ?? [];
-      
+
       // Save to local storage
       await Keys.courses.save(data);
       print('Synced ${data.length} courses');
@@ -68,8 +68,10 @@ class DataSyncService {
   Future<void> _syncEnrollments() async {
     try {
       final response = await _apiService.fetchMyEnrollments();
-      final data = response is List ? response : (response['data'] as List<dynamic>? ?? []);
-      
+      final data = response is List
+          ? response
+          : (response['data'] as List<dynamic>? ?? []);
+
       // Save enrollments (used for checking enrollment status)
       await Keys.courseProgress.save(data);
       print('Synced ${data.length} enrollments');
@@ -83,7 +85,7 @@ class DataSyncService {
     try {
       final response = await _apiService.fetchUserCertificates();
       final data = response['data'] as List<dynamic>? ?? [];
-      
+
       await Keys.certificates.save(data);
       print('Synced ${data.length} certificates');
     } catch (e) {
@@ -95,8 +97,10 @@ class DataSyncService {
   Future<void> _syncUserProfile() async {
     try {
       final response = await _apiService.getCurrentUser();
-      final userData = response is Map<String, dynamic> ? response : (response['data'] ?? response);
-      
+      final userData = response is Map<String, dynamic>
+          ? response
+          : (response['data'] ?? response);
+
       if (userData is Map<String, dynamic>) {
         await Keys.auth.save(userData);
         backpackSave(Keys.auth, userData);
@@ -121,13 +125,17 @@ class DataSyncService {
 
       // Update course in local courses list
       final courses = await Keys.courses.read<List>() ?? [];
-      final coursesList = courses.map((c) {
-        if (c is Map<String, dynamic>) return c;
-        if (c is Map) return Map<String, dynamic>.from(c);
-        return <String, dynamic>{};
-      }).where((c) => c.isNotEmpty).toList();
+      final coursesList = courses
+          .map((c) {
+            if (c is Map<String, dynamic>) return c;
+            if (c is Map) return Map<String, dynamic>.from(c);
+            return <String, dynamic>{};
+          })
+          .where((c) => c.isNotEmpty)
+          .toList();
 
-      final courseIndex = coursesList.indexWhere((c) => c['id']?.toString() == courseId);
+      final courseIndex =
+          coursesList.indexWhere((c) => c['id']?.toString() == courseId);
       if (courseIndex != -1) {
         coursesList[courseIndex] = courseData;
       } else {
@@ -156,7 +164,7 @@ class DataSyncService {
         if (lastSync != null) {
           final now = DateTime.now();
           final diff = now.difference(lastSync);
-          
+
           // Only refresh if last sync was more than 5 minutes ago
           if (diff.inMinutes < 5) {
             print('Data is fresh, skipping refresh');
@@ -212,7 +220,7 @@ class DataSyncService {
 
     final now = DateTime.now();
     final diff = now.difference(lastSync);
-    
+
     // Refresh if last sync was more than 30 minutes ago
     return diff.inMinutes > 30;
   }

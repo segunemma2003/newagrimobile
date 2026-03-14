@@ -1194,76 +1194,81 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
   }
 
   Future<void> _navigateToAssignment() async {
-    if (lesson?.assignmentId == null) return;
+    if (lesson?.assignmentId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("No assignment available for this lesson."),
+        ),
+      );
+      return;
+    }
 
     try {
-      // Load assignment from storage or create dummy
-      final assignmentsJson = await Keys.assignments.read<List>();
       Assignment? assignment;
 
-      if (assignmentsJson != null) {
-        final assignments =
-            assignmentsJson.map((a) => Assignment.fromJson(a)).toList();
-        assignment = assignments.firstWhere(
-          (a) => a.id == lesson!.assignmentId,
-          orElse: () => _createDummyAssignment(),
-        );
-      } else {
-        assignment = _createDummyAssignment();
+      // Try to load from local storage first
+      try {
+        final assignmentsJson = await Keys.assignments.read<List>();
+        if (assignmentsJson != null) {
+          final assignments =
+              assignmentsJson.map((a) => Assignment.fromJson(a)).toList();
+          assignment = assignments.firstWhere(
+            (a) => a.id == lesson!.assignmentId,
+          );
+        }
+      } catch (e) {
+        print("Error loading assignment from storage: $e");
       }
 
-      routeTo(AssignmentPage.path, data: {
-        "assignment": assignment,
-        "course": course,
-        "module": module,
-        "lesson": lesson,
-      });
-    } catch (e) {
-      // Create dummy assignment if not found
-      final assignment = _createDummyAssignment();
-      routeTo(AssignmentPage.path, data: {
-        "assignment": assignment,
-        "course": course,
-        "module": module,
-        "lesson": lesson,
-      });
-    }
-  }
+      // If not in storage, fetch from API
+      if (assignment == null && lesson?.assignmentId != null) {
+        try {
+          final api = ApiService();
+          final response =
+              await api.fetchAssignmentDetails(lesson!.assignmentId!);
+          final assignmentData = response['data'] ?? response;
+          assignment = Assignment.fromJson(assignmentData);
 
-  Assignment _createDummyAssignment() {
-    final assignment = Assignment()
-      ..id = lesson?.assignmentId ?? "assignment_${lesson?.id}"
-      ..courseId = course?.id
-      ..moduleId = module?.id
-      ..lessonId = lesson?.id
-      ..title = "${lesson?.title ?? 'Lesson'} Assignment"
-      ..description =
-          "Complete this assignment to demonstrate your understanding."
-      ..brief =
-          "In this assignment, you will apply what you've learned in this lesson. Follow the instructions carefully and submit your work before the due date."
-      ..requirements = [
-        "Include all required components",
-        "Follow the formatting guidelines",
-        "Submit in PDF or DOCX format",
-      ]
-      ..resources = [
-        {
-          "name": "Assignment_Template.pdf",
-          "url": "https://example.com/template.pdf",
-          "type": "pdf",
-          "size": "2.4 MB",
-        },
-        {
-          "name": "Grading_Rubric.docx",
-          "url": "https://example.com/rubric.docx",
-          "type": "docx",
-          "size": "1.1 MB",
-        },
-      ]
-      ..dueDate = DateTime.now().add(const Duration(days: 7))
-      ..estimatedHours = 2
-      ..status = 'not_submitted';
-    return assignment;
+          // Save to local storage
+          final assignmentsJson = await Keys.assignments.read<List>() ?? [];
+          assignmentsJson.add(assignment.toJson());
+          await Keys.assignments.save(assignmentsJson);
+        } catch (e) {
+          print("Error fetching assignment from API: $e");
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Failed to load assignment: ${e.toString()}"),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+      }
+
+      if (assignment != null) {
+        routeTo(AssignmentPage.path, data: {
+          "assignment": assignment,
+          "course": course,
+          "module": module,
+          "lesson": lesson,
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Assignment not found."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error navigating to assignment: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error loading assignment: ${e.toString()}"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Widget _buildQuickActionButton(
