@@ -42,11 +42,30 @@ class _IntroPageState extends NyPage<IntroPage> {
           // Verify auth data is valid
           final authData = safeReadAuthData();
           if (authData != null && authData.isNotEmpty) {
-            routeTo("/main");
+            // Check if bearer token exists
+            final token = await Keys.bearerToken.read<String>();
+            if (token != null && token.isNotEmpty) {
+              routeTo("/main");
+            } else {
+              // No token, clear auth and go to login
+              try {
+                await Keys.auth.save(null);
+                await Keys.bearerToken.save(null);
+              } catch (e) {
+                // Suppress keychain errors
+              }
+              backpackDelete(Keys.auth);
+              backpackDelete(Keys.bearerToken);
+              routeTo("/login");
+            }
           } else {
             // Auth flag says logged in but no valid data - clear it
-            await Keys.auth.save(null);
-            await Keys.bearerToken.save(null);
+            try {
+              await Keys.auth.save(null);
+              await Keys.bearerToken.save(null);
+            } catch (e) {
+              // Suppress keychain errors
+            }
             backpackDelete(Keys.auth);
             backpackDelete(Keys.bearerToken);
             routeTo("/login");

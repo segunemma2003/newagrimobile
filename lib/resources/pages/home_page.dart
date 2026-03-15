@@ -86,8 +86,8 @@ class _HomePageState extends NyPage<HomePage> {
     final secondaryTextColor = isDark ? Colors.grey[400]! : Colors.grey[500]!;
 
     final userName = _userData?['name']?.toString();
-    final displayName = (userName != null && userName.trim().isNotEmpty) 
-        ? userName.trim() 
+    final displayName = (userName != null && userName.trim().isNotEmpty)
+        ? userName.trim()
         : "User";
     final userAvatar = _userData?['avatar']?.toString();
 
@@ -188,211 +188,220 @@ class _HomePageState extends NyPage<HomePage> {
                 ],
               ),
             ),
-            // Scrollable Content
+            // Scrollable Content with Pull-to-Refresh
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Search Bar
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      child: Container(
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.05)
-                              : Colors.grey[50],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.grey[100]!,
-                            width: 1,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.02),
-                              blurRadius: 4,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 16),
-                              child: Icon(
-                                Icons.search,
-                                color: Colors.grey[400],
-                                size: 22,
-                              ),
-                            ),
-                            Expanded(
-                              child: TextField(
-                                decoration: InputDecoration(
-                                  hintText: "Search for courses...",
-                                  hintStyle: TextStyle(color: Colors.grey[400]),
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 14,
-                                  ),
-                                ),
-                                style: TextStyle(color: textColor),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // Continue Learning Section
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Continue Learning",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: primary,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              // TODO: Navigate to all courses
-                            },
-                            child: Text(
-                              "View All",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: accent,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Continue Learning Card
-                    if (_resumeCourse != null)
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await _loadCourses();
+                  _findResumeCourse();
+                  setState(() {});
+                },
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Search Bar
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: _buildContinueLearningCard(
-                          _resumeCourse!,
-                          bgColor,
-                          textColor,
-                          isDark,
-                        ),
-                      ),
-                    // My Dashboard Section
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "My Dashboard",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: primary,
-                              letterSpacing: -0.5,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        child: Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.05)
+                                : Colors.grey[50],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.grey[100]!,
+                              width: 1,
                             ),
-                          ),
-                          const SizedBox(height: 16),
-                          GridView.count(
-                            crossAxisCount: 2,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            mainAxisSpacing: 16,
-                            crossAxisSpacing: 16,
-                            childAspectRatio: 1.2,
-                            children: [
-                              _buildDashboardCard(
-                                icon: Icons.book,
-                                label: "My Courses",
-                                iconColor: accent,
-                                bgColor: accent.withValues(alpha: 0.1),
-                                borderColor: accent.withValues(alpha: 0.2),
-                                textColor: primary,
-                                isDark: isDark,
-                                onTap: () {
-                                  routeTo(CoursesPage.path);
-                                },
-                              ),
-                              _buildDashboardCard(
-                                icon: Icons.workspace_premium,
-                                label: "Certificates",
-                                iconColor: primary,
-                                bgColor: primary.withValues(alpha: 0.1),
-                                borderColor: primary.withValues(alpha: 0.2),
-                                textColor: primary,
-                                isDark: isDark,
-                                onTap: () {
-                                  routeTo(CertificatesPage.path);
-                                },
-                              ),
-                              _buildDashboardCard(
-                                icon: Icons.groups,
-                                label: "Community",
-                                iconColor: primary,
-                                bgColor: primary.withValues(alpha: 0.1),
-                                borderColor: primary.withValues(alpha: 0.2),
-                                textColor: primary,
-                                isDark: isDark,
-                                onTap: () {
-                                  routeTo(CommunityForumPage.path);
-                                },
-                              ),
-                              _buildDashboardCard(
-                                icon: Icons.support_agent,
-                                label: "Support",
-                                iconColor: accent,
-                                bgColor: accent.withValues(alpha: 0.1),
-                                borderColor: accent.withValues(alpha: 0.2),
-                                textColor: primary,
-                                isDark: isDark,
-                                onTap: () {
-                                  routeTo(HelpSupportPage.path);
-                                },
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.02),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-                    // Daily Recommendation Section
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Daily Recommendation",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: primary,
-                              letterSpacing: -0.5,
-                            ),
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 16),
+                                child: Icon(
+                                  Icons.search,
+                                  color: Colors.grey[400],
+                                  size: 22,
+                                ),
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    hintText: "Search for courses...",
+                                    hintStyle:
+                                        TextStyle(color: Colors.grey[400]),
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 14,
+                                    ),
+                                  ),
+                                  style: TextStyle(color: textColor),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 16),
-                          _buildDailyRecommendationCard(
-                            _allCourses.isNotEmpty ? _allCourses.first : null,
+                        ),
+                      ),
+                      // Continue Learning Section
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Continue Learning",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: primary,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                // TODO: Navigate to all courses
+                              },
+                              child: Text(
+                                "View All",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: accent,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Continue Learning Card
+                      if (_resumeCourse != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: _buildContinueLearningCard(
+                            _resumeCourse!,
                             bgColor,
                             textColor,
-                            secondaryTextColor,
                             isDark,
                           ),
-                        ],
+                        ),
+                      // My Dashboard Section
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "My Dashboard",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: primary,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            GridView.count(
+                              crossAxisCount: 2,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              mainAxisSpacing: 16,
+                              crossAxisSpacing: 16,
+                              childAspectRatio: 1.2,
+                              children: [
+                                _buildDashboardCard(
+                                  icon: Icons.book,
+                                  label: "My Courses",
+                                  iconColor: accent,
+                                  bgColor: accent.withValues(alpha: 0.1),
+                                  borderColor: accent.withValues(alpha: 0.2),
+                                  textColor: primary,
+                                  isDark: isDark,
+                                  onTap: () {
+                                    routeTo(CoursesPage.path);
+                                  },
+                                ),
+                                _buildDashboardCard(
+                                  icon: Icons.workspace_premium,
+                                  label: "Certificates",
+                                  iconColor: primary,
+                                  bgColor: primary.withValues(alpha: 0.1),
+                                  borderColor: primary.withValues(alpha: 0.2),
+                                  textColor: primary,
+                                  isDark: isDark,
+                                  onTap: () {
+                                    routeTo(CertificatesPage.path);
+                                  },
+                                ),
+                                _buildDashboardCard(
+                                  icon: Icons.groups,
+                                  label: "Community",
+                                  iconColor: primary,
+                                  bgColor: primary.withValues(alpha: 0.1),
+                                  borderColor: primary.withValues(alpha: 0.2),
+                                  textColor: primary,
+                                  isDark: isDark,
+                                  onTap: () {
+                                    routeTo(CommunityForumPage.path);
+                                  },
+                                ),
+                                _buildDashboardCard(
+                                  icon: Icons.support_agent,
+                                  label: "Support",
+                                  iconColor: accent,
+                                  bgColor: accent.withValues(alpha: 0.1),
+                                  borderColor: accent.withValues(alpha: 0.2),
+                                  textColor: primary,
+                                  isDark: isDark,
+                                  onTap: () {
+                                    routeTo(HelpSupportPage.path);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 100), // Space for bottom nav
-                  ],
+                      // Daily Recommendation Section
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Daily Recommendation",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: primary,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildDailyRecommendationCard(
+                              _allCourses.isNotEmpty ? _allCourses.first : null,
+                              bgColor,
+                              textColor,
+                              secondaryTextColor,
+                              isDark,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 100), // Space for bottom nav
+                    ],
+                  ),
                 ),
               ),
             ),

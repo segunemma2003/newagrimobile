@@ -35,12 +35,25 @@ String? _convertDartObjectStringToJson(String dartString) {
           return ': $val';
         }
         
-        // Keep numbers as-is
-        if (RegExp(r'^-?\d+(\.\d+)?$').hasMatch(val)) {
+        // Check if it's a phone number (starts with +, or starts with 0 and has digits, or has many digits)
+        // Phone numbers should always be strings, not numbers
+        final isPhoneNumber = val.startsWith('+') || 
+            (val.startsWith('0') && RegExp(r'^\d+$').hasMatch(val) && val.length >= 8) ||
+            (RegExp(r'^\d+$').hasMatch(val) && val.length >= 10);
+        
+        // Keep numbers as-is (but not phone numbers)
+        if (!isPhoneNumber && RegExp(r'^-?\d+(\.\d+)?$').hasMatch(val)) {
+          // Don't allow leading zeros in JSON numbers (they cause parsing errors)
+          // If it starts with 0 and has more digits, it's likely a phone number or ID, treat as string
+          if (val.startsWith('0') && val.length > 1 && !val.contains('.')) {
+            // Treat as string
+            val = val.replaceAll('"', '\\"');
+            return ': "$val"';
+          }
           return ': $val';
         }
         
-        // Quote everything else (strings)
+        // Quote everything else (strings, phone numbers, etc.)
         // Escape any existing quotes in the value
         val = val.replaceAll('"', '\\"');
         return ': "$val"';

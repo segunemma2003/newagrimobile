@@ -181,6 +181,15 @@ class CoursesController extends NyController {
 
   Future<void> logout() async {
     try {
+      // Clear all downloads first
+      try {
+        final downloadService = VideoDownloadService();
+        await downloadService.clearAllDownloads();
+        print('Cleared all downloaded videos');
+      } catch (e) {
+        print('Warning: Failed to clear downloads: $e');
+      }
+
       await Keys.auth.save(null);
       await Keys.bearerToken.save(null);
       // Clear all cached data
@@ -189,6 +198,8 @@ class CoursesController extends NyController {
       await Keys.forumPosts.save(null);
       await Keys.notes.save(null);
       await Keys.offlineQueue.save(null);
+      await Keys.categories.save(null);
+      await Keys.lastSyncTime.save(null);
     } catch (e) {
       // Suppress error logging for Keychain issues on simulator
       if (!e.toString().contains('-34018')) {

@@ -60,34 +60,15 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
         ]);
 
         final data = widget.data<Map<String, dynamic>>();
-        bool isEnrolledFlag = false;
         if (data != null) {
           lesson = data['lesson'] as Lesson?;
           course = data['course'] as Course?;
           module = data['module'] as Module?;
-          isEnrolledFlag = data['isEnrolled'] == true;
         }
         if (lesson != null && module != null && course != null) {
-          final isEnrolled = isEnrolledFlag || course!.isEnrolled == true;
+          // Never lock lessons - user requested no locking at all
+          lesson!.isLocked = false;
 
-          // Only apply locking rules when the user is NOT enrolled.
-          // If enrolled, all lessons should be open.
-          if (!isEnrolled) {
-            final isLocked =
-                await ProgressionService.isLessonLocked(lesson!, module!);
-            lesson!.isLocked = isLocked;
-
-            // Update lesson locks
-            await ProgressionService.updateLessonLocks(module!);
-
-            // If lesson is locked, show message and return
-            if (isLocked) {
-              setState(() {});
-              return;
-            }
-          } else {
-            lesson!.isLocked = false;
-          }
           await widget.controller.loadLesson(lesson!);
           // Initialize YouTube player for video lessons
           String? videoId;
@@ -473,71 +454,8 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
       );
     }
 
-    // Show locked state only for non-enrolled users
-    final isEnrolledForLesson = (course?.isEnrolled == true) ||
-        (widget.data<Map<String, dynamic>>()?['isEnrolled'] == true);
-
-    if (!isEnrolledForLesson && lesson!.isLocked == true) {
-      return Scaffold(
-        backgroundColor: bgColor,
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: bgColor,
-          automaticallyImplyLeading: true,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            color: textColor,
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Text(lesson!.title ?? "Lesson",
-              style: TextStyle(color: textColor)),
-        ),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.lock,
-                  size: 64,
-                  color: secondaryTextColor,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  "Lesson Locked",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: textColor,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Please complete the previous lesson to unlock this one.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: secondaryTextColor,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: accent,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 32, vertical: 12),
-                  ),
-                  child: const Text("Go Back"),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
+    // Never show locked screen - user requested no locking at all
+    // All lessons are always accessible
 
     final moduleNumber = module?.order ?? 1;
     final moduleTitle = module?.title ?? "Module $moduleNumber";
@@ -801,16 +719,15 @@ class _LessonDetailPageState extends NyPage<LessonDetailPage> {
                   if (lesson!.isCompleted == true)
                     Expanded(
                       child: ElevatedButton(
-                        onPressed:
-                            nextLesson != null && (nextLesson.isLocked != true)
-                                ? () {
-                                    routeTo(LessonDetailPage.path, data: {
-                                      "lesson": nextLesson,
-                                      "course": course,
-                                      "module": module,
-                                    });
-                                  }
-                                : null,
+                        onPressed: nextLesson != null
+                            ? () {
+                                routeTo(LessonDetailPage.path, data: {
+                                  "lesson": nextLesson,
+                                  "course": course,
+                                  "module": module,
+                                });
+                              }
+                            : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: accent,
                           foregroundColor: Colors.black87,

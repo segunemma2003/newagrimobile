@@ -27,6 +27,7 @@ class Quiz extends Model {
   String? question;
   List<QuizOption>? options;
   String? explanation;
+  String? image;
 
   static StorageKey key = 'quizzes';
 
@@ -37,6 +38,7 @@ class Quiz extends Model {
     lessonId = data['lesson_id']?.toString() ?? data['lessonId']?.toString();
     question = data['question'];
     explanation = data['explanation'];
+    image = data['image']?.toString();
     if (data['options'] != null) {
       options = (data['options'] as List)
           .map((option) => QuizOption.fromJson(option))
@@ -50,6 +52,7 @@ class Quiz extends Model {
         "lesson_id": lessonId,
         "question": question,
         "explanation": explanation,
+        "image": image,
         "options": options?.map((o) => o.toJson()).toList(),
       };
 }

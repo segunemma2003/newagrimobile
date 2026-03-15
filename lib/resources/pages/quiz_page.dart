@@ -7,6 +7,7 @@ import '/app/models/course.dart';
 import '/app/models/module.dart';
 import '/app/controllers/lesson_controller.dart';
 import '/app/networking/api_service.dart';
+import '/app/helpers/image_helper.dart';
 import '/resources/pages/course_detail_page.dart';
 
 class QuizPage extends NyStatefulWidget<LessonController> {
@@ -77,6 +78,7 @@ class _QuizPageState extends NyPage<QuizPage> {
           final quiz = Quiz();
           quiz.id = q['id']?.toString();
           quiz.question = q['question']?.toString();
+          quiz.image = q['image']?.toString();
 
           final options = <QuizOption>[];
           final optionsMap = q['options'] as Map<String, dynamic>? ?? {};
@@ -86,8 +88,8 @@ class _QuizPageState extends NyPage<QuizPage> {
               final option = QuizOption();
               option.id = key; // e.g. option_a
               option.text = value.toString();
-              option.isCorrect =
-                  (q['correct_answer']?.toString() ?? '') == key; // e.g. option_a
+              option.isCorrect = (q['correct_answer']?.toString() ?? '') ==
+                  key; // e.g. option_a
               options.add(option);
             }
           });
@@ -111,6 +113,7 @@ class _QuizPageState extends NyPage<QuizPage> {
           final quiz = Quiz();
           quiz.id = q['id']?.toString();
           quiz.question = q['question']?.toString();
+          quiz.image = q['image']?.toString();
 
           final options = <QuizOption>[];
           final optionsMap = q['options'] as Map<String, dynamic>? ?? {};
@@ -120,8 +123,7 @@ class _QuizPageState extends NyPage<QuizPage> {
               final option = QuizOption();
               option.id = key;
               option.text = value.toString();
-              option.isCorrect =
-                  (q['correct_answer']?.toString() ?? '') == key;
+              option.isCorrect = (q['correct_answer']?.toString() ?? '') == key;
               options.add(option);
             }
           });
@@ -441,17 +443,20 @@ class _QuizPageState extends NyPage<QuizPage> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  // Optional Image
-                  if (_currentQuizIndex % 3 == 0)
+                  // Show image only if quiz has an image from backend
+                  if (_quizzes[_currentQuizIndex].image != null &&
+                      _quizzes[_currentQuizIndex].image!.isNotEmpty)
                     Container(
                       height: 200,
+                      margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        image: const DecorationImage(
+                        image: DecorationImage(
                           image: NetworkImage(
-                            "https://lh3.googleusercontent.com/aida-public/AB6AXuDKR8PzicrDCAkkJN1sF2AcdwIy01_z-IbRFLpOY3mzLtlokiRXoVyFTjROWK4oxSp22KnqH3HqYBmeAWqP1i7k917dY5txEQEikp1nvkpwPbc8iE-NnYqYPYDt-hUJKZ-aRpB4x887KTHIONPDnbeQ5iEUEc0AEhrZwTkzydhYLfQOBB_VEF3t59CmBz4JD83ZSms3aNl49y6ueAfZDQ5Rb99ebxqk4psaL-GZFw8pDTZOBX2a2-tuMiaDO4K9gjSQDlxgtUNqyf8",
+                            getImageUrl(_quizzes[_currentQuizIndex].image!),
                           ),
                           fit: BoxFit.cover,
+                          onError: (_, __) {},
                         ),
                       ),
                       child: Stack(
@@ -846,8 +851,9 @@ class _QuizPageState extends NyPage<QuizPage> {
           padding: const EdgeInsets.all(16),
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-            color:
-                passed ? primary.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+            color: passed
+                ? primary.withValues(alpha: 0.1)
+                : Colors.red.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: passed ? primary : Colors.red,
@@ -996,8 +1002,9 @@ class _QuizPageState extends NyPage<QuizPage> {
               color: surfaceColor,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color:
-                    isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.grey[200]!,
               ),
             ),
             child: Column(

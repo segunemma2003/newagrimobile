@@ -1,5 +1,6 @@
 import '/resources/pages/login_page.dart';
 import '/config/keys.dart';
+import '/app/helpers/storage_helper.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 /* Auth Route Guard
@@ -25,8 +26,23 @@ class AuthRouteGuard extends NyRouteGuard {
       bool isLoggedIn = (await Auth.isAuthenticated());
       if (!isLoggedIn) {
         // Also check Backpack (session storage) as fallback
-        var backpackAuth = backpackRead(Keys.auth);
-        if (backpackAuth == null) {
+        var backpackAuth = safeReadAuthData();
+        if (backpackAuth == null || backpackAuth.isEmpty) {
+          return redirect(LoginPage.path);
+        }
+        // Also verify token exists
+        final token = await Keys.bearerToken.read<String>();
+        if (token == null || token.isEmpty) {
+          return redirect(LoginPage.path);
+        }
+      } else {
+        // Verify auth data is valid and token exists
+        final authData = safeReadAuthData();
+        if (authData == null || authData.isEmpty) {
+          return redirect(LoginPage.path);
+        }
+        final token = await Keys.bearerToken.read<String>();
+        if (token == null || token.isEmpty) {
           return redirect(LoginPage.path);
         }
       }
@@ -36,8 +52,17 @@ class AuthRouteGuard extends NyRouteGuard {
       if (!e.toString().contains('-34018')) {
         print('Warning: Failed to check authentication from storage: $e');
       }
-      var backpackAuth = backpackRead(Keys.auth);
-      if (backpackAuth == null) {
+      var backpackAuth = safeReadAuthData();
+      if (backpackAuth == null || backpackAuth.isEmpty) {
+        return redirect(LoginPage.path);
+      }
+      // Verify token exists
+      try {
+        final token = await Keys.bearerToken.read<String>();
+        if (token == null || token.isEmpty) {
+          return redirect(LoginPage.path);
+        }
+      } catch (e2) {
         return redirect(LoginPage.path);
       }
     }

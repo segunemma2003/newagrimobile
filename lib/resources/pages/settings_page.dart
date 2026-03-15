@@ -11,6 +11,7 @@ import '/app/providers/language_provider.dart';
 import '/app/helpers/language_helper.dart';
 import '/app/helpers/storage_helper.dart';
 import '/resources/pages/login_page.dart';
+import '/app/services/video_download_service.dart';
 
 class SettingsPage extends NyStatefulWidget {
   static RouteView path = ("/settings", (_) => SettingsPage());
@@ -82,29 +83,101 @@ class _SettingsPageState extends NyPage<SettingsPage> {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              try {
-                await Keys.auth.save(null);
-                await Keys.bearerToken.save(null);
-                // Clear all cached data
-                await Keys.courses.save(null);
-                await Keys.certificates.save(null);
-                await Keys.forumPosts.save(null);
-                await Keys.notes.save(null);
-                await Keys.offlineQueue.save(null);
-              } catch (e) {
-                if (!e.toString().contains('-34018')) {
-                  print('Warning: Failed to clear auth data: $e');
-                }
-              }
-              backpackDelete(Keys.auth);
-              backpackDelete(Keys.bearerToken);
               
-              // Use pushAndRemoveUntil to prevent going back to dashboard
-              if (mounted) {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                  (route) => false,
-                );
+              // Show loading dialog
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+
+              try {
+                // Clear all downloads first
+                try {
+                  final downloadService = VideoDownloadService();
+                  await downloadService.clearAllDownloads();
+                  print('Cleared all downloaded videos');
+                } catch (e) {
+                  print('Warning: Failed to clear downloads: $e');
+                }
+
+                // Clear auth data
+                try {
+                  await Keys.auth.save(null);
+                  await Keys.bearerToken.save(null);
+                  // Clear ALL cached data
+                  await Keys.courses.save(null);
+                  await Keys.modules.save(null);
+                  await Keys.lessons.save(null);
+                  await Keys.certificates.save(null);
+                  await Keys.forumPosts.save(null);
+                  await Keys.forumComments.save(null);
+                  await Keys.notes.save(null);
+                  await Keys.offlineQueue.save(null);
+                  await Keys.categories.save(null);
+                  await Keys.lastSyncTime.save(null);
+                  await Keys.lastSyncTimestamp.save(null);
+                  await Keys.courseProgress.save(null);
+                  await Keys.moduleProgress.save(null);
+                  await Keys.assignments.save(null);
+                  await Keys.comments.save(null);
+                  await Keys.reviews.save(null);
+                  await Keys.messages.save(null);
+                  await Keys.chatMessages.save(null);
+                  await Keys.notifications.save(null);
+                } catch (e) {
+                  if (!e.toString().contains('-34018')) {
+                    print('Warning: Failed to clear auth data: $e');
+                  }
+                }
+                backpackDelete(Keys.auth);
+                backpackDelete(Keys.bearerToken);
+                backpackDelete(Keys.courses);
+                backpackDelete(Keys.modules);
+                backpackDelete(Keys.lessons);
+                backpackDelete(Keys.certificates);
+                backpackDelete(Keys.forumPosts);
+                backpackDelete(Keys.forumComments);
+                backpackDelete(Keys.notes);
+                backpackDelete(Keys.offlineQueue);
+                backpackDelete(Keys.categories);
+                backpackDelete(Keys.lastSyncTime);
+                backpackDelete(Keys.lastSyncTimestamp);
+                backpackDelete(Keys.courseProgress);
+                backpackDelete(Keys.moduleProgress);
+                backpackDelete(Keys.assignments);
+                backpackDelete(Keys.comments);
+                backpackDelete(Keys.reviews);
+                backpackDelete(Keys.messages);
+                backpackDelete(Keys.chatMessages);
+                backpackDelete(Keys.notifications);
+                
+                // Close loading dialog
+                if (mounted) {
+                  Navigator.of(context).pop();
+                }
+                
+                // Use pushAndRemoveUntil to prevent going back to dashboard
+                if (mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                    (route) => false,
+                  );
+                }
+              } catch (e) {
+                print('Error during logout: $e');
+                // Close loading dialog if still open
+                if (mounted) {
+                  Navigator.of(context).pop();
+                }
+                if (mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                    (route) => false,
+                  );
+                }
               }
             },
             child: Text(

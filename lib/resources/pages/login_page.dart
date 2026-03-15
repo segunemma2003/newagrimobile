@@ -44,22 +44,36 @@ class _LoginPageState extends NyPage<LoginPage> {
         try {
           final isAuthenticated = await Auth.isAuthenticated();
           if (isAuthenticated) {
-          // Verify auth data is valid
-          final authData = safeReadAuthData();
-          if (authData != null && authData.isNotEmpty) {
-            routeTo("/main");
-            return;
-          } else {
-            // Auth flag says logged in but no valid data - clear it
-            try {
-              await Keys.auth.save(null);
-              await Keys.bearerToken.save(null);
-            } catch (e) {
-              // Suppress keychain errors
+            // Verify auth data is valid
+            final authData = safeReadAuthData();
+            if (authData != null && authData.isNotEmpty) {
+              // Check if bearer token exists
+              final token = await Keys.bearerToken.read<String>();
+              if (token != null && token.isNotEmpty) {
+                routeTo("/main");
+                return;
+              } else {
+                // No token, clear auth and stay on login page
+                try {
+                  await Keys.auth.save(null);
+                  await Keys.bearerToken.save(null);
+                } catch (e) {
+                  // Suppress keychain errors
+                }
+                backpackDelete(Keys.auth);
+                backpackDelete(Keys.bearerToken);
+              }
+            } else {
+              // Auth flag says logged in but no valid data - clear it
+              try {
+                await Keys.auth.save(null);
+                await Keys.bearerToken.save(null);
+              } catch (e) {
+                // Suppress keychain errors
+              }
+              backpackDelete(Keys.auth);
+              backpackDelete(Keys.bearerToken);
             }
-            backpackDelete(Keys.auth);
-            backpackDelete(Keys.bearerToken);
-          }
           }
         } catch (e) {
           // Handle storage errors gracefully - check Backpack as fallback
@@ -71,7 +85,21 @@ class _LoginPageState extends NyPage<LoginPage> {
         // Also check Backpack (session storage) as fallback
         var backpackAuth = safeReadAuthData();
         if (backpackAuth != null && backpackAuth.isNotEmpty) {
-          routeTo("/main");
+          // Verify token exists
+          final token = await Keys.bearerToken.read<String>();
+          if (token != null && token.isNotEmpty) {
+            routeTo("/main");
+          } else {
+            // No token, clear auth
+            try {
+              await Keys.auth.save(null);
+              await Keys.bearerToken.save(null);
+            } catch (e) {
+              // Suppress keychain errors
+            }
+            backpackDelete(Keys.auth);
+            backpackDelete(Keys.bearerToken);
+          }
         }
       };
 

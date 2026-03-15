@@ -91,7 +91,7 @@ class _SplashScreenState extends State<SplashScreen>
                           ],
                         ),
                         child: Image.asset(
-                          "logo-without.png",
+                          "public/images/logo-without.png",
                           width: 84,
                           height: 84,
                           fit: BoxFit.contain,

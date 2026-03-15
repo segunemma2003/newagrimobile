@@ -502,12 +502,17 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
                                 final created = ForumPost.fromJson(
                                     response['data'] ?? response);
 
+                                // Add to list immediately and reload from API to ensure consistency
                                 setState(() {
                                   _posts.insert(0, created);
                                   _sortPosts();
                                 });
 
                                 Navigator.of(context).pop();
+
+                                // Reload posts from API to ensure we have the latest data
+                                await _loadPosts();
+
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text("Post published"),
@@ -723,39 +728,52 @@ class _CommunityForumPageState extends NyPage<CommunityForumPage> {
                 ],
               ),
             ),
-            // Posts Feed
+            // Posts Feed with Pull-to-Refresh
             Expanded(
               child: _filteredPosts.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.forum_outlined,
-                              size: 64, color: secondaryTextColor),
-                          const SizedBox(height: 16),
-                          Text(
-                            "No posts found",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: secondaryTextColor,
+                  ? RefreshIndicator(
+                      onRefresh: _loadPosts,
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.5,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.forum_outlined,
+                                    size: 64, color: secondaryTextColor),
+                                const SizedBox(height: 16),
+                                Text(
+                                  "No posts found",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: secondaryTextColor,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     )
-                  : ListView.builder(
-                      itemCount: _filteredPosts.length,
-                      itemBuilder: (context, index) {
-                        return _buildPostCard(
-                          _filteredPosts[index],
-                          textColor,
-                          secondaryTextColor,
-                          surfaceColor,
-                          isDark,
-                          primary,
-                          secondary,
-                        );
-                      },
+                  : RefreshIndicator(
+                      onRefresh: _loadPosts,
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemCount: _filteredPosts.length,
+                        itemBuilder: (context, index) {
+                          return _buildPostCard(
+                            _filteredPosts[index],
+                            textColor,
+                            secondaryTextColor,
+                            surfaceColor,
+                            isDark,
+                            primary,
+                            secondary,
+                          );
+                        },
+                      ),
                     ),
             ),
           ],
