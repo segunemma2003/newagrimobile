@@ -52,6 +52,18 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                 _recipientId = parts[1];
               }
             }
+            // Also use senderId from conversation as recipientId (the other person in the chat)
+            if (_recipientId == null && _conversation!.senderId != null) {
+              _recipientId = _conversation!.senderId;
+            }
+            // Use conversation sender info for recipient
+            if (_recipientName == null && _conversation!.senderName != null) {
+              _recipientName = _conversation!.senderName;
+            }
+            if (_recipientAvatar == null &&
+                _conversation!.senderAvatar != null) {
+              _recipientAvatar = _conversation!.senderAvatar;
+            }
           }
           // Also check if course_id and recipient_id are passed directly
           if (data['courseId'] != null)
@@ -69,6 +81,11 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
         }
         _messageController = TextEditingController();
         await _loadCurrentUser();
+
+        // Debug: Print extracted values
+        print(
+            'ChatDetailPage init - courseId: $_courseId, recipientId: $_recipientId, currentUserId: $_currentUserId');
+
         await _loadMessages();
         _scrollToBottom();
 
@@ -165,7 +182,7 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
             });
           });
           _scrollToBottom();
-          
+
           // Don't show notification if we're already in this chat
           // (notification service will handle it for other cases)
         }
@@ -193,10 +210,10 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
       if (data == null) return;
 
       // Handle both direct message object and message_id
-      final messageId = data['id']?.toString() ?? 
-                       data['message_id']?.toString() ?? 
-                       data['message']?['id']?.toString();
-      
+      final messageId = data['id']?.toString() ??
+          data['message_id']?.toString() ??
+          data['message']?['id']?.toString();
+
       if (messageId != null) {
         setState(() {
           final messageIndex = _messages.indexWhere((m) => m.id == messageId);
@@ -223,10 +240,17 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
 
   Future<void> _loadMessages() async {
     if (_courseId == null || _currentUserId == null) {
+      print(
+          'ChatDetailPage: Cannot load messages - courseId: $_courseId, currentUserId: $_currentUserId');
       setState(() {
         _isLoading = false;
       });
       return;
+    }
+
+    if (_recipientId == null) {
+      print(
+          'ChatDetailPage: Warning - recipientId is null, trying to load messages anyway');
     }
 
     setState(() {
@@ -245,13 +269,23 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
             response is List ? response : (response['data'] ?? []);
         _messages = [];
 
+        print(
+            'ChatDetailPage: Loaded ${messagesData.length} messages from API');
+        print(
+            'ChatDetailPage: Filtering for currentUserId: $_currentUserId, recipientId: $_recipientId');
+
         for (var msgData in messagesData) {
           final senderId = msgData['sender_id']?.toString();
           final recipientId = msgData['recipient_id']?.toString();
-          
+
           // Only include messages in this conversation
-          if ((senderId == _currentUserId && recipientId == _recipientId) ||
-              (senderId == _recipientId && recipientId == _currentUserId)) {
+          // If recipientId is null, show all messages for this course (fallback)
+          final matchesConversation = _recipientId == null
+              ? true // Show all if recipientId not set
+              : ((senderId == _currentUserId && recipientId == _recipientId) ||
+                  (senderId == _recipientId && recipientId == _currentUserId));
+
+          if (matchesConversation) {
             final isSent = senderId == _currentUserId;
             final sender = msgData['sender'];
             final recipient = msgData['recipient'];
@@ -259,11 +293,15 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
 
             // Store recipient info for header
             if (!isSent && sender != null) {
-              _recipientName = sender['name'] ?? _conversation?.senderName ?? 'Unknown';
-              _recipientAvatar = sender['avatar'] ?? _conversation?.senderAvatar;
+              _recipientName =
+                  sender['name'] ?? _conversation?.senderName ?? 'Unknown';
+              _recipientAvatar =
+                  sender['avatar'] ?? _conversation?.senderAvatar;
             } else if (isSent && recipient != null) {
-              _recipientName = recipient['name'] ?? _conversation?.senderName ?? 'Unknown';
-              _recipientAvatar = recipient['avatar'] ?? _conversation?.senderAvatar;
+              _recipientName =
+                  recipient['name'] ?? _conversation?.senderName ?? 'Unknown';
+              _recipientAvatar =
+                  recipient['avatar'] ?? _conversation?.senderAvatar;
             }
 
             final chatMsg = ChatMessage()
@@ -297,12 +335,28 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
             }
           }
         }
-        
+
         // If recipient info not found in messages, use conversation data
         if (_recipientName == null && _conversation != null) {
           _recipientName = _conversation!.senderName;
           _recipientAvatar = _conversation!.senderAvatar;
         }
+
+        // If recipientId still not set but we have messages, try to extract it
+        if (_recipientId == null && _messages.isNotEmpty) {
+          // Get recipientId from first message
+          final firstMsg = _messages.first;
+          if (firstMsg.isSent == true && firstMsg.senderId != _currentUserId) {
+            _recipientId = firstMsg.senderId;
+          } else if (firstMsg.isSent == false) {
+            _recipientId = firstMsg.senderId;
+          }
+        }
+
+        print(
+            'ChatDetailPage: Loaded ${_messages.length} messages after filtering');
+        print(
+            'ChatDetailPage: Final recipientId: $_recipientId, recipientName: $_recipientName');
 
         // Sort by timestamp
         _messages.sort((a, b) {
@@ -314,7 +368,7 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
         setState(() {
           _isLoading = false;
         });
-        
+
         // Scroll to bottom after messages are loaded
         _scrollToBottom();
       } else {
@@ -341,7 +395,7 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
 
     final messageText = _messageController!.text.trim();
     _messageController!.clear();
-    
+
     // Dismiss keyboard
     FocusScope.of(context).unfocus();
 
@@ -379,12 +433,13 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
         // Update message with real ID and read status from server
         final msgData = response is Map ? response : response['data'];
         if (msgData != null && msgData['id'] != null) {
-          final messageIndex = _messages.indexWhere((m) => m.id == tempMessage.id);
+          final messageIndex =
+              _messages.indexWhere((m) => m.id == tempMessage.id);
           if (messageIndex != -1) {
             _messages[messageIndex].id = msgData['id']?.toString();
             _messages[messageIndex].timestamp = msgData['created_at'] != null
-              ? DateTime.tryParse(msgData['created_at'].toString())
-              : DateTime.now();
+                ? DateTime.tryParse(msgData['created_at'].toString())
+                : DateTime.now();
             _messages[messageIndex].isRead = msgData['is_read'] ?? false;
           }
         }
@@ -416,11 +471,11 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
 
   String _formatTime(DateTime? dateTime) {
     if (dateTime == null) return '';
-    
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
-    
+
     if (messageDate == today) {
       // Today - show time only
       final hour = dateTime.hour;
@@ -449,11 +504,11 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
 
   String _formatDate(DateTime? dateTime) {
     if (dateTime == null) return '';
-    
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
-    
+
     if (messageDate == today) {
       return 'Today';
     } else if (messageDate == today.subtract(const Duration(days: 1))) {
@@ -518,19 +573,20 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
         ),
         title: Row(
           children: [
-              Container(
-                width: 40,
-                height: 40,
-                margin: const EdgeInsets.only(right: 12),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                image: (_recipientAvatar != null && _recipientAvatar!.isNotEmpty)
-                    ? DecorationImage(
-                        image: NetworkImage(getImageUrl(_recipientAvatar!)),
-                    fit: BoxFit.cover,
-                    onError: (_, __) {},
-                      )
-                    : null,
+            Container(
+              width: 40,
+              height: 40,
+              margin: const EdgeInsets.only(right: 12),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image:
+                    (_recipientAvatar != null && _recipientAvatar!.isNotEmpty)
+                        ? DecorationImage(
+                            image: NetworkImage(getImageUrl(_recipientAvatar!)),
+                            fit: BoxFit.cover,
+                            onError: (_, __) {},
+                          )
+                        : null,
                 color: (_recipientAvatar == null || _recipientAvatar!.isEmpty)
                     ? Colors.white.withValues(alpha: 0.2)
                     : null,
@@ -547,7 +603,7 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                       ),
                     )
                   : null,
-              ),
+            ),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -555,15 +611,17 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                 children: [
                   Text(
                     _recipientName ?? _conversation?.senderName ?? "Chat",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   if (_conversation?.senderType != null)
                     Text(
-                      _conversation!.senderType == 'instructor' ? 'Instructor' : 'Student',
+                      _conversation!.senderType == 'instructor'
+                          ? 'Instructor'
+                          : 'Student',
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 12,
@@ -612,7 +670,8 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                                   Icon(
                                     Icons.chat_bubble_outline,
                                     size: 64,
-                                    color: secondaryTextColor.withValues(alpha: 0.5),
+                                    color: secondaryTextColor.withValues(
+                                        alpha: 0.5),
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
@@ -628,57 +687,64 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                                     "Start the conversation!",
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: secondaryTextColor.withValues(alpha: 0.7),
+                                      color: secondaryTextColor.withValues(
+                                          alpha: 0.7),
                                     ),
                                   ),
                                 ],
                               ),
                             )
-                      : ListView.builder(
-                          controller: _scrollController,
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          itemCount: _messages.length,
-                          itemBuilder: (context, index) {
-                            final message = _messages[index];
-                            final showDateDivider = index == 0 ||
-                                (_messages[index - 1].timestamp != null &&
-                                    message.timestamp != null &&
-                                    DateTime(
-                                          _messages[index - 1].timestamp!.year,
-                                          _messages[index - 1].timestamp!.month,
-                                          _messages[index - 1].timestamp!.day,
-                                        ) !=
+                          : ListView.builder(
+                              controller: _scrollController,
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              itemCount: _messages.length,
+                              itemBuilder: (context, index) {
+                                final message = _messages[index];
+                                final showDateDivider = index == 0 ||
+                                    (_messages[index - 1].timestamp != null &&
+                                        message.timestamp != null &&
                                         DateTime(
-                                          message.timestamp!.year,
-                                          message.timestamp!.month,
-                                          message.timestamp!.day,
-                                        ));
-                            
-                            return Column(
-                              children: [
-                                if (showDateDivider)
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 8),
-                                    child: Text(
-                                      _formatDate(message.timestamp),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: secondaryTextColor,
-                                        fontWeight: FontWeight.w500,
+                                              _messages[index - 1]
+                                                  .timestamp!
+                                                  .year,
+                                              _messages[index - 1]
+                                                  .timestamp!
+                                                  .month,
+                                              _messages[index - 1]
+                                                  .timestamp!
+                                                  .day,
+                                            ) !=
+                                            DateTime(
+                                              message.timestamp!.year,
+                                              message.timestamp!.month,
+                                              message.timestamp!.day,
+                                            ));
+
+                                return Column(
+                                  children: [
+                                    if (showDateDivider)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8),
+                                        child: Text(
+                                          _formatDate(message.timestamp),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: secondaryTextColor,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
                                       ),
+                                    _buildMessageBubble(
+                                      message,
+                                      textColor,
+                                      secondaryTextColor,
+                                      isDark,
                                     ),
-                                  ),
-                                _buildMessageBubble(
-                                  message,
-                                  textColor,
-                                  secondaryTextColor,
-                                  isDark,
-                                ),
-                              ],
-                            );
-                          },
-                        ),
+                                  ],
+                                );
+                              },
+                            ),
                 ),
                 // Input Area
                 Container(
@@ -989,7 +1055,7 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
     bool isDark,
   ) {
     final isSent = message.isSent == true;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       child: Row(
@@ -1018,17 +1084,17 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
               ),
               child:
                   message.senderAvatar == null || message.senderAvatar!.isEmpty
-                  ? Center(
-                      child: Text(
-                        (message.senderName ?? 'U')[0].toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: primary,
-                        ),
-                      ),
-                    )
-                  : null,
+                      ? Center(
+                          child: Text(
+                            (message.senderName ?? 'U')[0].toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: primary,
+                            ),
+                          ),
+                        )
+                      : null,
             ),
             const SizedBox(width: 4),
           ],
@@ -1083,9 +1149,7 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
                       if (isSent) ...[
                         const SizedBox(width: 4),
                         Icon(
-                          message.isRead == true 
-                              ? Icons.done_all 
-                              : Icons.done,
+                          message.isRead == true ? Icons.done_all : Icons.done,
                           size: 14,
                           color: message.isRead == true
                               ? (isDark ? secondary : Colors.blue)
@@ -1105,11 +1169,12 @@ class _ChatDetailPageState extends NyPage<ChatDetailPage> {
     );
   }
 
-  Widget _buildMessageContent(String content, bool isSent, bool isDark, Color textColor) {
+  Widget _buildMessageContent(
+      String content, bool isSent, bool isDark, Color textColor) {
     // Check if content contains HTML tags
-    final hasHtml = content.contains('<') && 
-                    (content.contains('</') || content.contains('/>'));
-    
+    final hasHtml = content.contains('<') &&
+        (content.contains('</') || content.contains('/>'));
+
     if (hasHtml) {
       return Html(
         data: content,

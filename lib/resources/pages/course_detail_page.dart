@@ -282,10 +282,19 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage>
     }
   }
 
-  Future<void> _loadReviews() async {
+  Future<void> _loadReviews({bool forceRefresh = false}) async {
     if (course?.id == null) return;
 
     try {
+      // Clear cache if forcing refresh
+      if (forceRefresh) {
+        try {
+          backpackDelete('course_reviews_${course!.id!}');
+        } catch (e) {
+          // Ignore cache deletion errors
+        }
+      }
+
       Map<String, dynamic>? response = await api<ApiService>(
         (request) =>
             request.fetchCourseReviews(course!.id!, perPage: 20, page: 1),
@@ -317,8 +326,9 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage>
             })
             .whereType<Review>()
             .toList();
-      } else if (course?.reviews != null && course!.reviews!.isNotEmpty) {
-        _reviews = List.from(course!.reviews!);
+      } else {
+        // Only use course.reviews as fallback if API returns empty, but don't use dummy data
+        _reviews = [];
       }
 
       if (_reviews.isNotEmpty) {
@@ -555,10 +565,19 @@ class _CourseDetailPageState extends NyPage<CourseDetailPage>
             child: RefreshIndicator(
               onRefresh: () async {
                 if (course?.id != null) {
-                  await widget.controller.loadCourseDetails(course!.id!);
+                  // Clear cache for course details before refreshing
+                  try {
+                    backpackDelete('course_${course!.id!}');
+                  } catch (e) {
+                    // Ignore cache deletion errors
+                  }
+
+                  // Force fresh data from API (bypass cache)
+                  await widget.controller
+                      .loadCourseDetails(course!.id!, forceRefresh: true);
                   course = widget.controller.course;
                   await _loadEnrollmentStatus();
-                  await _loadReviews();
+                  await _loadReviews(forceRefresh: true);
                   setState(() {});
                 }
               },

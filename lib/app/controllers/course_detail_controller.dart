@@ -13,22 +13,51 @@ class CourseDetailController extends NyController {
   Map<String, bool> lockedModules = {};
   Map<String, bool> lockedLessons = {};
 
-  Future<void> loadCourseDetails(String courseId) async {
+  Future<void> loadCourseDetails(String courseId, {bool forceRefresh = false}) async {
     if (await _isOnline()) {
       try {
-        Map<String, dynamic>? response = await api<ApiService>(
+        // Clear cache if forcing refresh
+        if (forceRefresh) {
+          try {
+            backpackDelete('course_$courseId');
+          } catch (e) {
+            // Ignore cache deletion errors
+          }
+        }
+        
+        dynamic response = await api<ApiService>(
           (request) => request.fetchCourse(courseId),
         );
 
         if (response != null) {
-          final data = response['data'] ?? response;
-          course = Course.fromJson(data);
-          await _saveCourseToStorage();
-          await _loadProgress();
-          return;
+          // Handle different response formats
+          dynamic data;
+          if (response is Map<String, dynamic>) {
+            data = response['data'] ?? response;
+          } else if (response is List && response.isNotEmpty) {
+            // If API returns a List directly, find the course by ID
+            data = response.firstWhere(
+              (item) => item is Map && (item['id']?.toString() == courseId || item['id'] == courseId),
+              orElse: () => null,
+            );
+            if (data == null) {
+              print("Course not found in list response");
+              return;
+            }
+          } else {
+            data = response;
+          }
+          
+          if (data != null && data is Map) {
+            course = Course.fromJson(data as Map<String, dynamic>);
+            await _saveCourseToStorage();
+            await _loadProgress();
+            return;
+          }
         }
       } catch (e) {
         print("Error fetching course details from API: $e");
+        // If API fails, continue to try loading from storage
       }
     }
 
@@ -104,10 +133,27 @@ class CourseDetailController extends NyController {
     if (course == null) return;
 
     try {
-      final progressJson = await Keys.courseProgress.read<List>();
-      if (progressJson != null) {
-        final progressList =
-            progressJson.map((json) => json as Map<String, dynamic>).toList();
+      dynamic progressData;
+      try {
+        progressData = await Keys.courseProgress.read<List>();
+      } catch (e) {
+        // If reading fails due to FormatException, try to handle it
+        if (e.toString().contains('FormatException') || e.toString().contains('Unexpected character')) {
+          print('Warning: Progress data may be corrupted, skipping...');
+          return;
+        }
+        rethrow;
+      }
+      
+      if (progressData != null && progressData is List) {
+        final progressList = progressData.map((json) {
+          if (json is Map<String, dynamic>) {
+            return json;
+          } else if (json is Map) {
+            return Map<String, dynamic>.from(json);
+          }
+          return <String, dynamic>{};
+        }).where((item) => item.isNotEmpty).toList();
 
         for (final progress in progressList) {
           if (progress['course_id'] == course!.id) {

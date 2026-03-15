@@ -25,6 +25,7 @@ import '/app/networking/api_service.dart';
 final Map<Type, dynamic> modelDecoders = {
   Map<String, dynamic>: (data) => Map<String, dynamic>.from(data),
   String: (data) => data.toString(),
+  List<dynamic>: (data) => List.from(data), // Add decoder for List<dynamic>
 
   List<User>: (data) =>
       List.from(data).map((json) => User.fromJson(json)).toList(),
