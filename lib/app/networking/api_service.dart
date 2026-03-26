@@ -799,12 +799,16 @@ class ApiService extends NyApiService {
   }
 
   /// Submit assignment - POST /assignments/{assignment_id}/submit
+  /// Accepts FormData for file upload
   Future submitAssignment(
-      String assignmentId, Map<String, dynamic> data) async {
+      String assignmentId, dynamic data) async {
     return await network(
       request: (request) => request.post(
         "/assignments/$assignmentId/submit",
         data: data,
+        options: Options(
+          contentType: 'multipart/form-data',
+        ),
       ),
     );
   }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:dio/dio.dart';
 import '/app/models/assignment.dart';
 import '/app/models/course.dart';
 import '/app/models/module.dart';
 import '/app/models/lesson.dart';
+import '/app/networking/api_service.dart';
 import '/app/helpers/text_helper.dart';
 import '/app/helpers/image_helper.dart';
 import '/config/keys.dart';
@@ -25,6 +27,8 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
   Map<String, bool> _requirementsCompleted = {};
   String? _submissionFilePath;
   String? _submissionFileName;
+  final TextEditingController _submissionContentController =
+      TextEditingController();
   bool _isSubmitting = false;
 
   // Color scheme
@@ -41,7 +45,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
           course = data['course'] as Course?;
           module = data['module'] as Module?;
           lesson = data['lesson'] as Lesson?;
-          
+
           // Load assignment from storage if exists
           if (assignment != null) {
             _loadAssignment();
@@ -51,26 +55,56 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
 
   Future<void> _loadAssignment() async {
     try {
-      final assignmentsJson = await Keys.assignments.read<List>();
-      if (assignmentsJson != null) {
-        final assignments = assignmentsJson.map((a) => Assignment.fromJson(a)).toList();
-        final savedAssignment = assignments.firstWhere(
-          (a) => a.id == assignment?.id,
-          orElse: () => assignment!,
-        );
-        assignment = savedAssignment;
-        _submissionFilePath = assignment?.submissionFilePath;
-        _submissionFileName = assignment?.submissionFile;
-        
-        // Load requirements completion status
-        if (assignment?.requirements != null) {
-          for (var req in assignment!.requirements!) {
-            _requirementsCompleted[req] = false;
+      // 1) Try to fetch fresh assignment from API (if id available)
+      if (assignment?.id != null) {
+        try {
+          final response = await api<ApiService>(
+            (request) => request.fetchAssignmentDetails(assignment!.id!),
+          );
+          if (response != null) {
+            final assignmentData = response is Map && response['data'] != null
+                ? response['data']
+                : response;
+            final fetched = Assignment.fromJson(assignmentData);
+            assignment = fetched;
           }
+        } catch (e) {
+          // Non-fatal: fall back to local cache
+          print("Warning: fetchAssignmentDetails failed: $e");
         }
-        
-        setState(() {});
       }
+
+      // 2) Fallback to local storage cache if needed
+      try {
+        final assignmentsJson = await Keys.assignments.read<List>();
+        if (assignmentsJson != null) {
+          final assignments =
+              assignmentsJson.map((a) => Assignment.fromJson(a)).toList();
+          final savedAssignment = assignments.firstWhere(
+            (a) => a.id == assignment?.id,
+            orElse: () => assignment!,
+          );
+          assignment = savedAssignment;
+        }
+      } catch (e) {
+        print("Warning: Error loading assignment from storage: $e");
+      }
+
+      // 3) Populate UI submission state from assignment fields
+      _submissionFilePath = assignment?.submissionFilePath;
+      _submissionFileName = assignment?.submissionFile;
+      if (_submissionContentController.text.trim().isEmpty) {
+        _submissionContentController.text = assignment?.description ?? "";
+      }
+
+      // Load requirements completion status
+      if (assignment?.requirements != null) {
+        for (var req in assignment!.requirements!) {
+          _requirementsCompleted[req] = false;
+        }
+      }
+
+      setState(() {});
     } catch (e) {
       print("Error loading assignment: $e");
     }
@@ -104,21 +138,22 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
 
   Future<void> _saveDraft() async {
     if (assignment == null) return;
-    
+
     try {
       assignment!.status = 'draft';
       assignment!.submissionFilePath = _submissionFilePath;
       assignment!.submissionFile = _submissionFileName;
-      
+
       final assignmentsJson = await Keys.assignments.read<List>() ?? [];
-      final assignments = assignmentsJson.map((a) => Assignment.fromJson(a)).toList();
-      
+      final assignments =
+          assignmentsJson.map((a) => Assignment.fromJson(a)).toList();
+
       // Remove old assignment if exists
       assignments.removeWhere((a) => a.id == assignment!.id);
       assignments.add(assignment!);
-      
+
       await Keys.assignments.save(assignments.map((a) => a.toJson()).toList());
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Draft saved successfully"),
@@ -136,8 +171,9 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
   }
 
   Future<void> _submitAssignment() async {
-    if (assignment == null) return;
-    
+    if (assignment == null || assignment!.id == null) return;
+    final submissionText = _submissionContentController.text.trim();
+
     if (_submissionFilePath == null || _submissionFileName == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -147,53 +183,84 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
       );
       return;
     }
-    
+    if (submissionText.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please type your submission before submitting"),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _isSubmitting = true;
     });
-    
+
     try {
+      // Build multipart form data for backend
+      final formData = FormData.fromMap({
+        'submission_content': submissionText,
+        'file': await MultipartFile.fromFile(
+          _submissionFilePath!,
+          filename: _submissionFileName,
+        ),
+      });
+
+      // Submit to backend
+      await api<ApiService>(
+        (request) => request.submitAssignment(assignment!.id!, formData),
+      );
+
+      // Mark as submitted locally
       assignment!.status = 'submitted';
       assignment!.submissionFilePath = _submissionFilePath;
       assignment!.submissionFile = _submissionFileName;
       assignment!.submittedAt = DateTime.now();
-      
+
+      // Persist to local cache
       final assignmentsJson = await Keys.assignments.read<List>() ?? [];
-      final assignments = assignmentsJson.map((a) => Assignment.fromJson(a)).toList();
-      
-      // Remove old assignment if exists
+      final assignments =
+          assignmentsJson.map((a) => Assignment.fromJson(a)).toList();
       assignments.removeWhere((a) => a.id == assignment!.id);
       assignments.add(assignment!);
-      
       await Keys.assignments.save(assignments.map((a) => a.toJson()).toList());
-      
+
       setState(() {
         _isSubmitting = false;
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Assignment submitted successfully!"),
           backgroundColor: primary,
         ),
       );
-      
+
       // Navigate back after a delay
       Future.delayed(const Duration(seconds: 1), () {
-        Navigator.of(context).pop();
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
       });
     } catch (e) {
       setState(() {
         _isSubmitting = false;
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Error submitting assignment: $e"),
+          content: Text("Error submitting assignment: ${e.toString()}"),
           backgroundColor: Colors.red,
         ),
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _submissionContentController.dispose();
+    super.dispose();
   }
 
   @override
@@ -231,7 +298,8 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
       );
     }
 
-    final isSubmitted = assignment!.status == 'submitted' || assignment!.status == 'graded';
+    final isSubmitted =
+        assignment!.status == 'submitted' || assignment!.status == 'graded';
     final statusText = isSubmitted
         ? "Submitted"
         : assignment!.status == 'draft'
@@ -259,7 +327,9 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
               color: bgColor,
               border: Border(
                 bottom: BorderSide(
-                  color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.grey[200]!,
                 ),
               ),
             ),
@@ -308,7 +378,8 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                   ),
                   const SizedBox(height: 24),
                   // Tabs
-                  _buildTabs(_selectedTab, textColor, secondaryTextColor, isDark),
+                  _buildTabs(
+                      _selectedTab, textColor, secondaryTextColor, isDark),
                   const SizedBox(height: 24),
                   // Tab Content
                   _buildTabContent(
@@ -332,7 +403,9 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                 color: bgColor.withValues(alpha: 0.95),
                 border: Border(
                   top: BorderSide(
-                    color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.1)
+                        : Colors.grey[200]!,
                   ),
                 ),
               ),
@@ -346,7 +419,9 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                           foregroundColor: textColor,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           side: BorderSide(
-                            color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey[300]!,
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.2)
+                                : Colors.grey[300]!,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -381,7 +456,8 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
                                 ),
                               )
                             : const Text(
@@ -416,7 +492,8 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
         color: surfaceColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+          color:
+              isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
         ),
       ),
       child: Column(
@@ -425,7 +502,8 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
           Container(
             height: 128,
             decoration: BoxDecoration(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
               image: course?.thumbnail != null
                   ? DecorationImage(
                       image: NetworkImage(getImageUrl(course!.thumbnail!)),
@@ -436,7 +514,8 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
             ),
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -457,11 +536,13 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+                        border: Border.all(
+                            color: statusColor.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -518,7 +599,8 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Icon(Icons.calendar_today, size: 18, color: secondaryTextColor),
+                    Icon(Icons.calendar_today,
+                        size: 18, color: secondaryTextColor),
                     const SizedBox(width: 8),
                     Text(
                       assignment.dueDate != null
@@ -560,7 +642,8 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
     );
   }
 
-  Widget _buildTabs(String selectedTab, Color textColor, Color secondaryTextColor, bool isDark) {
+  Widget _buildTabs(String selectedTab, Color textColor,
+      Color secondaryTextColor, bool isDark) {
     return Row(
       children: [
         Expanded(
@@ -612,9 +695,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: isSelected
-                  ? primary
-                  : Colors.transparent,
+              color: isSelected ? primary : Colors.transparent,
               width: 2,
             ),
           ),
@@ -642,12 +723,15 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
   ) {
     switch (tab) {
       case "Resources":
-        return _buildResourcesTab(assignment, surfaceColor, textColor, secondaryTextColor, isDark);
+        return _buildResourcesTab(
+            assignment, surfaceColor, textColor, secondaryTextColor, isDark);
       case "Submission":
-        return _buildSubmissionTab(assignment, surfaceColor, textColor, secondaryTextColor, isDark);
+        return _buildSubmissionTab(
+            assignment, surfaceColor, textColor, secondaryTextColor, isDark);
       case "Instructions":
       default:
-        return _buildInstructionsTab(assignment, surfaceColor, textColor, secondaryTextColor, isDark);
+        return _buildInstructionsTab(
+            assignment, surfaceColor, textColor, secondaryTextColor, isDark);
     }
   }
 
@@ -683,11 +767,15 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
             color: surfaceColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.grey[200]!,
             ),
           ),
           child: Text(
-            stripHtmlTags(assignment.brief ?? assignment.description ?? "No description available."),
+            stripHtmlTags(assignment.brief ??
+                assignment.description ??
+                "No description available."),
             style: TextStyle(
               fontSize: 16,
               color: textColor,
@@ -712,19 +800,23 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
           ],
         ),
         const SizedBox(height: 12),
-        if (assignment.requirements != null && assignment.requirements!.isNotEmpty)
+        if (assignment.requirements != null &&
+            assignment.requirements!.isNotEmpty)
           Container(
             decoration: BoxDecoration(
               color: surfaceColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.grey[200]!,
               ),
             ),
             child: Column(
-            children: assignment.requirements!.map((requirement) {
-                final isCompleted = _requirementsCompleted[requirement] ?? false;
-                
+              children: assignment.requirements!.map((requirement) {
+                final isCompleted =
+                    _requirementsCompleted[requirement] ?? false;
+
                 return InkWell(
                   onTap: () {
                     setState(() {
@@ -736,10 +828,14 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
-                          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100]!,
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.05)
+                              : Colors.grey[100]!,
                         ),
                       ),
-                      color: isCompleted ? primary.withValues(alpha: 0.05) : Colors.transparent,
+                      color: isCompleted
+                          ? primary.withValues(alpha: 0.05)
+                          : Colors.transparent,
                     ),
                     child: Row(
                       children: [
@@ -749,13 +845,18 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isCompleted ? primary : (isDark ? Colors.grey[600]! : Colors.grey[300]!),
+                              color: isCompleted
+                                  ? primary
+                                  : (isDark
+                                      ? Colors.grey[600]!
+                                      : Colors.grey[300]!),
                               width: 2,
                             ),
                             color: isCompleted ? primary : Colors.transparent,
                           ),
                           child: isCompleted
-                              ? const Icon(Icons.check, size: 14, color: Colors.white)
+                              ? const Icon(Icons.check,
+                                  size: 14, color: Colors.white)
                               : null,
                         ),
                         const SizedBox(width: 12),
@@ -765,8 +866,11 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: isCompleted ? textColor : secondaryTextColor,
-                              decoration: isCompleted ? TextDecoration.lineThrough : null,
+                              color:
+                                  isCompleted ? textColor : secondaryTextColor,
+                              decoration: isCompleted
+                                  ? TextDecoration.lineThrough
+                                  : null,
                             ),
                           ),
                         ),
@@ -784,7 +888,9 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
               color: surfaceColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.grey[200]!,
               ),
             ),
             child: Text(
@@ -828,7 +934,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
               final url = resource['url'];
               final type = resource['type'] ?? 'file';
               final size = resource['size'] ?? '';
-              
+
               IconData icon;
               Color iconColor;
               if (type == 'pdf' || name.toLowerCase().contains('.pdf')) {
@@ -838,7 +944,7 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                 icon = Icons.description;
                 iconColor = Colors.blue;
               }
-              
+
               return InkWell(
                 onTap: url != null
                     ? () async {
@@ -855,7 +961,9 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                     color: surfaceColor,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : Colors.grey[200]!,
                     ),
                   ),
                   child: Row(
@@ -909,7 +1017,9 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
               color: surfaceColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200]!,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.grey[200]!,
               ),
             ),
             child: Text(
@@ -928,8 +1038,9 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
     Color secondaryTextColor,
     bool isDark,
   ) {
-    final isSubmitted = assignment.status == 'submitted' || assignment.status == 'graded';
-    
+    final isSubmitted =
+        assignment.status == 'submitted' || assignment.status == 'graded';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -948,6 +1059,48 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
           ],
         ),
         const SizedBox(height: 12),
+        if (!isSubmitted) ...[
+          Text(
+            "Submission Notes",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _submissionContentController,
+            maxLines: 4,
+            decoration: InputDecoration(
+              hintText: "Type your response or notes for this assignment...",
+              filled: true,
+              fillColor: surfaceColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : Colors.grey[300]!,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : Colors.grey[300]!,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: primary),
+              ),
+            ),
+            style: TextStyle(color: textColor),
+          ),
+          const SizedBox(height: 16),
+        ],
         if (isSubmitted && _submissionFileName != null)
           Container(
             padding: const EdgeInsets.all(16),
@@ -1002,7 +1155,9 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                 color: surfaceColor,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.grey[300]!,
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : Colors.grey[300]!,
                   width: 2,
                   style: BorderStyle.solid,
                 ),
@@ -1012,7 +1167,9 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100],
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.05)
+                          : Colors.grey[100],
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -1083,8 +1240,18 @@ class _AssignmentPageState extends NyPage<AssignmentPage> {
 
   String _formatDate(DateTime date) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
     ];
     return "${months[date.month - 1]} ${date.day}, ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
   }

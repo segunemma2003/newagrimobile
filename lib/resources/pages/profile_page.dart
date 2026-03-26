@@ -3,6 +3,7 @@ import 'package:nylo_framework/nylo_framework.dart';
 import '/config/keys.dart';
 import '/app/helpers/storage_helper.dart';
 import '/app/helpers/image_helper.dart';
+import '/app/networking/api_service.dart';
 import '/resources/pages/notification_settings_page.dart';
 import '/resources/pages/help_support_page.dart';
 import '/resources/pages/terms_conditions_page.dart';
@@ -204,19 +205,101 @@ class _ProfilePageState extends NyPage<ProfilePage> {
       return;
     }
 
+    // Show password confirmation dialog
+    final passwordController = TextEditingController();
+    final passwordConfirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Confirm Password"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "Please enter your password to confirm account deletion:",
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: "Password",
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              if (passwordController.text.isNotEmpty) {
+                Navigator.of(context).pop(true);
+              }
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text("Delete"),
+          ),
+        ],
+      ),
+    );
+
+    if (passwordConfirmed != true || passwordController.text.isEmpty) {
+      return;
+    }
+
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
     try {
-      // Clear all user data
+      // Call backend API to delete account
+      await api<ApiService>(
+        (request) => request.deleteAccount(password: passwordController.text),
+      );
+
+      // Clear all user data locally
       try {
+        // Clear all downloads first
+        try {
+          final downloadService = VideoDownloadService();
+          await downloadService.clearAllDownloads();
+          print('Cleared all downloaded videos');
+        } catch (e) {
+          print('Warning: Failed to clear downloads: $e');
+        }
+
         await Keys.auth.save(null);
         await Keys.bearerToken.save(null);
         await Keys.courses.save(null);
+        await Keys.modules.save(null);
+        await Keys.lessons.save(null);
+        await Keys.certificates.save(null);
+        await Keys.forumPosts.save(null);
+        await Keys.forumComments.save(null);
+        await Keys.notes.save(null);
+        await Keys.offlineQueue.save(null);
+        await Keys.categories.save(null);
+        await Keys.lastSyncTime.save(null);
+        await Keys.lastSyncTimestamp.save(null);
         await Keys.courseProgress.save(null);
         await Keys.moduleProgress.save(null);
-        await Keys.notes.save(null);
         await Keys.assignments.save(null);
         await Keys.comments.save(null);
         await Keys.reviews.save(null);
         await Keys.messages.save(null);
+        await Keys.chatMessages.save(null);
+        await Keys.notifications.save(null);
       } catch (e) {
         if (!e.toString().contains('-34018')) {
           print('Warning: Failed to clear data: $e');
@@ -227,32 +310,45 @@ class _ProfilePageState extends NyPage<ProfilePage> {
       backpackDelete(Keys.auth);
       backpackDelete(Keys.bearerToken);
       backpackDelete(Keys.courses);
+      backpackDelete(Keys.modules);
+      backpackDelete(Keys.lessons);
+      backpackDelete(Keys.certificates);
+      backpackDelete(Keys.forumPosts);
+      backpackDelete(Keys.forumComments);
+      backpackDelete(Keys.notes);
+      backpackDelete(Keys.offlineQueue);
+      backpackDelete(Keys.categories);
+      backpackDelete(Keys.lastSyncTime);
+      backpackDelete(Keys.lastSyncTimestamp);
       backpackDelete(Keys.courseProgress);
       backpackDelete(Keys.moduleProgress);
-      backpackDelete(Keys.notes);
       backpackDelete(Keys.assignments);
       backpackDelete(Keys.comments);
       backpackDelete(Keys.reviews);
       backpackDelete(Keys.messages);
-
-      // In a real app, you would call an API to delete the account
-      // await api<ApiService>((request) => request.deleteAccount());
+      backpackDelete(Keys.chatMessages);
+      backpackDelete(Keys.notifications);
 
       if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Account deleted successfully"),
             backgroundColor: Colors.green,
           ),
         );
-        routeTo("/login");
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => LoginPage()),
+          (route) => false,
+        );
       }
     } catch (e) {
       print('Error during account deletion: $e');
       if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Error deleting account: $e"),
+            content: Text("Error deleting account: ${e.toString()}"),
             backgroundColor: Colors.red,
           ),
         );
