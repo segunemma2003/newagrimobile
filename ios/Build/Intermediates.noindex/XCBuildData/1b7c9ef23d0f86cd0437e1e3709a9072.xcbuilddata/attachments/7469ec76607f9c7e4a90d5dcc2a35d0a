@@ -1,4 +1,0 @@
-
-module OrderedSet.__Swift {
-  exclude header "OrderedSet-Swift.h"
-}

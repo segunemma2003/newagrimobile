@@ -1,5 +1,0 @@
-
-module PusherTweetNacl.Swift {
-  header "PusherTweetNacl-Swift.h"
-  requires objc
-}

@@ -1,5 +1,0 @@
-
-module PusherSwift.Swift {
-  header "PusherSwift-Swift.h"
-  requires objc
-}

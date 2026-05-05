@@ -1,5 +1,0 @@
-
-module NWWebSocket.Swift {
-  header "NWWebSocket-Swift.h"
-  requires objc
-}
